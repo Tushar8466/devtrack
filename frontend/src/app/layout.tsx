@@ -1,5 +1,6 @@
 import { FloatingNav } from "@/components/ui/floating-navbar";
 import "./globals.css";
+import { SessionProvider } from "@/components/providers/SessionProvider";
 
 export default function RootLayout({
   children,
@@ -15,8 +16,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="bg-black text-white">
-        <FloatingNav navItems={navItems} />
-        {children}
+        <SessionProvider>
+          <FloatingNav navItems={navItems} />
+          {children}
+        </SessionProvider>
       </body>
     </html>
   );

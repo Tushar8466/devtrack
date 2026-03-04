@@ -15,6 +15,7 @@
     "next-auth": "^4.24.13",
     "react": "19.2.3",
     "react-dom": "19.2.3",
+    "react-github-calendar": "^5.0.5",
     "tailwind-merge": "^3.5.0"
   },
   "devDependencies": {

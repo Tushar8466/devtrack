@@ -52,7 +52,7 @@ export const FloatingNav: React.FC<FloatingNavProps> = ({
 
         {/* CTA Button */}
         <button className="rounded-full bg-neutral-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-neutral-800 dark:bg-white dark:text-black dark:hover:bg-neutral-100">
-          Login
+          <a href="/sign-in">Sign In</a>
         </button>
       </div>
     </motion.div>
