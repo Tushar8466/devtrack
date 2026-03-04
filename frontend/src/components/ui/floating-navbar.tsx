@@ -30,7 +30,7 @@ export const FloatingNav: React.FC<FloatingNavProps> = ({
       )}
     >
       <div className="flex items-center gap-3 rounded-full border border-white/10 bg-white/80 px-4 py-2 shadow-xl backdrop-blur-md dark:bg-black/50">
-        
+
         {/* Navigation Links */}
         <div className="flex items-center gap-2">
           {navItems.map((item, index) => (

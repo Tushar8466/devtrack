@@ -15,7 +15,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="bg-black text-white">
-        <FloatingNav  navItems={navItems}/>
+        <FloatingNav navItems={navItems} />
         {children}
       </body>
     </html>
