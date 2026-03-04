@@ -58,13 +58,23 @@ export const BackgroundBeams = React.memo(
       "M-37 -581C-37 -581 31 -176 495 -49C959 78 1027 483 1027 483",
     ];
 
-    const motionParams = React.useMemo(() => {
-      return paths.map(() => ({
-        y2: `${93 + Math.random() * 8}%`,
-        duration: Math.random() * 10 + 10,
-        delay: Math.random() * 10
-      }));
-    }, [paths]);
+    const [motionParams, setMotionParams] = React.useState(
+      paths.map(() => ({
+        y2: "0%",
+        duration: 0,
+        delay: 0,
+      }))
+    );
+
+    React.useEffect(() => {
+      setMotionParams(
+        paths.map(() => ({
+          y2: `${93 + Math.random() * 8}%`,
+          duration: Math.random() * 10 + 10,
+          delay: Math.random() * 10
+        }))
+      );
+    }, []);
 
     return (
       <div
