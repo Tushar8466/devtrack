@@ -57,25 +57,6 @@ export const BackgroundBeams = React.memo(
       "M-44 -573C-44 -573 24 -168 488 -41C952 86 1020 491 1020 491",
       "M-37 -581C-37 -581 31 -176 495 -49C959 78 1027 483 1027 483",
     ];
-
-    const [motionParams, setMotionParams] = React.useState(
-      paths.map(() => ({
-        y2: "0%",
-        duration: 0,
-        delay: 0,
-      }))
-    );
-
-    React.useEffect(() => {
-      setMotionParams(
-        paths.map(() => ({
-          y2: `${93 + Math.random() * 8}%`,
-          duration: Math.random() * 10 + 10,
-          delay: Math.random() * 10
-        }))
-      );
-    }, []);
-
     return (
       <div
         className={cn(
@@ -88,6 +69,7 @@ export const BackgroundBeams = React.memo(
           width="100%"
           height="100%"
           viewBox="0 0 696 316"
+          preserveAspectRatio="none"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >
@@ -122,13 +104,13 @@ export const BackgroundBeams = React.memo(
                   x1: ["0%", "100%"],
                   x2: ["0%", "95%"],
                   y1: ["0%", "100%"],
-                  y2: ["0%", motionParams[index].y2],
+                  y2: ["0%", `${93 + Math.random() * 8}%`],
                 }}
                 transition={{
-                  duration: motionParams[index].duration,
+                  duration: Math.random() * 10 + 10,
                   ease: "easeInOut",
                   repeat: Infinity,
-                  delay: motionParams[index].delay,
+                  delay: Math.random() * 10,
                 }}
               >
                 <stop stopColor="#18CCFC" stopOpacity="0"></stop>
@@ -144,11 +126,11 @@ export const BackgroundBeams = React.memo(
               cy="0"
               r="1"
               gradientUnits="userSpaceOnUse"
-              gradientTransform="translate(352 34) rotate(90) scale(555 1560.62)"
+              gradientTransform="translate(352 34) rotate(90) scale(1000 2500)"
             >
               <stop offset="0.0666667" stopColor="#d4d4d4"></stop>
-              <stop offset="0.243243" stopColor="#d4d4d4"></stop>
-              <stop offset="0.43594" stopColor="white" stopOpacity="0"></stop>
+              <stop offset="0.5" stopColor="#d4d4d4"></stop>
+              <stop offset="1" stopColor="white" stopOpacity="0"></stop>
             </radialGradient>
           </defs>
         </svg>
