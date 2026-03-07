@@ -38,15 +38,15 @@ export default function StatsBar({ data }: StatsBarProps) {
     }
 
     const stats = [
-        { label: "Public Repos", value: publicRepos, icon: "📦", color: "text-blue-400" },
-        { label: "Total Stars", value: totalStars, icon: "⭐", color: "text-yellow-400" },
+        { label: "Public Repos", value: publicRepos, icon: "📦", color: "text-white" },
+        { label: "Total Stars", value: totalStars, icon: "⭐", color: "text-white" },
     ];
 
     if (contributions !== undefined) {
-        stats.push({ label: "Contributions (Year)", value: contributions, icon: "🔥", color: "text-orange-400" });
+        stats.push({ label: "Contributions (Year)", value: contributions, icon: "🔥", color: "text-white" });
     }
 
-    stats.push({ label: "Top Language", value: topLanguage, icon: "💻", color: "text-green-400" });
+    stats.push({ label: "Top Language", value: topLanguage, icon: "💻", color: "text-white" });
 
     return (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">

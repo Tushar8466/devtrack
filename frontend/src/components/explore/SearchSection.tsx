@@ -41,7 +41,7 @@ export default function SearchSection({ onSearch, isLoading, hideButton = false 
                             onChange={(e) => setUsername(e.target.value)}
                             placeholder="e.g. torvalds"
                             required
-                            className="w-full bg-black/40 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white placeholder-neutral-600 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all font-mono"
+                            className="w-full bg-black/40 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white placeholder-neutral-600 focus:outline-none focus:ring-2 focus:ring-white/30 transition-all font-mono"
                         />
                     </div>
                 </div>
@@ -51,7 +51,7 @@ export default function SearchSection({ onSearch, isLoading, hideButton = false 
                     <button
                         type="submit"
                         disabled={isLoading || !username.trim()}
-                        className="w-full bg-linear-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-medium py-3.5 px-4 rounded-xl transition-all shadow-lg hover:shadow-purple-500/25 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-2"
+                        className="w-full bg-white text-black hover:bg-neutral-200 font-semibold py-3.5 px-4 rounded-xl transition-all shadow-lg hover:shadow-white/10 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-2"
                     >
                         {isLoading ? (
                             <>

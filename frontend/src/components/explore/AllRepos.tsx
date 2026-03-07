@@ -45,7 +45,7 @@ export default function AllRepos({ data }: AllReposProps) {
         <div className="space-y-6">
             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
                 <h3 className="text-2xl font-bold flex items-center gap-2 text-white shrink-0">
-                    <span className="text-blue-400">📦</span> All Repositories
+                    <span className="text-neutral-300">📦</span> All Repositories
                     <span className="text-sm font-normal text-neutral-500 bg-white/10 px-2 py-0.5 rounded-full ml-2">
                         {filteredRepos.length}
                     </span>
@@ -65,7 +65,7 @@ export default function AllRepos({ data }: AllReposProps) {
                             placeholder="Find a repository..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full bg-white/5 border border-white/10 rounded-xl py-2 pl-10 pr-4 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all font-medium placeholder-neutral-500"
+                            className="w-full bg-white/5 border border-white/10 rounded-xl py-2 pl-10 pr-4 text-sm text-white focus:outline-none focus:ring-2 focus:ring-white/30 transition-all font-medium placeholder-neutral-500"
                         />
                     </div>
 
@@ -73,7 +73,7 @@ export default function AllRepos({ data }: AllReposProps) {
                     <select
                         value={selectedLanguage}
                         onChange={(e) => setSelectedLanguage(e.target.value)}
-                        className="w-full sm:w-40 bg-white/5 border border-white/10 rounded-xl py-2 px-4 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all font-medium appearance-none cursor-pointer"
+                        className="w-full sm:w-40 bg-white/5 border border-white/10 rounded-xl py-2 px-4 text-sm text-white focus:outline-none focus:ring-2 focus:ring-white/30 transition-all font-medium appearance-none cursor-pointer"
                     >
                         {languages.map((lang) => (
                             <option key={lang} value={lang} className="bg-neutral-900">{lang}</option>
@@ -93,7 +93,7 @@ export default function AllRepos({ data }: AllReposProps) {
                             className="flex flex-col justify-between p-5 rounded-2xl border border-white/5 bg-white/5 backdrop-blur-md hover:bg-white/10 hover:border-white/20 transition-all cursor-pointer h-full"
                         >
                             <div>
-                                <h4 className="font-bold text-lg text-blue-400 hover:text-blue-300 transition-colors truncate mb-2">
+                                <h4 className="font-bold text-lg text-white hover:text-neutral-300 transition-colors truncate mb-2">
                                     {repo.name}
                                 </h4>
                                 <p className="text-sm text-neutral-400 line-clamp-2 mb-4">
