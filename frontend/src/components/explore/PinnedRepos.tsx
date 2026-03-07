@@ -10,7 +10,7 @@ export default function PinnedRepos({ data }: PinnedReposProps) {
     return (
         <div className="space-y-6">
             <h3 className="text-2xl font-bold flex items-center gap-2 text-white">
-                <span className="text-purple-400">📌</span> Pinned Repositories
+                <span className="text-neutral-300">📌</span> Pinned Repositories
             </h3>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -20,11 +20,11 @@ export default function PinnedRepos({ data }: PinnedReposProps) {
                         href={repo.url}
                         target="_blank"
                         rel="noreferrer"
-                        className="group flex flex-col justify-between p-6 rounded-3xl border border-white/10 bg-white/5 backdrop-blur-md hover:bg-white/10 hover:border-purple-500/50 transition-all shadow-lg hover:shadow-purple-500/10 h-full"
+                        className="group flex flex-col justify-between p-6 rounded-3xl border border-white/10 bg-white/5 backdrop-blur-md hover:bg-white/10 hover:border-white/30 transition-all shadow-lg hover:shadow-black/30 h-full"
                     >
                         <div>
                             <div className="flex items-start justify-between mb-3">
-                                <h4 className="font-bold text-lg text-blue-400 group-hover:text-purple-400 transition-colors truncate pr-4">
+                                <h4 className="font-bold text-lg text-white group-hover:text-neutral-300 transition-colors truncate pr-4">
                                     {repo.name}
                                 </h4>
                             </div>

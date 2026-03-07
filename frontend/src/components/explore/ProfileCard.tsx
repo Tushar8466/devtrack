@@ -30,19 +30,19 @@ export default function ProfileCard({ data }: ProfileCardProps) {
     return (
         <div className="relative rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl shadow-2xl p-8 md:p-10 overflow-hidden">
             {/* Background glow */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/10 rounded-full blur-[100px] pointer-events-none" />
-            <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-500/10 rounded-full blur-[100px] pointer-events-none" />
+            <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-[100px] pointer-events-none" />
+            <div className="absolute bottom-0 left-0 w-64 h-64 bg-neutral-800/30 rounded-full blur-[100px] pointer-events-none" />
 
             <div className="relative flex flex-col md:flex-row items-center md:items-start gap-8">
                 <div className="relative shrink-0">
-                    <div className="absolute inset-0 bg-linear-to-br from-purple-500 to-blue-500 rounded-full blur-xl opacity-30 scale-110" />
+                    <div className="absolute inset-0 bg-linear-to-br from-neutral-600 to-neutral-800 rounded-full blur-xl opacity-30 scale-110" />
                     {avatarUrl ? (
                         <Image
                             src={avatarUrl}
                             alt="Profile avatar"
                             width={160}
                             height={160}
-                            className="relative rounded-full border-4 border-white/10 shadow-2xl ring-2 ring-purple-500/30 object-cover"
+                            className="relative rounded-full border-4 border-white/10 shadow-2xl ring-2 ring-white/20 object-cover"
                         />
                     ) : (
                         <div className="relative w-[160px] h-[160px] rounded-full border-4 border-white/10 bg-neutral-800 flex items-center justify-center text-6xl text-white font-bold">
@@ -55,7 +55,7 @@ export default function ProfileCard({ data }: ProfileCardProps) {
                     <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-white mb-1">
                         {name || login}
                     </h2>
-                    <p className="text-xl text-purple-400 font-medium mb-4">
+                    <p className="text-xl text-neutral-400 font-medium mb-4">
                         @{login}
                     </p>
 

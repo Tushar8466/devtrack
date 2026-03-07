@@ -1,148 +1,75 @@
 "use client";
 
 import { useState } from "react";
-import SearchSection from "@/components/explore/SearchSection";
-import ProfileCard from "@/components/explore/ProfileCard";
-import StatsBar from "@/components/explore/StatsBar";
-import PinnedRepos from "@/components/explore/PinnedRepos";
-import AllRepos from "@/components/explore/AllRepos";
-import LanguageBreakdown from "@/components/explore/LanguageBreakdown";
+import { useRouter } from "next/navigation";
+import { motion } from "motion/react";
+import { IconBrandGithub, IconSearch, IconArrowRight } from "@tabler/icons-react";
+import { WavyBackground } from "@/components/ui/wavy-background";
 
-export default function ExplorePage() {
+export default function AnalyzePage() {
     const [username, setUsername] = useState("");
-    const [pat, setPat] = useState("");
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-    const [profileData, setProfileData] = useState<any>(null);
+    const router = useRouter();
 
-    const fetchProfileData = async (searchUsername: string, token: string) => {
-        if (!searchUsername) return;
-
-        setLoading(true);
-        setError(null);
-        setProfileData(null);
-        setUsername(searchUsername);
-        setPat(token);
-
-        const headers: Record<string, string> = {};
-        if (token) {
-            headers["Authorization"] = `Bearer ${token}`;
-        }
-
-        try {
-            // Fetch REST API Data for User
-            const userRes = await fetch(`https://api.github.com/users/${searchUsername}`);
-            if (!userRes.ok) {
-                if (userRes.status === 404) throw new Error("User not found");
-                if (userRes.status === 403) throw new Error("API Rate limit exceeded. Please try again later.");
-                throw new Error(`REST Error: ${userRes.statusText}`);
-            }
-            const restData = await userRes.json();
-
-            // Fetch REST API Data for Repos
-            const reposRes = await fetch(`https://api.github.com/users/${searchUsername}/repos?sort=updated&per_page=100`);
-            const reposData = reposRes.ok ? await reposRes.json() : [];
-
-            // Map REST data to match expected "GraphQL" structure for the UI components
-            const mappedNodes = reposData.map((repo: any) => ({
-                name: repo.name,
-                description: repo.description,
-                stargazerCount: repo.stargazers_count,
-                forkCount: repo.forks_count,
-                primaryLanguage: repo.language ? { name: repo.language, color: "#8a2be2" } : null,
-                updatedAt: repo.updated_at,
-                url: repo.html_url
-            }));
-
-            // Simulate Pinned Items with top starred
-            const sortedByStars = [...mappedNodes].sort((a, b) => b.stargazerCount - a.stargazerCount);
-            const pinnedNodes = sortedByStars.slice(0, 6);
-
-            const graphqlData = {
-                name: restData.name,
-                bio: restData.bio,
-                avatarUrl: restData.avatar_url,
-                location: restData.location,
-                company: restData.company,
-                websiteUrl: restData.blog,
-                followers: { totalCount: restData.followers },
-                following: { totalCount: restData.following },
-                contributionsCollection: {
-                    contributionCalendar: {
-                        totalContributions: undefined // Unavailable via REST without scraping
-                    }
-                },
-                pinnedItems: {
-                    nodes: pinnedNodes
-                },
-                repositories: {
-                    nodes: mappedNodes
-                }
-            };
-
-            setProfileData({
-                rest: restData,
-                graphql: graphqlData
-            });
-
-        } catch (err: any) {
-            setError(err.message || "An unexpected error occurred while fetching data.");
-        } finally {
-            setLoading(false);
+    const handleAnalyze = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (username.trim()) {
+            router.push(`/analyze/${username.trim()}`);
         }
     };
 
     return (
-        <div className="min-h-screen bg-[#050510] text-white pt-28 pb-20 px-4 relative overflow-hidden">
-            {/* Background Ambience */}
-            <div className="absolute top-0 left-1/4 w-[800px] h-[800px] bg-blue-900/10 rounded-full blur-[180px] pointer-events-none -translate-y-1/2" />
-            <div className="absolute bottom-1/4 right-1/4 w-[600px] h-[600px] bg-purple-900/10 rounded-full blur-[150px] pointer-events-none" />
-
-            <div className="max-w-6xl mx-auto relative z-10 space-y-10">
-
-                <div className="text-center mb-12">
-                    <h1 className="text-4xl md:text-5xl font-bold tracking-tight bg-linear-to-r from-blue-400 via-purple-400 to-indigo-400 bg-clip-text text-transparent mb-4">
-                        GitHub Profile Explorer
-                    </h1>
-                    <p className="text-neutral-400 max-w-2xl mx-auto">
-                        Deep dive into any GitHub profile. View comprehensive statistics, top repositories, language distribution, and more.
-                    </p>
+        <WavyBackground
+            backgroundFill="black"
+            colors={["#8b5cf6", "#6366f1", "#0ea5e9", "#14b8a6", "#3b82f6"]}
+            waveWidth={30}
+            containerClassName="min-h-screen flex flex-col items-center justify-center px-4"
+        >
+            <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, ease: "easeOut" }}
+                className="w-full max-w-lg text-center bg-black/40 backdrop-blur-xl border border-white/10 p-10 rounded-3xl"
+            >
+                {/* Logo */}
+                <div className="flex items-center justify-center gap-3 mb-8">
+                    <div className="w-10 h-10 rounded-lg bg-linear-to-br from-violet-500 to-indigo-600 flex items-center justify-center">
+                        <IconBrandGithub className="w-5 h-5 text-white" />
+                    </div>
+                    <span className="text-white font-bold text-2xl tracking-tight">Devtrack</span>
                 </div>
 
-                <SearchSection onSearch={fetchProfileData} isLoading={loading} hideButton={!!profileData && !loading && !error} />
+                <h1 className="text-4xl font-bold text-white mb-3">
+                    Analyze a GitHub Profile
+                </h1>
+                <p className="text-neutral-300 text-lg mb-10">
+                    Enter a GitHub username to scan for AI-generated contribution signals.
+                </p>
 
-                {error && (
-                    <div className="bg-red-500/10 border border-red-500/30 text-red-400 p-6 rounded-2xl text-center max-w-2xl mx-auto shadow-lg">
-                        <h3 className="text-lg font-semibold mb-2">Error Fetching Profile</h3>
-                        <p>{error}</p>
+                <form onSubmit={handleAnalyze} className="flex gap-3">
+                    <div className="flex-1 relative">
+                        <IconSearch className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500" />
+                        <input
+                            type="text"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            placeholder="e.g. torvalds"
+                            className="w-full pl-11 pr-4 py-3.5 bg-neutral-900 border border-neutral-700 rounded-xl text-white placeholder-neutral-500 focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500/50 transition-all font-mono"
+                        />
                     </div>
-                )}
+                    <button
+                        type="submit"
+                        disabled={!username.trim()}
+                        className="px-5 py-3.5 bg-violet-600 hover:bg-violet-500 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-xl font-semibold transition-all flex items-center gap-2 whitespace-nowrap"
+                    >
+                        Analyze
+                        <IconArrowRight className="w-4 h-4" />
+                    </button>
+                </form>
 
-                {loading && (
-                    <div className="space-y-8 animate-pulse">
-                        {/* Skeleton states */}
-                        <div className="h-64 bg-white/5 rounded-3xl border border-white/5"></div>
-                        <div className="h-32 bg-white/5 rounded-3xl border border-white/5"></div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {[1, 2, 3, 4, 5, 6].map(i => (
-                                <div key={i} className="h-48 bg-white/5 rounded-2xl border border-white/5"></div>
-                            ))}
-                        </div>
-                    </div>
-                )}
-
-                {!loading && !error && profileData && (
-                    <div className="space-y-12 animate-in fade-in duration-700 slide-in-from-bottom-8">
-                        <ProfileCard data={profileData} />
-                        <StatsBar data={profileData} />
-                        <LanguageBreakdown data={profileData} />
-                        {profileData.graphql?.pinnedItems?.nodes?.length > 0 && (
-                            <PinnedRepos data={profileData.graphql.pinnedItems.nodes} />
-                        )}
-                        <AllRepos data={profileData} />
-                    </div>
-                )}
-            </div>
-        </div>
+                <p className="text-neutral-500 text-sm mt-5">
+                    Only scans public repositories · No code stored · GDPR-friendly
+                </p>
+            </motion.div>
+        </WavyBackground>
     );
 }
