@@ -104,7 +104,7 @@ export default function RepoCommits({ username, repoName, onClose }: RepoCommits
                 <div className="flex-1 overflow-y-auto p-4 md:p-6 bg-black">
                     {loading ? (
                         <div className="flex flex-col items-center justify-center h-full gap-4">
-                            <div className="w-10 h-10 rounded-full border-2 border-white/10 border-t-[#00e676] animate-spin" />
+                            <div className="w-10 h-10 rounded-full border-2 border-white/10 border-t-purple animate-spin" />
                             <p className="text-neutral-400 animate-pulse font-medium">Scanning commit history...</p>
                         </div>
                     ) : error ? (

@@ -43,6 +43,9 @@ export async function GET(req: NextRequest) {
             totalContributions = parseInt(totalMatch[1].replace(/,/g, ""), 10);
         }
 
+        // Sort chronologically (GitHub HTML has them row-by-row, so all Sundays, then all Mondays, etc.)
+        contributions.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
         return NextResponse.json({
             username,
             totalContributions,

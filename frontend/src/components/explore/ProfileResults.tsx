@@ -85,6 +85,172 @@ function MetricCard({ icon, iconBg, cardBgClass, title, score, description }: { 
     );
 }
 
+// GitHub-style contribution graph fetching real data
+function GitHubContributions({ username }: { username: string }) {
+    const [weeks, setWeeks] = useState<{ date: string; level: number; count: number }[][]>([]);
+    const [monthLabels, setMonthLabels] = useState<{ label: string; index: number }[]>([]);
+    const [totalActiveDays, setTotalActiveDays] = useState<number | null>(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        setLoading(true);
+        fetch(`/api/github/contributions?username=${username}`)
+            .then(r => r.json())
+            .then(data => {
+                const contribs = data.contributions || [];
+                setTotalActiveDays(data.totalContributions ?? 0);
+
+                if (contribs.length === 0) {
+                    setWeeks([]);
+                    return;
+                }
+
+                // Layout the grid (Sunday start)
+                const grid: { date: string; level: number; count: number }[][] = [];
+                let currentWeek: { date: string; level: number; count: number }[] = [];
+
+                const firstDate = new Date(contribs[0].date);
+                const startDayOfWeek = firstDate.getDay();
+
+                for (let i = 0; i < startDayOfWeek; i++) {
+                    currentWeek.push({ date: "", level: -1, count: 0 });
+                }
+
+                contribs.forEach((day: any) => {
+                    currentWeek.push(day);
+                    if (currentWeek.length === 7) {
+                        grid.push(currentWeek);
+                        currentWeek = [];
+                    }
+                });
+
+                if (currentWeek.length > 0) {
+                    while (currentWeek.length < 7) {
+                        currentWeek.push({ date: "", level: -1, count: 0 });
+                    }
+                    grid.push(currentWeek);
+                }
+
+                setWeeks(grid);
+
+                const labels: { label: string; index: number }[] = [];
+                let lastMonthIndex = -1;
+                grid.forEach((week, i) => {
+                    const firstValidDay = week.find(d => d.level !== -1);
+                    if (firstValidDay) {
+                        const d = new Date(firstValidDay.date);
+                        const monthIndex = d.getMonth();
+                        const m = d.toLocaleDateString("en-US", { month: "short" });
+                        if (monthIndex !== lastMonthIndex) {
+                            labels.push({ label: m, index: i });
+                            lastMonthIndex = monthIndex;
+                        }
+                    }
+                });
+                setMonthLabels(labels);
+            })
+            .catch(() => {
+                setWeeks([]);
+                setTotalActiveDays(0);
+            })
+            .finally(() => setLoading(false));
+    }, [username]);
+
+    if (!loading && weeks.length === 0) return null;
+
+    return (
+        <div className="w-full mb-8 animate-in fade-in duration-1000 font-sans">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-2">
+                <h2 className="text-[16px] font-normal text-neutral-200">
+                    {totalActiveDays !== null ? totalActiveDays.toLocaleString() : "—"} contributions in the last year
+                </h2>
+                <div className="text-[12px] text-neutral-400 hover:text-blue-400 cursor-pointer hidden sm:block">
+                    Contribution settings <span className="text-[10px] ml-1">▼</span>
+                </div>
+            </div>
+
+            <div className="border border-white/10 rounded-md p-4 bg-transparent">
+                {loading ? (
+                    <div className="flex items-center justify-center py-12">
+                        <div className="w-6 h-6 rounded-full border-2 border-white/20 border-t-emerald-400 animate-spin" />
+                    </div>
+                ) : (
+                    <>
+                        {/* Scrollable graph container */}
+                        <div className="overflow-x-auto custom-scrollbar pb-2">
+                            <div className="inline-block min-w-max">
+                                <div className="flex">
+                                    {/* Day-of-week labels */}
+                                    <div className="flex flex-col relative w-8 mr-1 shrink-0 text-[12px] text-neutral-400 pt-[16px] h-[100px]">
+                                        <span className="absolute top-[28px] leading-[10px]">Mon</span>
+                                        <span className="absolute top-[52px] leading-[10px]">Wed</span>
+                                        <span className="absolute top-[76px] leading-[10px]">Fri</span>
+                                    </div>
+
+                                    <div className="flex flex-col relative pt-[16px]">
+                                        {/* Month labels row */}
+                                        {monthLabels.map((m, i) => (
+                                            <span
+                                                key={i}
+                                                className="absolute top-0 text-[12px] text-neutral-400 whitespace-nowrap"
+                                                style={{ left: `${m.index * 12}px` }}
+                                            >
+                                                {m.label}
+                                            </span>
+                                        ))}
+
+                                        {/* Grid */}
+                                        <div className="flex gap-[2px]">
+                                            {weeks.map((week, wi) => (
+                                                <div key={wi} className="flex flex-col gap-[2px]">
+                                                    {week.map((day, di) => {
+                                                        if (day.level === -1) {
+                                                            return <div key={di} className="w-[10px] h-[10px] bg-transparent rounded-[2px]" />;
+                                                        }
+                                                        const bgClass =
+                                                            day.level === 0 ? "bg-[#161b22]" :
+                                                                day.level === 1 ? "bg-[#0e4429]" :
+                                                                    day.level === 2 ? "bg-[#006d32]" :
+                                                                        day.level === 3 ? "bg-[#26a641]" :
+                                                                            "bg-[#39d353]";
+                                                        // Title needs exactly exact format
+                                                        let titleText = `${day.count || 'No'} contributions on ${new Date(day.date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}`;
+                                                        if (day.level === 0) titleText = `No contributions on ${new Date(day.date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}`;
+
+                                                        return (
+                                                            <div
+                                                                key={di}
+                                                                className={`w-[10px] h-[10px] rounded-[2px] ${bgClass} transition-colors hover:ring-1 hover:ring-white cursor-pointer`}
+                                                                title={titleText}
+                                                            />
+                                                        );
+                                                    })}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Footer: Learn more + legend */}
+                        <div className="flex flex-wrap items-center justify-between mt-3 text-[12px] text-neutral-400">
+                            <a href="#" className="hover:text-blue-400 transition-colors">Learn how we count contributions</a>
+                            <div className="flex items-center gap-1 mt-2 sm:mt-0">
+                                <span className="mr-1">Less</span>
+                                {["bg-[#161b22]", "bg-[#0e4429]", "bg-[#006d32]", "bg-[#26a641]", "bg-[#39d353]"].map((c, i) => (
+                                    <div key={i} className={`rounded-[2px] ${c} w-[10px] h-[10px]`} />
+                                ))}
+                                <span className="ml-1">More</span>
+                            </div>
+                        </div>
+                    </>
+                )}
+            </div>
+        </div>
+    );
+}
+
 export default function ProfileResults({ data, onBack }: ProfileResultsProps) {
     const { rest, graphql } = data;
 
@@ -111,63 +277,6 @@ export default function ProfileResults({ data, onBack }: ProfileResultsProps) {
     const overallScore = useMemo(() => Math.round((aiScore + styleDrift + postMerge + repoTrend) / 4), [aiScore, styleDrift, postMerge, repoTrend]);
     const overallRisk = getOverallRisk(overallScore);
     const scanId = useMemo(() => `trace_${login.slice(0, 4)}${hashScore(login, 1000, 9999)}`, [login]);
-
-    // Fetch real GitHub contribution data
-    const [contribs, setContribs] = useState<{ date: string; level: number }[]>([]);
-    const [contribTotal, setContribTotal] = useState<number | null>(null);
-    const [contribLoading, setContribLoading] = useState(true);
-
-    useEffect(() => {
-        setContribLoading(true);
-        fetch(`/api/github/contributions?username=${login}`)
-            .then(r => r.json())
-            .then(data => {
-                setContribs(data.contributions || []);
-                setContribTotal(data.totalContributions ?? null);
-            })
-            .catch(() => {
-                setContribs([]);
-                setContribTotal(null);
-            })
-            .finally(() => setContribLoading(false));
-    }, [login]);
-
-    // Organize contributions into weeks (columns of 7 days)
-    const weeks = useMemo(() => {
-        if (contribs.length === 0) return [];
-        const result: { date: string; level: number }[][] = [];
-        const numWeeks = Math.ceil(contribs.length / 7);
-
-        for (let w = 0; w < numWeeks; w++) {
-            const week = [];
-            for (let d = 0; d < 7; d++) {
-                const index = d * numWeeks + w;
-                if (contribs[index]) {
-                    week.push(contribs[index]);
-                }
-            }
-            if (week.length > 0) result.push(week);
-        }
-        return result;
-    }, [contribs]);
-
-    // Extract month labels from contribution dates
-    const monthLabels = useMemo(() => {
-        if (weeks.length === 0) return [];
-        const labels: { label: string; index: number }[] = [];
-        let lastMonth = "";
-        weeks.forEach((week, i) => {
-            if (week[0]) {
-                const d = new Date(week[0].date);
-                const m = d.toLocaleDateString("en-US", { month: "short" });
-                if (m !== lastMonth) {
-                    labels.push({ label: m, index: i });
-                    lastMonth = m;
-                }
-            }
-        });
-        return labels;
-    }, [weeks]);
 
     return (
         <div className="min-h-screen bg-black text-white flex">
@@ -330,103 +439,7 @@ export default function ProfileResults({ data, onBack }: ProfileResultsProps) {
                     description="Monitors commit frequency, burst patterns and off-hours activity for increasing AI assistance over time."
                 />
 
-                {/* GitHub Contributions Calendar */}
-                <div className="bg-white/5 border border-white/10 rounded-2xl p-8">
-                    <h3 className="text-white font-bold text-xl mb-6">GitHub Contributions</h3>
-
-                    {contribLoading ? (
-                        <div className="flex items-center justify-center py-12">
-                            <div className="w-6 h-6 rounded-full border-2 border-white/20 border-t-emerald-400 animate-spin" />
-                            <span className="ml-3 text-neutral-500 text-sm">Loading contributions...</span>
-                        </div>
-                    ) : weeks.length > 0 ? (
-                        <>
-                            {/* Scrollable graph container */}
-                            <div className="overflow-x-auto pb-2">
-                                <div style={{ minWidth: weeks.length * 22 + 40 }}>
-
-                                    {/* Month labels row */}
-                                    <div className="flex mb-1" style={{ paddingLeft: 40 }}>
-                                        {monthLabels.map((m, i) => {
-                                            const nextIndex = monthLabels[i + 1]?.index ?? weeks.length;
-                                            const span = nextIndex - m.index;
-                                            return (
-                                                <span
-                                                    key={m.label + m.index}
-                                                    className="text-neutral-500 text-xs font-medium"
-                                                    style={{ width: span * 22 }}
-                                                >
-                                                    {m.label}
-                                                </span>
-                                            );
-                                        })}
-                                    </div>
-
-                                    {/* Grid: day labels + cells */}
-                                    <div className="flex">
-                                        {/* Day-of-week labels */}
-                                        <div className="flex flex-col shrink-0" style={{ width: 36, gap: 4 }}>
-                                            {["", "Mon", "", "Wed", "", "Fri", ""].map((d, i) => (
-                                                <span
-                                                    key={i}
-                                                    className="text-neutral-600 text-[11px] leading-none flex items-center"
-                                                    style={{ height: 18 }}
-                                                >
-                                                    {d}
-                                                </span>
-                                            ))}
-                                        </div>
-
-                                        {/* Week columns */}
-                                        <div className="flex" style={{ gap: 4 }}>
-                                            {weeks.map((week, wi) => (
-                                                <div key={wi} className="flex flex-col" style={{ gap: 4 }}>
-                                                    {week.map((day, di) => (
-                                                        <span
-                                                            key={di}
-                                                            className={`rounded-sm ${day.level === 0 ? "bg-[#161b22]" :
-                                                                day.level === 1 ? "bg-[#0e4429]" :
-                                                                    day.level === 2 ? "bg-[#006d32]" :
-                                                                        day.level === 3 ? "bg-[#26a641]" :
-                                                                            "bg-[#39d353]"
-                                                                }`}
-                                                            style={{ width: 18, height: 18 }}
-                                                            title={`${day.date}: Level ${day.level}`}
-                                                        />
-                                                    ))}
-                                                    {/* Fill empty days at end of last week */}
-                                                    {Array.from({ length: 7 - week.length }, (_, i) => (
-                                                        <span
-                                                            key={`e${i}`}
-                                                            className="rounded-sm bg-transparent"
-                                                            style={{ width: 18, height: 18 }}
-                                                        />
-                                                    ))}
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Footer: count + legend */}
-                            <div className="flex items-center justify-between mt-4">
-                                <span className="text-neutral-400 text-sm">
-                                    {contribTotal !== null ? contribTotal.toLocaleString() : "—"} contributions in the last year
-                                </span>
-                                <div className="flex items-center gap-1.5">
-                                    <span className="text-neutral-500 text-xs">Less</span>
-                                    {["bg-[#161b22]", "bg-[#0e4429]", "bg-[#006d32]", "bg-[#26a641]", "bg-[#39d353]"].map((c, i) => (
-                                        <span key={i} className={`rounded-sm ${c}`} style={{ width: 14, height: 14 }} />
-                                    ))}
-                                    <span className="text-neutral-500 text-xs">More</span>
-                                </div>
-                            </div>
-                        </>
-                    ) : (
-                        <p className="text-neutral-500 text-sm text-center py-8">No contribution data available for this user.</p>
-                    )}
-                </div>
+                <GitHubContributions username={login} />
 
                 {/* All Repositories Section */}
                 <div className="pt-8 border-t border-white/10 mt-8">
