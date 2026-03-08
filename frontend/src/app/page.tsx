@@ -1,5 +1,6 @@
 import HeroSection from "@/components/HeroSection";
 import { MacbookScroll } from "@/components/ui/macbook-scroll";
+import AnimatedDevTrackScreen from "@/components/ui/AnimatedDevTrackScreen";
 
 const features = [
   {
@@ -74,7 +75,7 @@ export default function Home() {
               <span className="text-violet-400">Instantly.</span>
             </span>
           }
-          src="/screenshot.png"
+          screenContent={<AnimatedDevTrackScreen />}
           showGradient={false}
         />
       </div>
