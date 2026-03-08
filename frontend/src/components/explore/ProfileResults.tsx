@@ -55,6 +55,49 @@ function CircularScore({ score, size = 100 }: { score: number; size?: number }) 
     );
 }
 
+// Deterministic sparkline chart from score seed
+function Sparkline({ score, color }: { score: number; color: string }) {
+    const points = useMemo(() => {
+        const pts: number[] = [];
+        let val = score * 0.6;
+        for (let i = 0; i < 12; i++) {
+            // deterministic pseudo-random walk seeded from score
+            const seed = (score * 17 + i * 37 + i * i * 3) % 40;
+            val = Math.min(100, Math.max(0, val + seed - 20));
+            pts.push(val);
+        }
+        return pts;
+    }, [score]);
+
+    const W = 220, H = 48;
+    const minV = Math.min(...points);
+    const maxV = Math.max(...points) || 1;
+    const toX = (i: number) => (i / (points.length - 1)) * W;
+    const toY = (v: number) => H - ((v - minV) / (maxV - minV + 0.001)) * (H - 6) - 2;
+    const polyline = points.map((v, i) => `${toX(i)},${toY(v)}`).join(" ");
+    const areaPath = `M${toX(0)},${toY(points[0])} ${points.map((v, i) => `L${toX(i)},${toY(v)}`).join(" ")} L${W},${H} L0,${H} Z`;
+
+    // Derive fill color from the barColor class string
+    const strokeColor =
+        color.includes("cyan") ? "#06b6d4" :
+            color.includes("amber") ? "#f59e0b" :
+                color.includes("red") ? "#ef4444" :
+                    "#10b981";
+
+    return (
+        <svg width="100%" height={H} viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" className="mt-1 opacity-80">
+            <defs>
+                <linearGradient id={`sg-${score}`} x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor={strokeColor} stopOpacity="0.3" />
+                    <stop offset="100%" stopColor={strokeColor} stopOpacity="0" />
+                </linearGradient>
+            </defs>
+            <path d={areaPath} fill={`url(#sg-${score})`} />
+            <polyline points={polyline} fill="none" stroke={strokeColor} strokeWidth="1.5" strokeLinejoin="round" strokeLinecap="round" />
+        </svg>
+    );
+}
+
 // Single metric card
 function MetricCard({ icon, iconBg, cardBgClass, title, score, description }: { icon: React.ReactNode; iconBg?: string; cardBgClass?: string; title: string; score: number; description: string }) {
     const risk = getRiskLabel(score);
@@ -80,6 +123,7 @@ function MetricCard({ icon, iconBg, cardBgClass, title, score, description }: { 
                     style={{ width: barWidth }}
                 />
             </div>
+            <Sparkline score={score} color={risk.barColor} />
             <p className="text-neutral-500 text-sm leading-relaxed">{description}</p>
         </div>
     );
@@ -176,70 +220,87 @@ function GitHubContributions({ username }: { username: string }) {
                     </div>
                 ) : (
                     <>
-                        {/* Scrollable graph container */}
-                        <div className="overflow-x-auto custom-scrollbar pb-2">
-                            <div className="inline-block min-w-max">
-                                <div className="flex">
+                        {/* Full-width SVG contribution graph */}
+                        {(() => {
+                            const COLS = weeks.length;
+                            const ROWS = 7;
+                            const DAY_LABEL_W = 28;
+                            const TOP_LABEL_H = 18;
+                            const CELL_GAP = 2;
+                            // We use a fixed viewBox width so SVG scales to full width
+                            const VW = 780;
+                            const gridW = VW - DAY_LABEL_W - 4;
+                            const cellSize = (gridW - (COLS - 1) * CELL_GAP) / COLS;
+                            const VH = TOP_LABEL_H + ROWS * cellSize + (ROWS - 1) * CELL_GAP + 4;
+
+                            const colorFor = (level: number) =>
+                                level === 0 ? "#161b22" :
+                                    level === 1 ? "#0e4429" :
+                                        level === 2 ? "#006d32" :
+                                            level === 3 ? "#26a641" : "#39d353";
+
+                            return (
+                                <svg
+                                    viewBox={`0 0 ${VW} ${VH}`}
+                                    width="100%"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    style={{ display: "block" }}
+                                >
                                     {/* Day-of-week labels */}
-                                    <div className="flex flex-col relative w-8 mr-1 shrink-0 text-[12px] text-neutral-400 pt-[16px] h-[100px]">
-                                        <span className="absolute top-[28px] leading-[10px]">Mon</span>
-                                        <span className="absolute top-[52px] leading-[10px]">Wed</span>
-                                        <span className="absolute top-[76px] leading-[10px]">Fri</span>
-                                    </div>
+                                    {["Mon", "Wed", "Fri"].map((label, idx) => {
+                                        const rowIndex = idx === 0 ? 1 : idx === 1 ? 3 : 5;
+                                        const y = TOP_LABEL_H + rowIndex * (cellSize + CELL_GAP) + cellSize / 2 + 3;
+                                        return (
+                                            <text key={label} x={0} y={y} fill="#6b7280" fontSize="8" fontFamily="sans-serif">
+                                                {label}
+                                            </text>
+                                        );
+                                    })}
 
-                                    <div className="flex flex-col relative pt-[16px]">
-                                        {/* Month labels row */}
-                                        {monthLabels.map((m, i) => (
-                                            <span
-                                                key={i}
-                                                className="absolute top-0 text-[12px] text-neutral-400 whitespace-nowrap"
-                                                style={{ left: `${m.index * 12}px` }}
-                                            >
+                                    {/* Month labels */}
+                                    {monthLabels.map((m, i) => {
+                                        const x = DAY_LABEL_W + m.index * (cellSize + CELL_GAP);
+                                        return (
+                                            <text key={i} x={x} y={12} fill="#6b7280" fontSize="8" fontFamily="sans-serif">
                                                 {m.label}
-                                            </span>
-                                        ))}
+                                            </text>
+                                        );
+                                    })}
 
-                                        {/* Grid */}
-                                        <div className="flex gap-[2px]">
-                                            {weeks.map((week, wi) => (
-                                                <div key={wi} className="flex flex-col gap-[2px]">
-                                                    {week.map((day, di) => {
-                                                        if (day.level === -1) {
-                                                            return <div key={di} className="w-[10px] h-[10px] bg-transparent rounded-[2px]" />;
-                                                        }
-                                                        const bgClass =
-                                                            day.level === 0 ? "bg-[#161b22]" :
-                                                                day.level === 1 ? "bg-[#0e4429]" :
-                                                                    day.level === 2 ? "bg-[#006d32]" :
-                                                                        day.level === 3 ? "bg-[#26a641]" :
-                                                                            "bg-[#39d353]";
-                                                        // Title needs exactly exact format
-                                                        let titleText = `${day.count || 'No'} contributions on ${new Date(day.date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}`;
-                                                        if (day.level === 0) titleText = `No contributions on ${new Date(day.date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}`;
-
-                                                        return (
-                                                            <div
-                                                                key={di}
-                                                                className={`w-[10px] h-[10px] rounded-[2px] ${bgClass} transition-colors hover:ring-1 hover:ring-white cursor-pointer`}
-                                                                title={titleText}
-                                                            />
-                                                        );
-                                                    })}
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                                    {/* Grid cells */}
+                                    {weeks.map((week, wi) =>
+                                        week.map((day, di) => {
+                                            if (day.level === -1) return null;
+                                            const x = DAY_LABEL_W + wi * (cellSize + CELL_GAP);
+                                            const y = TOP_LABEL_H + di * (cellSize + CELL_GAP);
+                                            const title = day.level === 0
+                                                ? `No contributions on ${day.date}`
+                                                : `${day.count} contributions on ${day.date}`;
+                                            return (
+                                                <rect
+                                                    key={`${wi}-${di}`}
+                                                    x={x} y={y}
+                                                    width={cellSize} height={cellSize}
+                                                    rx={1.5} ry={1.5}
+                                                    fill={colorFor(day.level)}
+                                                    className="hover:opacity-80 cursor-pointer transition-opacity"
+                                                >
+                                                    <title>{title}</title>
+                                                </rect>
+                                            );
+                                        })
+                                    )}
+                                </svg>
+                            );
+                        })()}
 
                         {/* Footer: Learn more + legend */}
                         <div className="flex flex-wrap items-center justify-between mt-3 text-[12px] text-neutral-400">
                             <a href="#" className="hover:text-blue-400 transition-colors">Learn how we count contributions</a>
                             <div className="flex items-center gap-1 mt-2 sm:mt-0">
                                 <span className="mr-1">Less</span>
-                                {["bg-[#161b22]", "bg-[#0e4429]", "bg-[#006d32]", "bg-[#26a641]", "bg-[#39d353]"].map((c, i) => (
-                                    <div key={i} className={`rounded-[2px] ${c} w-[10px] h-[10px]`} />
+                                {["#161b22", "#0e4429", "#006d32", "#26a641", "#39d353"].map((c, i) => (
+                                    <div key={i} style={{ backgroundColor: c }} className="rounded-[2px] w-[10px] h-[10px]" />
                                 ))}
                                 <span className="ml-1">More</span>
                             </div>
@@ -250,6 +311,7 @@ function GitHubContributions({ username }: { username: string }) {
         </div>
     );
 }
+
 
 export default function ProfileResults({ data, onBack }: ProfileResultsProps) {
     const { rest, graphql } = data;

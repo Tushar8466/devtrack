@@ -36,19 +36,41 @@ export const authOptions: NextAuthOptions = {
 
   events: {
     async signIn({ user }) {
+      if (!user.email) return;
       try {
-        await fetch("https://f4ad-103-97-165-15.ngrok-free.app/webhook/github_login", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
+        // We only send email if credentials are provided in .env
+        if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+          console.log("Skipping welcome email: EMAIL_USER or EMAIL_PASS not set in .env.local");
+          return;
+        }
+
+        const transporter = await import('nodemailer').then(m => m.createTransport({
+          service: 'gmail',
+          auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS,
           },
-          body: JSON.stringify({
-            email: user.email,
-            name: user.name
-          })
+        }));
+
+        await transporter.sendMail({
+          from: `"DevTrack" <${process.env.EMAIL_USER}>`,
+          to: user.email,
+          subject: "Welcome to DevTrack!",
+          html: `<div style="font-family: sans-serif; color: #222; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eaeaea; border-radius: 10px;">
+            <h2 style="color: #6d28d9;">Welcome to DevTrack, ${user.name || "Developer"}! 👋</h2>
+            <p style="font-size: 16px; line-height: 1.5;">Thank you for signing in with your GitHub account. We're incredibly excited to have you on board!</p>
+            <p style="font-size: 16px; line-height: 1.5;">With DevTrack Pro, you can instantly seamlessly scan GitHub profiles to detect AI-generated code patterns, analyze post-merge stability, and gauge true software authorship confidence.</p>
+            <br/>
+            <p style="font-size: 16px; color: #555;">Ready to decode developer DNA?</p>
+            <a href="${process.env.NEXTAUTH_URL}" style="display: inline-block; padding: 12px 24px; background-color: #7c3aed; color: #fff; text-decoration: none; border-radius: 6px; font-weight: bold; margin-top: 10px;">Start Scanning Now</a>
+            <br/><br/>
+            <p style="font-size: 14px; color: #888;">Best,<br/>The DevTrack Team</p>
+          </div>`
         });
+
+        console.log("Welcome email sent successfully to", user.email);
       } catch (error) {
-        console.error("Webhook error:", error);
+        console.error("Email sending error:", error);
       }
     }
   },
