@@ -5,11 +5,20 @@ import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import { IconBrandGithub, IconArrowLeft, IconGitCommit } from "@tabler/icons-react";
 
-interface Contributor {
-    login: string;
-    avatar_url: string;
-    contributions: number;
+interface Commit {
+    sha: string;
     html_url: string;
+    commit: {
+        message: string;
+        author: {
+            name: string;
+            date: string;
+        };
+    };
+    author?: {
+        avatar_url: string;
+        login: string;
+    };
 }
 
 export default function RepositoryCommitsPage() {
@@ -18,49 +27,47 @@ export default function RepositoryCommitsPage() {
     const username = params.username as string;
     const repoName = params.repo as string;
 
-    const [contributors, setContributors] = useState<Contributor[]>([]);
-    const [totalCommits, setTotalCommits] = useState<number>(0);
+    const [commits, setCommits] = useState<Commit[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         if (!username || !repoName) return;
 
-        const fetchContributors = async () => {
+        const fetchCommits = async () => {
             setLoading(true);
             setError(null);
             try {
-                // Fetch up to 100 contributors via GitHub REST
-                const res = await fetch(`https://api.github.com/repos/${username}/${repoName}/contributors?per_page=100`);
+                // Fetch recent commits from GitHub REST API
+                const res = await fetch(`https://api.github.com/repos/${username}/${repoName}/commits?per_page=30`);
 
                 if (!res.ok) {
-                    if (res.status === 404) throw new Error("Repository not found or has no contributors.");
-                    throw new Error(`Failed to fetch contributors (${res.status})`);
+                    if (res.status === 404) throw new Error("Repository or commits not found.");
+                    if (res.status === 409) throw new Error("Repository is empty.");
+                    throw new Error(`Failed to fetch commits (${res.status})`);
                 }
 
-                const data: Contributor[] = await res.json();
-
-                // Sum up contributions from the top returned contributors
-                const total = data.reduce((sum, curr) => sum + curr.contributions, 0);
-
-                setContributors(data);
-                setTotalCommits(total);
+                const data = await res.json();
+                setCommits(data);
             } catch (err: any) {
-                setError(err.message || "An error occurred while fetching contributors.");
+                setError(err.message || "An error occurred while fetching commits.");
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchContributors();
+        fetchCommits();
     }, [username, repoName]);
 
     const handleBack = () => {
         router.push("/explore");
     };
 
-    // Show top 2 contributors to match the reference design perfectly
-    const displayContributors = contributors.slice(0, 2);
+    // Format date roughly relative (e.g., "Oct 12, 2023, 14:30")
+    const formatDate = (dateString: string) => {
+        const date = new Date(dateString);
+        return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit" });
+    };
 
     return (
         <div className="min-h-screen bg-black text-white p-4 md:p-8 pt-24 relative overflow-hidden">
@@ -78,119 +85,133 @@ export default function RepositoryCommitsPage() {
                     </button>
                 </div>
 
-                {/* Header Title area */}
-                <div className="text-center mb-10 w-full">
-                    <h2 className="text-4xl md:text-5xl font-bold text-white mb-4 flex items-center justify-center gap-4 tracking-tight">
-                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#00e676" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-                        Repository Contributors
-                    </h2>
-                    <p className="text-neutral-400 text-lg max-w-xl mx-auto">
-                        Lookup any GitHub repository to analyze contributors. Data is combined from GitHub REST API for deep dive metrics.
-                    </p>
-                </div>
+                <div className="w-full bg-black border border-white/10 rounded-2xl shadow-2xl flex flex-col h-[85vh] max-h-[900px] overflow-hidden ring-1 ring-white/5">
 
-                <div className="w-full space-y-6">
-                    {/* Search / Target Bar Mockup */}
-                    <div className="max-w-xl mx-auto bg-black border border-white/10 rounded-full flex items-center justify-between p-2 mb-8 shadow-2xl">
-                        <div className="flex items-center gap-3 pl-4 text-neutral-300 font-mono text-sm">
-                            <IconBrandGithub className="w-5 h-5 text-neutral-500" />
-                            <span>{username}/{repoName}</span>
+                    {/* Header Title area */}
+                    <div className="px-6 py-5 border-b border-white/10 flex items-center justify-between bg-white/5 backdrop-blur-md">
+                        <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 rounded-xl bg-[#00e676]/10 border border-[#00e676]/20 flex items-center justify-center text-[#00e676]">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3" /><line x1="3" y1="12" x2="9" y2="12" /><line x1="15" y1="12" x2="21" y2="12" /><line x1="12" y1="3" x2="12" y2="9" /><line x1="12" y1="15" x2="12" y2="21" /></svg>
+                            </div>
+                            <div>
+                                <h3 className="text-xl md:text-2xl font-bold text-white flex items-center gap-1.5 flex-wrap">
+                                    <span className="text-neutral-400 font-normal">{username}</span>
+                                    <span className="text-neutral-600">/</span>
+                                    <span className="text-[#00e676]">{repoName}</span>
+                                </h3>
+                                <div className="flex items-center gap-2 mt-1">
+                                    <IconGitCommit className="w-4 h-4 text-neutral-500" />
+                                    <span className="text-sm font-medium text-neutral-400">Commit History</span>
+                                </div>
+                            </div>
                         </div>
-                        <a href={`https://github.com/${username}/${repoName}`} target="_blank" rel="noreferrer" className="bg-[#00e676] hover:bg-[#00c853] text-black font-bold rounded-full px-6 py-2.5 flex items-center gap-2 transition-all hover:scale-105 active:scale-95 shadow-lg shadow-[#00e676]/20">
+
+                        <a
+                            href={`https://github.com/${username}/${repoName}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="p-2.5 text-[#00e676] bg-[#00e676]/10 border border-[#00e676]/20 hover:bg-[#00e676]/20 rounded-xl transition-all hidden sm:flex items-center gap-2 font-medium text-sm"
+                        >
                             <IconBrandGithub className="w-4 h-4" />
                             Repository
                         </a>
                     </div>
 
-                    {/* Top Bar with Repo Name and Total Commits */}
-                    <div className="w-full bg-black border border-white/10 rounded-2xl p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 shadow-xl ring-1 ring-white/5">
-                        <div className="flex items-center gap-4">
-                            <IconBrandGithub className="w-7 h-7 text-neutral-400 shrink-0" />
-                            <h3 className="text-2xl font-bold flex flex-wrap items-center tracking-tight">
-                                <span className="text-white">{username}</span>
-                                <span className="text-neutral-500 mx-3">/</span>
-                                <span className="text-[#00e676]">{repoName}</span>
-                            </h3>
-                        </div>
-
-                        <div className="flex flex-col items-end shrink-0">
-                            <div className="flex items-center border border-white/10 rounded-xl px-5 py-3 bg-black/50 min-w-[220px] justify-between shadow-inner">
-                                <IconGitCommit className="w-6 h-6 text-[#00e676]" />
-                                <div className="flex flex-col text-right">
-                                    <span className="text-[10px] text-neutral-500 font-bold uppercase tracking-wider mb-1">Total Commits (REST)</span>
-                                    <span className="text-2xl font-black text-white leading-none tracking-tighter">
-                                        {loading ? "..." : totalCommits.toLocaleString()}
-                                    </span>
-                                </div>
+                    {/* Content area */}
+                    <div className="flex-1 overflow-y-auto p-4 md:p-8 md:pl-10 bg-black">
+                        {loading ? (
+                            <div className="flex flex-col items-center justify-center h-full gap-4">
+                                <div className="w-10 h-10 rounded-full border-2 border-white/10 border-t-[#00e676] animate-spin" />
+                                <p className="text-neutral-400 animate-pulse font-medium">Scanning commit history...</p>
                             </div>
-                        </div>
-                    </div>
-
-                    <p className="text-neutral-500 text-sm pl-2">
-                        {loading ? "Fetching contributors..." : `Fetched ${displayContributors.length} top contributors via REST API`}
-                    </p>
-
-                    {/* Contributor Cards Row */}
-                    {!loading && !error && contributors.length > 0 && (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 w-full">
-                            {displayContributors.map((contributor) => {
-                                const percentage = totalCommits > 0
-                                    ? ((contributor.contributions / totalCommits) * 100).toFixed(2)
-                                    : "0.00";
-
-                                return (
+                        ) : error ? (
+                            <div className="flex flex-col items-center justify-center h-full px-6 text-center">
+                                <div className="w-16 h-16 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-500 mb-6">
+                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>
+                                </div>
+                                <h3 className="text-xl font-bold text-white mb-2">Failed to load</h3>
+                                <p className="text-neutral-400 mb-1">{error}</p>
+                                <p className="text-neutral-500 text-sm">Could not retrieve commit history.</p>
+                            </div>
+                        ) : commits.length === 0 ? (
+                            <div className="flex flex-col items-center justify-center h-full px-6 text-center text-neutral-400">
+                                <IconBrandGithub className="w-16 h-16 text-neutral-800 mb-4" />
+                                <p className="text-lg font-medium">No commits found in this repository.</p>
+                            </div>
+                        ) : (
+                            <div className="relative border-l border-white/10 ml-9 space-y-8 pb-4">
+                                {commits.map((commitData) => (
                                     <a
-                                        key={contributor.login}
-                                        href={contributor.html_url}
+                                        key={commitData.sha}
+                                        href={commitData.html_url}
                                         target="_blank"
                                         rel="noreferrer"
-                                        className="bg-black border border-white/10 rounded-2xl p-6 flex items-center gap-5 hover:bg-neutral-900 transition-all group shadow-lg hover:shadow-xl hover:-translate-y-1 relative overflow-hidden"
+                                        className="relative flex flex-col sm:flex-row gap-5 group p-4 md:p-5 md:-ml-[2.8rem] -ml-10 rounded-2xl hover:bg-white/5 transition-all border border-transparent hover:border-white/10"
                                     >
-                                        <div className="absolute inset-0 bg-linear-to-r from-[#00e676]/0 via-[#00e676]/0 to-[#00e676]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                                        {/* Timeline dot */}
+                                        <div className="absolute left-[34px] md:left-[38px] top-[34px] w-3 h-3 rounded-full bg-neutral-800 border-2 border-neutral-600 group-hover:bg-[#00e676] group-hover:border-[#00e676] transition-colors" />
 
-                                        <Image
-                                            src={contributor.avatar_url}
-                                            alt={contributor.login}
-                                            width={64}
-                                            height={64}
-                                            className="rounded-full border border-white/10 shadow-lg shrink-0 relative z-10"
-                                        />
-                                        <div className="flex-1 w-full min-w-0 relative z-10">
-                                            <h4 className="text-white font-bold text-xl truncate group-hover:text-[#00e676] transition-colors mb-2">
-                                                {contributor.login}
-                                            </h4>
-                                            <div className="flex items-center gap-3 text-sm text-neutral-400 font-medium">
-                                                <span>{contributor.contributions.toLocaleString()} commits</span>
-                                                <span className="w-1 h-1 rounded-full bg-neutral-700" />
-                                                <span className="text-[#00e676]">{percentage}%</span>
+                                        <div className="flex items-center sm:items-start shrink-0 pl-16 sm:pl-0 sm:w-16 pt-1">
+                                            {commitData.author?.avatar_url ? (
+                                                <Image
+                                                    src={commitData.author.avatar_url}
+                                                    alt={commitData.commit.author.name}
+                                                    width={48}
+                                                    height={48}
+                                                    className="rounded-full shadow-lg border border-white/10 bg-neutral-900"
+                                                />
+                                            ) : (
+                                                <div className="w-12 h-12 rounded-full bg-neutral-800 border border-white/10 flex items-center justify-center text-lg font-bold text-neutral-400 shadow-lg">
+                                                    {commitData.commit.author.name.charAt(0).toUpperCase()}
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        <div className="flex-1 min-w-0 pl-16 sm:pl-0">
+                                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4 mb-2">
+                                                <p className="text-white font-bold text-base md:text-lg leading-snug group-hover:text-[#00e676] transition-colors">
+                                                    {commitData.commit.message.split('\n')[0]}
+                                                </p>
+                                                <div className="flex items-center gap-2 shrink-0">
+                                                    <span className="font-mono text-xs text-neutral-400 bg-white/5 px-2 py-1 rounded-md border border-white/10">
+                                                        {commitData.sha.substring(0, 7)}
+                                                    </span>
+                                                </div>
                                             </div>
 
-                                            {/* Progress Bar */}
-                                            <div className="w-full h-1.5 bg-black/40 rounded-full mt-4 overflow-hidden border border-white/5">
-                                                <div
-                                                    className="h-full bg-[#00e676] rounded-full transition-all duration-1000 ease-out relative overflow-hidden"
-                                                    style={{ width: `${percentage}%` }}
-                                                >
-                                                    <div className="absolute inset-0 bg-white/20 w-full h-full animate-[shimmer_2s_infinite]" />
-                                                </div>
+                                            {commitData.commit.message.includes('\n') && (
+                                                <p className="text-neutral-400 text-sm line-clamp-3 mb-3 bg-white/5 p-3 rounded-xl border border-white/5 hidden sm:block">
+                                                    {commitData.commit.message.split('\n').slice(1).join('\n').trim()}
+                                                </p>
+                                            )}
+
+                                            <div className="flex items-center gap-2 text-sm text-neutral-500 font-medium">
+                                                <span className="text-neutral-300">{commitData.commit.author.name}</span>
+                                                <span className="w-1 h-1 rounded-full bg-neutral-700" />
+                                                <span>{formatDate(commitData.commit.author.date)}</span>
                                             </div>
                                         </div>
                                     </a>
-                                );
-                            })}
-                        </div>
-                    )}
+                                ))}
+                            </div>
+                        )}
+                    </div>
 
-                    {error && (
-                        <div className="bg-red-500/10 border border-red-500/20 rounded-2xl p-6 text-center text-red-500 shadow-lg flex flex-col items-center justify-center gap-3">
-                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>
-                            <span className="font-semibold">{error}</span>
-                        </div>
-                    )}
-
-                    {!loading && !error && contributors.length === 0 && (
-                        <div className="bg-white/5 border border-white/10 rounded-2xl p-10 text-center text-neutral-400 shadow-lg">
-                            <p className="text-lg font-medium">No contributors found.</p>
+                    {/* Footer area */}
+                    {commits.length > 0 && !loading && !error && (
+                        <div className="px-6 py-5 border-t border-white/10 bg-white/5 flex items-center justify-between">
+                            <span className="text-sm font-medium text-neutral-500">
+                                Showing the {commits.length} most recent commits
+                            </span>
+                            <a
+                                href={`https://github.com/${username}/${repoName}/commits`}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="bg-[#00e676] hover:bg-[#00c853] text-black font-semibold rounded-full px-5 py-2 text-sm flex items-center gap-2 transition-transform hover:scale-105"
+                            >
+                                View all
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"></path><path d="M12 5l7 7-7 7"></path></svg>
+                            </a>
                         </div>
                     )}
                 </div>

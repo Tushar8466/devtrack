@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useMemo, useState, useEffect } from "react";
+import AllRepos from "./AllRepos";
 
 interface ProfileResultsProps {
     data: any;
@@ -425,6 +426,11 @@ export default function ProfileResults({ data, onBack }: ProfileResultsProps) {
                     ) : (
                         <p className="text-neutral-500 text-sm text-center py-8">No contribution data available for this user.</p>
                     )}
+                </div>
+
+                {/* All Repositories Section */}
+                <div className="pt-8 border-t border-white/10 mt-8">
+                    <AllRepos data={data} username={login} />
                 </div>
 
                 {/* Disclaimer footer */}

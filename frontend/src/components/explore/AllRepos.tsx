@@ -1,40 +1,51 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import RepoCommits from "./RepoCommits";
 
 interface AllReposProps {
     data: any;
+    username: string;
 }
 
-export default function AllRepos({ data }: AllReposProps) {
+export default function AllRepos({ data, username }: AllReposProps) {
     const { graphql } = data;
-    const repos = graphql?.repositories?.nodes || [];
+    // Extract both pinned repos and all repos from the data
+    const pinnedRepos = graphql?.pinnedItems?.nodes || [];
+    const allRepos = graphql?.repositories?.nodes || [];
 
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedLanguage, setSelectedLanguage] = useState("All");
+    const [selectedRepo, setSelectedRepo] = useState<string | null>(null);
 
-    // Get unique languages for filter dropdown
+    // Get unique languages for filter dropdown from ALL repos
     const languages = useMemo(() => {
         const langs = new Set<string>();
-        repos.forEach((repo: any) => {
+        allRepos.forEach((repo: any) => {
             if (repo.primaryLanguage?.name) {
                 langs.add(repo.primaryLanguage.name);
             }
         });
         return ["All", ...Array.from(langs).sort()];
-    }, [repos]);
+    }, [allRepos]);
 
-    // Filter repos based on search query and selected language
-    const filteredRepos = useMemo(() => {
-        return repos.filter((repo: any) => {
-            const matchesSearch = repo.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                (repo.description && repo.description.toLowerCase().includes(searchQuery.toLowerCase()));
-            const matchesLanguage = selectedLanguage === "All" || repo.primaryLanguage?.name === selectedLanguage;
-            return matchesSearch && matchesLanguage;
-        });
-    }, [repos, searchQuery, selectedLanguage]);
+    // Filter repos: if searching, search among all repos. If not, show only pinned repos.
+    const displayRepos = useMemo(() => {
+        // If there's a search term or a specific language selected, search across ALL repositories
+        if (searchQuery.trim() !== "" || selectedLanguage !== "All") {
+            return allRepos.filter((repo: any) => {
+                const matchesSearch = repo.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    (repo.description && repo.description.toLowerCase().includes(searchQuery.toLowerCase()));
+                const matchesLanguage = selectedLanguage === "All" || repo.primaryLanguage?.name === selectedLanguage;
+                return matchesSearch && matchesLanguage;
+            });
+        }
 
-    if (repos.length === 0) return null;
+        // Otherwise, just show the pinned repositories by default
+        return pinnedRepos.length > 0 ? pinnedRepos : allRepos;
+    }, [allRepos, pinnedRepos, searchQuery, selectedLanguage]);
+
+    if (allRepos.length === 0) return null;
 
     const formatDate = (dateString?: string) => {
         if (!dateString) return "";
@@ -45,9 +56,9 @@ export default function AllRepos({ data }: AllReposProps) {
         <div className="space-y-6">
             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
                 <h3 className="text-2xl font-bold flex items-center gap-2 text-white shrink-0">
-                    <span className="text-neutral-300">📦</span> All Repositories
+                    <span className="text-neutral-300">📦</span> {searchQuery || selectedLanguage !== "All" ? "All Repositories" : "Pinned Repositories"}
                     <span className="text-sm font-normal text-neutral-500 bg-white/10 px-2 py-0.5 rounded-full ml-2">
-                        {filteredRepos.length}
+                        {displayRepos.length}
                     </span>
                 </h3>
 
@@ -82,15 +93,13 @@ export default function AllRepos({ data }: AllReposProps) {
                 </div>
             </div>
 
-            {filteredRepos.length > 0 ? (
+            {displayRepos.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {filteredRepos.map((repo: any, idx: number) => (
-                        <a
+                    {displayRepos.map((repo: any, idx: number) => (
+                        <button
                             key={idx}
-                            href={repo.url}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="flex flex-col justify-between p-5 rounded-2xl border border-white/5 bg-white/5 backdrop-blur-md hover:bg-white/10 hover:border-white/20 transition-all cursor-pointer h-full"
+                            onClick={() => setSelectedRepo(repo.name)}
+                            className="flex flex-col justify-between p-5 rounded-2xl border border-white/5 bg-white/5 backdrop-blur-md hover:bg-white/10 hover:border-white/20 transition-all cursor-pointer h-full text-left"
                         >
                             <div>
                                 <h4 className="font-bold text-lg text-white hover:text-neutral-300 transition-colors truncate mb-2">
@@ -126,13 +135,21 @@ export default function AllRepos({ data }: AllReposProps) {
                                     Updated {formatDate(repo.updatedAt)}
                                 </span>
                             </div>
-                        </a>
+                        </button>
                     ))}
                 </div>
             ) : (
                 <div className="py-12 text-center text-neutral-500 bg-white/5 rounded-3xl border border-white/5">
                     <p>No repositories match your search or filter criteria.</p>
                 </div>
+            )}
+
+            {selectedRepo && (
+                <RepoCommits
+                    username={username}
+                    repoName={selectedRepo}
+                    onClose={() => setSelectedRepo(null)}
+                />
             )}
         </div>
     );
