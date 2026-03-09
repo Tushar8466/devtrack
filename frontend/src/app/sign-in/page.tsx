@@ -2,19 +2,14 @@
 
 import { signIn } from "next-auth/react";
 import { motion } from "motion/react";
-import { WavyBackground } from "@/components/ui/wavy-background";
+import { BackgroundBeams } from "@/components/ui/background-beams";
 import { GlowingEffect } from "@/components/ui/glowing-effect";
-import { Fingerprint, Github, Globe } from "lucide-react";
+import { Fingerprint, Github } from "lucide-react";
 
 export default function SignInPage() {
     return (
         <div className="min-h-screen bg-[#050505] flex items-center justify-center p-4 relative overflow-hidden">
-            <WavyBackground
-                containerClassName="absolute inset-0 z-0"
-                className="max-w-4xl mx-auto"
-                waveOpacity={0.3}
-                blur={10}
-            />
+            <BackgroundBeams />
 
             <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
