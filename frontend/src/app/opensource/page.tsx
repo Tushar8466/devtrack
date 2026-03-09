@@ -3,7 +3,7 @@ import { ContainerScroll } from "@/components/ui/container-scroll-animation";
 
 function page() {
   return (
-    <div className="flex flex-col overflow-hidden">
+    <div className="flex flex-col overflow-hidden bg-black">
       <ContainerScroll
         titleComponent={
           <h1 className="text-4xl font-semibold text-white">
