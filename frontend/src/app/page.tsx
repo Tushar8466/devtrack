@@ -1,43 +1,56 @@
 import HeroSection from "@/components/HeroSection";
 import { MacbookScroll } from "@/components/ui/macbook-scroll";
 import AnimatedDevTrackScreen from "@/components/ui/AnimatedDevTrackScreen";
+import { EvervaultCard } from "@/components/ui/evervault-card";
+import { Search, Brain, BarChart, User, Settings, Lock } from "lucide-react";
+
+const Icon = ({ className }: { className?: string }) => {
+  return (
+    <svg
+      className={className}
+      width="12"
+      height="12"
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1"
+    >
+      <line x1="10" y1="4" x2="10" y2="16" />
+      <line x1="4" y1="10" x2="16" y2="10" />
+    </svg>
+  );
+};
 
 const features = [
   {
-    icon: "🔍",
-    title: "Profile Analysis",
-    description:
-      "Instantly analyze any public GitHub profile. Get deep insights into coding patterns, commit history, and repository quality.",
+    title: "AI Likelihood Score",
+    description: "Scan any GitHub PR or commit URL in seconds.",
+    icon: <Search className="w-12 h-12 sm:w-16 sm:h-16 text-blue-500" strokeWidth={1.5} />,
   },
   {
-    icon: "🤖",
-    title: "AI Influence Detection",
-    description:
-      "Our proprietary algorithm detects patterns consistent with AI-assisted code generation, giving you transparency on authorship.",
+    title: "Style Drift Indicator",
+    description: "Powered by CodeBERT — trained specifically on code, not text.",
+    icon: <Brain className="w-12 h-12 sm:w-16 sm:h-16 text-purple-500" strokeWidth={1.5} />,
   },
   {
-    icon: "📊",
-    title: "Contribution Heatmap",
-    description:
-      "Visualize a developer's year-long activity with a beautiful GitHub-style contribution graph, powered by real data.",
-  },
-  {
-    icon: "⚡",
     title: "Post-Merge Stability",
-    description:
-      "Analyze hotfix frequency and revert patterns within 72 hours of a PR merge — a key signal of low-confidence code.",
+    description: "Get a 0–100% AI probability score with an explainability report.",
+    icon: <BarChart className="w-12 h-12 sm:w-16 sm:h-16 text-green-500" strokeWidth={1.5} />,
   },
   {
-    icon: "🛡️",
-    title: "Authorship Confidence Score",
-    description:
-      "A single, easy-to-read score that summarizes a developer's true software authorship confidence based on multiple signals.",
+    title: "Ownership Confidence",
+    description: "Detects deviations from a contributor's historical coding style.",
+    icon: <User className="w-12 h-12 sm:w-16 sm:h-16 text-amber-500" strokeWidth={1.5} />,
   },
   {
-    icon: "🔎",
-    title: "Repository Deep-Dive",
-    description:
-      "Browse all pinned and public repositories, inspect commit logs, and filter by language — all without leaving DevTrack.",
+    title: "Repository AI Influence Trend",
+    description: "Drop one config file into any repo. Scans run automatically.",
+    icon: <Settings className="w-12 h-12 sm:w-16 sm:h-16 text-pink-500" strokeWidth={1.5} />,
+  },
+  {
+    title: "Privacy First",
+    description: "Code is never stored. Scans are ephemeral. Always.",
+    icon: <Lock className="w-12 h-12 sm:w-16 sm:h-16 text-cyan-500" strokeWidth={1.5} />,
   },
 ];
 
@@ -82,31 +95,42 @@ export default function Home() {
 
       {/* Features section */}
       <section className="bg-black py-24 px-6 border-t border-white/5">
-        <div className="max-w-6xl mx-auto">
+        <div className="relative z-20 w-full mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <span className="text-violet-400 text-sm font-semibold uppercase tracking-widest">
-              Features
-            </span>
-            <h2 className="mt-3 text-4xl md:text-5xl font-bold text-white">
-              Everything you need to <br />
-              <span className="text-violet-400">decode a developer</span>
+            <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
+              Everything you need to detect AI code
             </h2>
-            <p className="mt-4 text-neutral-400 text-lg max-w-2xl mx-auto">
-              DevTrack gives you a complete picture of any GitHub developer, powered by real data and intelligent analysis.
+            <p className="mt-4 text-lg text-neutral-600 dark:text-neutral-400">
+              Powerful tools built for modern engineering teams.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {features.map((f, i) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {features.map((feature, idx) => (
               <div
-                key={i}
-                className="p-6 rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 hover:border-violet-500/40 transition-all duration-300 group"
+                key={idx}
+                className="border border-black/20 dark:border-white/20 flex flex-col items-start p-4 relative h-[30rem] bg-white/50 dark:bg-black/50 backdrop-blur-sm rounded-2xl group"
               >
-                <div className="text-3xl mb-4">{f.icon}</div>
-                <h3 className="text-white font-semibold text-lg mb-2 group-hover:text-violet-400 transition-colors">
-                  {f.title}
-                </h3>
-                <p className="text-neutral-400 text-sm leading-relaxed">{f.description}</p>
+                {/* Corner icons */}
+                <Icon className="absolute h-6 w-6 -top-3 -left-3 text-slate-900 dark:text-white" />
+                <Icon className="absolute h-6 w-6 -bottom-3 -left-3 text-slate-900 dark:text-white" />
+                <Icon className="absolute h-6 w-6 -top-3 -right-3 text-slate-900 dark:text-white" />
+                <Icon className="absolute h-6 w-6 -bottom-3 -right-3 text-slate-900 dark:text-white" />
+
+                {/* Evervault interactive card */}
+                <div className="w-full flex-1 flex items-center justify-center">
+                  <EvervaultCard text={feature.icon} />
+                </div>
+
+                {/* Text */}
+                <div className="w-full mt-2 flex flex-col gap-3 pb-10">
+                  <h3 className="text-slate-900 dark:text-white text-xl font-bold">
+                    {feature.title}
+                  </h3>
+                  <p className="text-sm font-light border border-black/20 dark:border-white/20 rounded-full px-4 py-2 text-neutral-600 dark:text-neutral-400">
+                    {feature.description}
+                  </p>
+                </div>
               </div>
             ))}
           </div>
