@@ -10,6 +10,9 @@ import { Box, Users, GitFork, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface GitHubUser {
+  login: string;
+  name: string | null;
+  avatar_url: string | null;
   public_repos: number;
   followers: number;
   following: number;
@@ -93,7 +96,9 @@ export default function DashboardPage() {
 
   const [githubData, setGithubData] = useState<GitHubUser | null>(null);
   const [repos, setRepos] = useState<GitHubRepo[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [manualUsername, setManualUsername] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -101,31 +106,46 @@ export default function DashboardPage() {
     }
   }, [status, router]);
 
-  const githubUsername = (session?.user as SessionUser)?.username || "";
+  const sessionUsername = (session?.user as SessionUser)?.username || "";
+  const effectiveUsername = manualUsername || sessionUsername;
 
   useEffect(() => {
-    if (!githubUsername) return;
+    if (!effectiveUsername) return;
+
+    Promise.resolve().then(() => {
+      setLoading(true);
+      setIsSearching(true);
+    });
 
     Promise.all([
-      fetch(`https://api.github.com/users/${githubUsername}`).then((res) =>
-        res.json()
+      fetch(`https://api.github.com/users/${effectiveUsername}`).then((res) =>
+        res.ok ? res.json() : null
       ),
       fetch(
-        `https://api.github.com/users/${githubUsername}/repos?sort=updated&per_page=6`
-      ).then((res) => res.json()),
+        `https://api.github.com/users/${effectiveUsername}/repos?sort=updated&per_page=6`
+      ).then((res) => (res.ok ? res.json() : [])),
     ])
       .then(([userData, reposData]) => {
-        setGithubData(userData);
-        if (Array.isArray(reposData)) setRepos(reposData);
+        if (userData) {
+          setGithubData(userData);
+          if (Array.isArray(reposData)) setRepos(reposData);
+        } else {
+          setGithubData(null);
+          setRepos([]);
+        }
         setLoading(false);
+        setIsSearching(false);
       })
-      .catch(() => setLoading(false));
-  }, [githubUsername]);
+      .catch(() => {
+        setLoading(false);
+        setIsSearching(false);
+      });
+  }, [effectiveUsername]);
 
-  if (status === "loading" || loading) {
+  if (status === "loading") {
     return (
       <div className="min-h-screen flex items-center justify-center bg-black text-white">
-        Loading profile...
+        Loading session...
       </div>
     );
   }
@@ -147,40 +167,109 @@ export default function DashboardPage() {
 
         {/* HERO PROFILE */}
 
-        <div className="rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl p-8 flex items-center gap-6">
-          {session.user?.image && (
-            <Image
-              src={session.user.image}
-              alt="Profile"
-              width={90}
-              height={90}
-              className="rounded-full ring-2 ring-white/10"
-            />
-          )}
+        {!githubData && !loading && !isSearching ? (
+          <div className="relative group max-w-2xl mx-auto">
+            <div className="relative rounded-3xl border border-white/10 bg-[#050505] p-2 overflow-hidden shadow-2xl">
+              <GlowingEffect
+                blur={0}
+                borderWidth={3}
+                spread={80}
+                glow={true}
+                disabled={false}
+                proximity={64}
+                inactiveZone={0.01}
+              />
+              <div className="relative rounded-2xl bg-[#050505] p-10 flex flex-col gap-6 items-center text-center">
+                <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center border border-white/10 mb-2">
+                  <GitFork className="w-8 h-8 text-purple-500" />
+                </div>
+                <div>
+                  <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-linear-to-b from-white to-neutral-400">
+                    Link Your GitHub Profile
+                  </h2>
+                  <p className="text-neutral-500 mt-2 max-w-sm">
+                    Connect your GitHub account to see your real-time developer metrics and project gallery.
+                  </p>
+                </div>
 
-          <div className="flex-1">
-            <h1 className="text-3xl font-bold tracking-tight">{session.user?.name}</h1>
-            <p className="text-neutral-400 mt-1">{githubData?.bio}</p>
-
-            <div className="flex items-center gap-4 mt-4">
-              <span className="text-sm text-neutral-500 bg-white/5 px-3 py-1 rounded-full border border-white/5">
-                @{githubUsername}
-              </span>
-              {githubData?.location && (
-                <span className="text-sm text-neutral-500">
-                  {githubData.location}
-                </span>
-              )}
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    const formData = new FormData(e.currentTarget);
+                    const username = formData.get("username") as string;
+                    if (username) setManualUsername(username);
+                  }}
+                  className="w-full max-w-md flex flex-col sm:flex-row gap-3"
+                >
+                  <input
+                    name="username"
+                    type="text"
+                    placeholder="Enter GitHub username (e.g. tushar8466)"
+                    className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all placeholder:text-neutral-600"
+                    required
+                  />
+                  <button
+                    type="submit"
+                    className="bg-white text-black font-semibold px-6 py-3 rounded-xl hover:bg-neutral-200 transition-colors"
+                  >
+                    Fetch Profile
+                  </button>
+                </form>
+              </div>
             </div>
           </div>
+        ) : loading || isSearching ? (
+          <div className="flex flex-col items-center justify-center py-20 gap-4">
+            <div className="w-10 h-10 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin"></div>
+            <p className="text-neutral-500 animate-pulse">Syncing GitHub data...</p>
+          </div>
+        ) : (
+          <div className="rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl p-8 flex items-center gap-6">
+            {githubData?.avatar_url || session.user?.image ? (
+              <Image
+                src={githubData?.avatar_url || session.user?.image || ""}
+                alt="Profile"
+                width={90}
+                height={90}
+                className="rounded-full ring-2 ring-white/10"
+              />
+            ) : null}
 
-          <button
-            onClick={() => signOut({ callbackUrl: "/" })}
-            className="border border-red-500/40 text-red-400 px-6 py-2.5 rounded-xl hover:bg-red-500/10 transition-colors font-medium"
-          >
-            Sign Out
-          </button>
-        </div>
+            <div className="flex-1">
+              <h1 className="text-3xl font-bold tracking-tight">{githubData?.name || session.user?.name}</h1>
+              <p className="text-neutral-400 mt-1">{githubData?.bio || "DevTrack authenticated user"}</p>
+
+              <div className="flex items-center gap-4 mt-4">
+                <span className="text-sm text-neutral-500 bg-white/5 px-3 py-1 rounded-full border border-white/5">
+                  @{effectiveUsername}
+                </span>
+                {githubData?.location && (
+                  <span className="text-sm text-neutral-500">
+                    {githubData.location}
+                  </span>
+                )}
+                {manualUsername && (
+                  <button
+                    onClick={() => {
+                      setManualUsername("");
+                      setGithubData(null);
+                    }}
+                    className="text-xs text-purple-400 hover:text-purple-300 transition-colors underline underline-offset-4"
+                  >
+                    Change Account
+                  </button>
+                )}
+              </div>
+            </div>
+
+            <button
+              onClick={() => signOut({ callbackUrl: "/" })}
+              className="border border-red-500/40 text-red-400 px-6 py-2.5 rounded-xl hover:bg-red-500/10 transition-colors font-medium"
+            >
+              Sign Out
+            </button>
+          </div>
+        )}
 
         {/* GLOWING STATS */}
 
@@ -232,9 +321,9 @@ export default function DashboardPage() {
               <div className="relative h-full rounded-2xl bg-[#050505] p-8 flex flex-col gap-6">
                 <h2 className="text-xl font-bold">Contribution Activity</h2>
                 <div className="flex-1 flex items-center justify-center overflow-x-auto py-4">
-                  {githubUsername && (
+                  {effectiveUsername && (
                     <GitHubCalendar
-                      username={githubUsername}
+                      username={effectiveUsername}
                       colorScheme="dark"
                       blockSize={14}
                       blockMargin={5}

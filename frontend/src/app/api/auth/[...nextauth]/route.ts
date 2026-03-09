@@ -1,5 +1,6 @@
 import NextAuth, { NextAuthOptions } from "next-auth";
 import GitHubProvider from "next-auth/providers/github";
+import GoogleProvider from "next-auth/providers/google";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -12,23 +13,36 @@ export const authOptions: NextAuthOptions = {
           name: profile.name || profile.login,
           email: profile.email,
           image: profile.avatar_url,
-          username: profile.login, // Attach the GitHub username
+          username: profile.login,
         };
       },
-    })
+    }),
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      profile(profile) {
+        return {
+          id: profile.sub,
+          name: profile.name,
+          email: profile.email,
+          image: profile.picture,
+          username: profile.email.split("@")[0], // Fallback username
+        };
+      },
+    }),
   ],
 
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
         // user is the object returned from the provider profile() callback above
-        token.username = (user as any).username;
+        token.username = (user as { username?: string }).username;
       }
       return token;
     },
     async session({ session, token }) {
       if (token && session.user) {
-        (session.user as any).username = token.username;
+        (session.user as { username?: string }).username = token.username as string;
       }
       return session;
     },
