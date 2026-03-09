@@ -32,7 +32,7 @@ export const FloatingNav: React.FC<FloatingNavProps> = ({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: "easeOut" }}
       className={cn(
-        "fixed top-8 inset-x-0 z-[5000] mx-auto flex max-w-fit items-center justify-center",
+        "fixed top-8 inset-x-0 z-5000 mx-auto flex max-w-fit items-center justify-center",
         className
       )}
     >
