@@ -100,12 +100,6 @@ export default function DashboardPage() {
   const [manualUsername, setManualUsername] = useState("");
   const [isSearching, setIsSearching] = useState(false);
 
-  useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/sign-in");
-    }
-  }, [status, router]);
-
   const sessionUsername = (session?.user as SessionUser)?.username || "";
   const effectiveUsername = manualUsername || sessionUsername;
 

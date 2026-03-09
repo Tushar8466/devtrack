@@ -1,8 +1,13 @@
 "use client";
 
+import { useSession } from "next-auth/react";
+import Link from "next/link";
 import { BoxesCore } from "./ui/background-boxes";
 
 export default function HeroSection() {
+  const { data: session } = useSession();
+  const nextRoute = session ? "/explore" : "/sign-in";
+
   return (
     <div>
       <div className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden">
@@ -32,9 +37,12 @@ export default function HeroSection() {
           </p>
 
           <div className="flex flex-col sm:flex-row items-center gap-4 mt-4 animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-500 ease-out fill-mode-both">
-            <button className="px-8 py-3.5 rounded-xl bg-violet-600 hover:bg-violet-500 text-white font-semibold transition-all duration-300 shadow-[0_0_30px_-5px_var(--tw-shadow-color)] shadow-violet-500/30 hover:shadow-violet-500/50 hover:-translate-y-0.5">
+            <Link
+              href={nextRoute}
+              className="px-8 py-3.5 rounded-xl bg-violet-600 hover:bg-violet-500 text-white font-semibold transition-all duration-300 shadow-[0_0_30px_-5px_var(--tw-shadow-color)] shadow-violet-500/30 hover:shadow-violet-500/50 hover:-translate-y-0.5"
+            >
               Start Scanning Now
-            </button>
+            </Link>
             <button className="px-8 py-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-semibold transition-all duration-300 hover:-translate-y-0.5">
               View Example Report
             </button>

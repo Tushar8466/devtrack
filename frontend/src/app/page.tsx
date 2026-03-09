@@ -1,9 +1,14 @@
+"use client";
+
+import { useSession } from "next-auth/react";
+import Link from "next/link";
 import HeroSection from "@/components/HeroSection";
 import { MacbookScroll } from "@/components/ui/macbook-scroll";
 import AnimatedDevTrackScreen from "@/components/ui/AnimatedDevTrackScreen";
 import { EvervaultCard } from "@/components/ui/evervault-card";
 import { Search, Brain, BarChart, User, Settings, Lock } from "lucide-react";
 
+// ... (Icon definition same as before)
 const Icon = ({ className }: { className?: string }) => {
   return (
     <svg
@@ -21,6 +26,7 @@ const Icon = ({ className }: { className?: string }) => {
   );
 };
 
+// ... (features and steps same as before)
 const features = [
   {
     title: "AI Likelihood Score",
@@ -75,6 +81,9 @@ const steps = [
 ];
 
 export default function Home() {
+  const { data: session } = useSession();
+  const nextRoute = session ? "/explore" : "/sign-in";
+
   return (
     <div className="bg-black">
       <HeroSection />
@@ -172,12 +181,12 @@ export default function Home() {
           <p className="text-neutral-400 text-lg mb-10 max-w-xl mx-auto">
             Start analyzing GitHub profiles instantly — no setup, no credit card required.
           </p>
-          <a
-            href="/explore"
+          <Link
+            href={nextRoute}
             className="inline-block px-10 py-4 rounded-xl bg-violet-600 hover:bg-violet-500 text-white font-semibold text-lg transition-all duration-300 shadow-[0_0_40px_-5px_rgba(124,58,237,0.5)] hover:shadow-[0_0_60px_-5px_rgba(124,58,237,0.7)] hover:-translate-y-0.5"
           >
             Start Scanning Now →
-          </a>
+          </Link>
         </div>
       </section>
 
@@ -186,8 +195,8 @@ export default function Home() {
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-neutral-500 text-sm">© 2026 DevTrack. All rights reserved.</p>
           <div className="flex items-center gap-6">
-            <a href="/explore" className="text-neutral-500 hover:text-white text-sm transition-colors">Explore</a>
-            <a href="/opensource" className="text-neutral-500 hover:text-white text-sm transition-colors">Open Source</a>
+            <Link href={nextRoute} className="text-neutral-500 hover:text-white text-sm transition-colors">Explore</Link>
+            <Link href="/opensource" className="text-neutral-500 hover:text-white text-sm transition-colors">Open Source</Link>
             <a href="https://github.com" target="_blank" rel="noreferrer" className="text-neutral-500 hover:text-white text-sm transition-colors">GitHub</a>
           </div>
         </div>

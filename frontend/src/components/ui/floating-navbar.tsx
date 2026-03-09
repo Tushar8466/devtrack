@@ -24,6 +24,8 @@ export const FloatingNav: React.FC<FloatingNavProps> = ({
 }) => {
   const { data: session } = useSession();
 
+  const protectedRoutes = ["/dashboard", "/explore", "/analyze", "/opensource", "/contributors"];
+
   return (
     <motion.div
       initial={{ opacity: 0, y: -80 }}
@@ -38,18 +40,23 @@ export const FloatingNav: React.FC<FloatingNavProps> = ({
 
         {/* Navigation Links */}
         <div className="flex items-center gap-2">
-          {navItems.map((item, index) => (
-            <Link
-              key={index}
-              href={item.link}
-              className="flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium text-neutral-700 transition hover:bg-neutral-200 hover:text-black dark:text-neutral-300 dark:hover:bg-white/10 dark:hover:text-white"
-            >
-              {item.icon && (
-                <span className="block sm:hidden">{item.icon}</span>
-              )}
-              <span className="hidden sm:block">{item.name}</span>
-            </Link>
-          ))}
+          {navItems.map((item, index) => {
+            const isProtected = protectedRoutes.some(route => item.link.startsWith(route));
+            const href = (!session && isProtected) ? "/sign-in" : item.link;
+
+            return (
+              <Link
+                key={index}
+                href={href}
+                className="flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium text-neutral-700 transition hover:bg-neutral-200 hover:text-black dark:text-neutral-300 dark:hover:bg-white/10 dark:hover:text-white"
+              >
+                {item.icon && (
+                  <span className="block sm:hidden">{item.icon}</span>
+                )}
+                <span className="hidden sm:block">{item.name}</span>
+              </Link>
+            );
+          })}
         </div>
 
         {/* Divider */}
