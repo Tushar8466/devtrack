@@ -23,6 +23,18 @@ export const FloatingNav: React.FC<FloatingNavProps> = ({
   className,
 }) => {
   const { data: session } = useSession();
+  const [customAvatar, setCustomAvatar] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    const loadAvatar = () => {
+      const savedAvatar = localStorage.getItem("devtrack_custom_avatar");
+      setCustomAvatar(savedAvatar);
+    };
+
+    loadAvatar();
+    window.addEventListener("devtrack_avatar_updated", loadAvatar);
+    return () => window.removeEventListener("devtrack_avatar_updated", loadAvatar);
+  }, []);
 
   const protectedRoutes = ["/dashboard", "/explore", "/analyze", "/opensource", "/contributors"];
 
@@ -69,16 +81,17 @@ export const FloatingNav: React.FC<FloatingNavProps> = ({
               href="/dashboard"
               className="flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium text-neutral-700 transition hover:bg-neutral-200 hover:text-black dark:text-neutral-300 dark:hover:bg-white/10 dark:hover:text-white"
             >
-              {session.user?.image ? (
-                <Image
-                  src={session.user.image}
-                  alt="Avatar"
-                  width={24}
-                  height={24}
-                  className="rounded-full shadow-md"
-                />
+              {customAvatar || session.user?.image ? (
+                <div className="relative w-6 h-6">
+                  <Image
+                    src={customAvatar || session.user?.image || ""}
+                    alt="Avatar"
+                    fill
+                    className="rounded-full shadow-md object-cover"
+                  />
+                </div>
               ) : (
-                <div className="w-6 h-6 rounded-full bg-neutral-700 flex items-center justify-center text-xs">
+                <div className="w-6 h-6 rounded-full bg-neutral-700 flex items-center justify-center text-xs text-white">
                   {session.user?.name?.charAt(0) || "U"}
                 </div>
               )}
