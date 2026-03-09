@@ -9,7 +9,7 @@ export default function RootLayout({
 }) {
   const navItems = [
     { name: "Home", link: "/" },
-    { name: "Dashboard", link: "/dashboard" },
+    { name: "OpenSource Tracker", link: "/opensource" },
     { name: "Explore", link: "/explore" },
   ];
 

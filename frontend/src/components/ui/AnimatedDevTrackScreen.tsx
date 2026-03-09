@@ -97,7 +97,7 @@ export default function AnimatedDevTrackScreen() {
             {/* Nav bar */}
             <div style={{ background: "#0d0d1a", borderBottom: "1px solid #ffffff10", padding: "5px 12px", display: "flex", gap: 12, alignItems: "center" }}>
                 <span style={{ color: "#818cf8", fontWeight: 700, fontSize: 9 }}>DevTrack</span>
-                {["Home", "Dashboard", "Explore", "Profile"].map(n => (
+                {["Home", "OpenSource Track", "Explore", "Profile"].map(n => (
                     <span key={n} style={{ color: n === "Explore" ? "#a5b4fc" : "#555", fontSize: 8 }}>{n}</span>
                 ))}
             </div>

@@ -187,7 +187,7 @@ export default function Home() {
           <p className="text-neutral-500 text-sm">© 2026 DevTrack. All rights reserved.</p>
           <div className="flex items-center gap-6">
             <a href="/explore" className="text-neutral-500 hover:text-white text-sm transition-colors">Explore</a>
-            <a href="/dashboard" className="text-neutral-500 hover:text-white text-sm transition-colors">Dashboard</a>
+            <a href="/opensource" className="text-neutral-500 hover:text-white text-sm transition-colors">Open Source</a>
             <a href="https://github.com" target="_blank" rel="noreferrer" className="text-neutral-500 hover:text-white text-sm transition-colors">GitHub</a>
           </div>
         </div>
