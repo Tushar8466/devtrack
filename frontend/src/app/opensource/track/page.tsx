@@ -7,17 +7,20 @@ import { motion } from "motion/react";
 import { Vortex } from "@/components/ui/vortex";
 import { GlareCard } from "@/components/ui/glare-card";
 import { Layers, Sparkles, Zap } from "lucide-react";
+import { Button } from "@/components/ui/stateful-button";
+import { MultiStepLoader } from "@/components/ui/multi-step-loader";
 
 export default function TrackerSearchPage() {
     const router = useRouter();
     const [searchQuery, setSearchQuery] = useState("");
     const [loading, setLoading] = useState(false);
 
-    const handleSearch = (e: React.FormEvent) => {
-        e.preventDefault();
+    const handleSearch = async (e?: React.FormEvent | React.MouseEvent<HTMLButtonElement>) => {
+        if (e) e.preventDefault();
         if (searchQuery.trim()) {
             setLoading(true);
             router.push(`/opensource/track/${searchQuery.trim()}`);
+            await new Promise((resolve) => setTimeout(resolve, 1500));
         }
     };
 
@@ -73,17 +76,13 @@ export default function TrackerSearchPage() {
                                     autoFocus
                                 />
                                 <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-neutral-500 w-7 h-7" />
-                                <button
-                                    type="submit"
-                                    className="absolute right-4 top-1/2 -translate-y-1/2 bg-violet-600 hover:bg-violet-500 text-white px-10 py-4 rounded-xl font-bold transition-all shadow-lg shadow-violet-500/20 active:scale-95 flex items-center gap-2 text-lg"
-                                    disabled={loading}
+                                <Button
+                                    type="button"
+                                    onClick={handleSearch}
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 bg-violet-600 hover:bg-violet-500 hover:ring-violet-500 text-white px-10 py-4 rounded-xl font-bold transition-all shadow-lg shadow-violet-500/20 active:scale-95 flex items-center gap-2 text-lg"
                                 >
-                                    {loading ? (
-                                        <div className="w-6 h-6 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-                                    ) : (
-                                        "Analyze"
-                                    )}
-                                </button>
+                                    Analyze
+                                </Button>
                             </form>
 
                             <div className="mt-28 grid grid-cols-1 md:grid-cols-3 gap-12 w-full max-w-5xl px-4">
@@ -109,6 +108,19 @@ export default function TrackerSearchPage() {
                     </motion.div>
                 </div>
             </Vortex>
+            <MultiStepLoader
+                loadingStates={[
+                    { text: "Initializing analysis engine" },
+                    { text: "Fetching GitHub profile data" },
+                    { text: "Synchronizing repositories" },
+                    { text: "Aggregating pull requests" },
+                    { text: "Calculating contribution impact" },
+                    { text: "Generating insights" },
+                    { text: "Finalizing report" },
+                ]}
+                loading={loading}
+                duration={500}
+            />
         </div>
     );
 }

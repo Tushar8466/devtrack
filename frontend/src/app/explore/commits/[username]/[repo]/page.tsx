@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import { IconBrandGithub, IconArrowLeft, IconGitCommit } from "@tabler/icons-react";
+import { MultiStepLoader } from "@/components/ui/loader";
 
 interface Commit {
     sha: string;
@@ -120,10 +121,17 @@ export default function RepositoryCommitsPage() {
                     {/* Content area */}
                     <div className="flex-1 overflow-y-auto p-4 md:p-8 md:pl-10 bg-black">
                         {loading ? (
-                            <div className="flex flex-col items-center justify-center h-full gap-4">
-                                <div className="w-10 h-10 rounded-full border-2 border-white/10 border-t-[#00e676] animate-spin" />
-                                <p className="text-neutral-400 animate-pulse font-medium">Scanning commit history...</p>
-                            </div>
+                            <MultiStepLoader
+                                loading={loading}
+                                duration={400}
+                                loadingStates={[
+                                    { text: "Connecting to GitHub API" },
+                                    { text: "Fetching repository data" },
+                                    { text: "Scanning commit history" },
+                                    { text: "Resolving commit authors" },
+                                    { text: "Generating timeline" },
+                                ]}
+                            />
                         ) : error ? (
                             <div className="flex flex-col items-center justify-center h-full px-6 text-center">
                                 <div className="w-16 h-16 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-500 mb-6">

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import ProfileResults from "@/components/explore/ProfileResults";
+import { MultiStepLoader } from "@/components/ui/multi-step-loader";
 
 export default function AnalyzeUserPage() {
     const params = useParams();
@@ -81,14 +82,18 @@ export default function AnalyzeUserPage() {
         fetchData();
     }, [username]);
 
-    // Loading state
     if (loading) {
         return (
-            <div className="min-h-screen bg-black flex items-center justify-center">
-                <div className="flex flex-col items-center gap-4">
-                    <div className="w-10 h-10 rounded-full border-3 border-white/10 border-t-violet-500 animate-spin" />
-                    <p className="text-neutral-400 text-lg">Analyzing <span className="text-white font-mono font-semibold">@{username}</span>...</p>
-                </div>
+            <div className="min-h-screen bg-black relative">
+                <MultiStepLoader
+                    loadingStates={[
+                        { text: "Finding User" },
+                        { text: "Loading User Repositories" },
+                        { text: "Gathering Stats" },
+                    ]}
+                    loading={loading}
+                    duration={500}
+                />
             </div>
         );
     }

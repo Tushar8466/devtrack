@@ -8,6 +8,7 @@ import { SparklesCore } from "@/components/ui/sparkles";
 import { WavyBackground } from "@/components/ui/wavy-background";
 import { motion, AnimatePresence } from "motion/react";
 import { useOutsideClick } from "@/hooks/use-outside-click";
+import { MultiStepLoader } from "@/components/ui/multi-step-loader";
 
 import { Cover } from "@/components/ui/cover";
 
@@ -93,13 +94,16 @@ export default function TrackerResultsPage() {
                 <div className="fixed inset-0 z-0">
                     <WavyBackground backgroundFill="black" containerClassName="h-full w-full" />
                 </div>
-                <div className="relative z-10 flex flex-col items-center gap-6">
-                    <div className="w-16 h-16 rounded-full border-4 border-white/5 border-t-violet-500 animate-spin" />
-                    <div className="text-center">
-                        <p className="text-white text-2xl font-black uppercase italic tracking-widest">Analyzing {username}</p>
-                        <p className="text-neutral-500 text-sm mt-2 font-mono uppercase tracking-widest">Fetching GitHub Intelligence...</p>
-                    </div>
-                </div>
+                <MultiStepLoader
+                    loadingStates={[
+                        { text: "Connecting to GitHub APIs" },
+                        { text: "Gathering Pull Requests" },
+                        { text: "Finding issues" },
+                        { text: "Locating Merged Results" },
+                    ]}
+                    loading={loading}
+                    duration={500}
+                />
             </div>
         );
     }

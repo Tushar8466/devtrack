@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { GlowingCard } from "@/components/ui/glowing-card";
 import { FileUpload } from "@/components/ui/file-upload";
 import { X } from "lucide-react";
+import { MultiStepLoader } from "@/components/ui/multi-step-loader";
 
 interface GitHubUser {
   login: string;
@@ -195,10 +196,16 @@ export default function DashboardPage() {
             </div>
           </div>
         ) : loading || isSearching ? (
-          <div className="flex flex-col items-center justify-center py-20 gap-4">
-            <div className="w-10 h-10 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin"></div>
-            <p className="text-neutral-500 animate-pulse">Syncing GitHub data...</p>
-          </div>
+          <MultiStepLoader
+            loadingStates={[
+              { text: "Locating GitHub profile" },
+              { text: "Fetching user info" },
+              { text: "Loading linked repositories" },
+              { text: "Drawing contribution graph" },
+            ]}
+            loading={loading || isSearching}
+            duration={400}
+          />
         ) : (
           <div className="rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl p-8 flex items-center gap-6">
             <div className="relative group cursor-pointer" onClick={() => setShowUploadModal(true)}>
