@@ -181,9 +181,9 @@ function OpenSourceLandingPage() {
               { step: "04", title: "Merge", desc: "Open a PR and collaborate with maintainers.", icon: <Star className="w-6 h-6" />, color: "rose" },
             ].map((item, i) => (
               <div key={i} className={`relative p-8 rounded-3xl bg-white/5 border transition-all group overflow-hidden ${item.color === "amber" ? "hover:bg-amber-500/3 border-white/5 hover:border-amber-500/20" :
-                  item.color === "blue" ? "hover:bg-blue-500/3 border-white/5 hover:border-blue-500/20" :
-                    item.color === "emerald" ? "hover:bg-emerald-500/3 border-white/5 hover:border-emerald-500/20" :
-                      "hover:bg-rose-500/3 border-white/5 hover:border-rose-500/20"
+                item.color === "blue" ? "hover:bg-blue-500/3 border-white/5 hover:border-blue-500/20" :
+                  item.color === "emerald" ? "hover:bg-emerald-500/3 border-white/5 hover:border-emerald-500/20" :
+                    "hover:bg-rose-500/3 border-white/5 hover:border-rose-500/20"
                 }`}>
                 <div className={`absolute -top-10 -right-10 w-32 h-32 rounded-full blur-3xl opacity-0 group-hover:opacity-20 transition-opacity ${item.color === "amber" ? "bg-amber-500" :
                   item.color === "blue" ? "bg-blue-500" :

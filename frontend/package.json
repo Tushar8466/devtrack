@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@react-three/fiber": "^10.0.0-alpha.2",
+    "@splinetool/react-spline": "^4.1.0",
+    "@splinetool/runtime": "^1.12.68",
     "@tabler/icons-react": "^3.40.0",
     "@tsparticles/engine": "^3.9.1",
     "@tsparticles/react": "^3.0.0",
@@ -26,6 +28,7 @@
     "react-github-calendar": "^5.0.5",
     "recharts": "^3.8.0",
     "simplex-noise": "^4.0.3",
+    "spline": "^0.0.0",
     "tailwind-merge": "^3.5.0",
     "three": "^0.183.2",
     "three-globe": "^2.45.0"

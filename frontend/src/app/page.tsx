@@ -7,6 +7,17 @@ import { MacbookScroll } from "@/components/ui/macbook-scroll";
 import AnimatedDevTrackScreen from "@/components/ui/AnimatedDevTrackScreen";
 import { EvervaultCard } from "@/components/ui/evervault-card";
 import { Search, Brain, BarChart, User, Settings, Lock } from "lucide-react";
+import dynamic from "next/dynamic";
+
+const Globe = dynamic(() => import("@/components/globe"), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-full flex flex-col items-center justify-center gap-4 text-neutral-500 bg-black/20">
+      <div className="w-8 h-8 border-2 border-violet-500/20 border-t-violet-500 rounded-full animate-spin" />
+      <p className="text-xs font-medium uppercase tracking-widest animate-pulse">Initializing World Map...</p>
+    </div>
+  ),
+});
 
 // ... (Icon definition same as before)
 const Icon = ({ className }: { className?: string }) => {
@@ -187,6 +198,30 @@ export default function Home() {
           >
             Start Scanning Now →
           </Link>
+        </div>
+      </section>
+
+      {/* Global Interactive Section */}
+      <section id="global-map" className="bg-black py-24 px-6 border-t border-white/5 overflow-hidden relative min-h-[600px] flex flex-col items-center">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(124,58,237,0.05),transparent)] pointer-events-none" />
+
+        <div className="max-w-5xl mx-auto text-center mb-16 relative z-10">
+          <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">
+            A Global Insight Into <span className="text-violet-400">Software Authorship</span>
+          </h2>
+          <p className="text-neutral-400 max-w-2xl mx-auto">
+            Interactive visualization of real-time developer metrics across the global ecosystem.
+          </p>
+        </div>
+
+        <div className="w-full max-w-6xl h-[600px] md:h-[800px] relative z-10 bg-white/2 border border-white/5 border-indigo-500/10 rounded-[3rem] p-1 backdrop-blur-sm group hover:border-violet-500/20 transition-all duration-700">
+          <div className="w-full h-full rounded-[2.8rem] overflow-hidden">
+            <Globe />
+          </div>
+
+          {/* Accent decoration */}
+          <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-violet-600/20 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute -top-6 -left-6 w-32 h-32 bg-blue-600/20 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity" />
         </div>
       </section>
 
