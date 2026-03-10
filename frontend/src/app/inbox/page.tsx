@@ -24,6 +24,7 @@ interface Feedback {
     timestamp: string;
     author: string;
     email?: string | null;
+    githubHandle?: string | null;
     avatar?: string | null;
     isVerified?: boolean;
 }
@@ -203,12 +204,12 @@ export default function InboxPage() {
                                                 </span>
                                                 {f.isVerified && (
                                                     <Link
-                                                        href={`https://github.com/${f.author.replace(/\s+/g, '')}`}
+                                                        href={`https://github.com/${f.githubHandle || f.author.toLowerCase().replace(/\s+/g, '')}`}
                                                         target="_blank"
                                                         className="text-[11px] font-mono text-violet-400 hover:text-white transition-colors flex items-center gap-2"
                                                     >
                                                         <span className="w-1.5 h-1.5 rounded-full bg-violet-500 animate-pulse" />
-                                                        github.com/{f.author.toLowerCase().replace(/\s+/g, '')}
+                                                        github.com/{f.githubHandle || f.author.toLowerCase().replace(/\s+/g, '')}
                                                     </Link>
                                                 )}
                                                 {!f.isVerified && (

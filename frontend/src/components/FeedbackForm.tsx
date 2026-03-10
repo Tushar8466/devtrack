@@ -38,6 +38,7 @@ export function FeedbackForm() {
                 timestamp: new Date().toISOString(),
                 author: authorName,
                 email: session?.user?.email || null,
+                githubHandle: (session as any)?.user?.username || (session as any)?.gh_username || session?.user?.name?.toLowerCase().replace(/\s+/g, '') || null,
                 avatar: session?.user?.image || null,
                 isVerified: !!session
             };
