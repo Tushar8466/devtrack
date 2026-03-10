@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import { IconBrandGithub, IconArrowLeft, IconGitCommit } from "@tabler/icons-react";
-import { MultiStepLoader } from "@/components/ui/loader";
+import { MultiStepLoader } from "@/components/ui/multi-step-loader";
 
 interface Commit {
     sha: string;
