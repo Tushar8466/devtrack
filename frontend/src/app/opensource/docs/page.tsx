@@ -465,7 +465,17 @@ const colorMap: Record<string, { bg: string; border: string; text: string; ring:
 export default function OpenSourceDocsPage() {
     const router = useRouter();
     const [activeStep, setActiveStep] = useState(0);
+    const [expandedSteps, setExpandedSteps] = useState<Set<number>>(new Set([0]));
     const stepRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+    const toggleStep = (index: number) => {
+        setExpandedSteps((prev) => {
+            const next = new Set(prev);
+            if (next.has(index)) next.delete(index);
+            else next.add(index);
+            return next;
+        });
+    };
 
     // track which step is in view
     useEffect(() => {
@@ -485,7 +495,8 @@ export default function OpenSourceDocsPage() {
     }, []);
 
     const scrollToStep = (i: number) => {
-        stepRefs.current[i]?.scrollIntoView({ behavior: "smooth", block: "center" });
+        setExpandedSteps((prev) => { const next = new Set(prev); next.add(i); return next; });
+        setTimeout(() => stepRefs.current[i]?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
     };
 
     return (
@@ -603,7 +614,7 @@ export default function OpenSourceDocsPage() {
                                 >
                                     <div className={`relative rounded-3xl border transition-all duration-500 overflow-hidden ${isActive ? `border-white/15 shadow-2xl` : "border-white/8"
                                         }`}>
-                                        {/* Subtle top gradient bar */}
+                                        {/* Gradient top bar */}
                                         {isActive && (
                                             <div className={`absolute top-0 left-0 right-0 h-0.5 bg-linear-to-r ${step.color === "cyan" ? "from-cyan-500 to-blue-500" :
                                                 step.color === "violet" ? "from-violet-500 to-purple-500" :
@@ -616,75 +627,99 @@ export default function OpenSourceDocsPage() {
                                                 }`} />
                                         )}
 
-                                        <div className="bg-[#050508] p-8">
-                                            {/* Header row */}
-                                            <div className="flex items-start gap-5 mb-6">
-                                                <div className={`w-12 h-12 rounded-2xl ${c.bg} ${c.border} border flex items-center justify-center ${c.text} shrink-0`}>
-                                                    {step.icon}
+                                        {/* Clickable header — toggles expand/collapse */}
+                                        <button
+                                            onClick={() => toggleStep(index)}
+                                            className="w-full bg-[#050508] px-8 pt-8 pb-6 flex items-center gap-5 text-left hover:bg-white/2 transition-colors"
+                                        >
+                                            <div className={`w-12 h-12 rounded-2xl ${c.bg} ${c.border} border flex items-center justify-center ${c.text} shrink-0 transition-transform duration-300 ${expandedSteps.has(index) ? "scale-100" : "scale-95 opacity-70"
+                                                }`}>
+                                                {step.icon}
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex items-center gap-3 mb-1 flex-wrap">
+                                                    <span className={`text-xs font-black ${c.text} uppercase tracking-[0.2em]`}>{step.number}</span>
+                                                    <span className="text-neutral-700 text-xs">·</span>
+                                                    <span className="text-xs text-neutral-500 italic">{step.tagline}</span>
                                                 </div>
-                                                <div className="flex-1 min-w-0">
-                                                    <div className="flex items-center gap-3 mb-1 flex-wrap">
-                                                        <span className={`text-xs font-black ${c.text} uppercase tracking-[0.2em]`}>{step.number}</span>
-                                                        <span className="text-neutral-700 text-xs">·</span>
-                                                        <span className="text-xs text-neutral-500 italic">{step.tagline}</span>
+                                                <h2 className="text-xl md:text-2xl font-black text-white tracking-tight">{step.title}</h2>
+                                            </div>
+                                            {/* Chevron */}
+                                            <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 transition-all duration-300 ${expandedSteps.has(index)
+                                                ? `${c.bg} ${c.border} border ${c.text}`
+                                                : "bg-white/3 border border-white/8 text-neutral-500"
+                                                }`}>
+                                                <ChevronRight className={`w-4 h-4 transition-transform duration-300 ${expandedSteps.has(index) ? "rotate-90" : ""
+                                                    }`} />
+                                            </div>
+                                        </button>
+
+                                        {/* Collapsible body */}
+                                        <AnimatePresence initial={false}>
+                                            {expandedSteps.has(index) && (
+                                                <motion.div
+                                                    key="body"
+                                                    initial={{ height: 0, opacity: 0 }}
+                                                    animate={{ height: "auto", opacity: 1 }}
+                                                    exit={{ height: 0, opacity: 0 }}
+                                                    transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
+                                                    className="overflow-hidden"
+                                                >
+                                                    <div className="bg-[#050508] px-8 pb-8 space-y-6 border-t border-white/5">
+                                                        {/* Description */}
+                                                        <p className="text-neutral-300 leading-relaxed text-[15px] pt-6">{step.description}</p>
+
+                                                        {/* Tips */}
+                                                        <div>
+                                                            <p className={`text-[10px] uppercase tracking-widest font-black mb-3 flex items-center gap-2 ${c.text}`}>
+                                                                <Lightbulb className="w-3 h-3" />
+                                                                Key Tips
+                                                            </p>
+                                                            <ul className="grid sm:grid-cols-2 gap-x-6 gap-y-2.5">
+                                                                {step.tips.map((tip, i) => (
+                                                                    <li key={i} className="flex items-start gap-2.5 text-sm text-neutral-400 leading-relaxed">
+                                                                        <ChevronRight className={`w-4 h-4 ${c.text} shrink-0 mt-0.5`} />
+                                                                        {tip}
+                                                                    </li>
+                                                                ))}
+                                                            </ul>
+                                                        </div>
+
+                                                        {/* Code */}
+                                                        <div>
+                                                            <p className={`text-[10px] uppercase tracking-widest font-black mb-3 flex items-center gap-2 ${c.text}`}>
+                                                                <Terminal className="w-3 h-3" />
+                                                                Terminal
+                                                            </p>
+                                                            <CodeBlock code={step.code.snippet} label={step.code.label} />
+                                                        </div>
+
+                                                        {/* Navigation */}
+                                                        {(index > 0 || index < steps.length - 1) && (
+                                                            <div className="flex justify-between items-center pt-6 border-t border-white/5">
+                                                                <button
+                                                                    onClick={() => index > 0 && scrollToStep(index - 1)}
+                                                                    disabled={index === 0}
+                                                                    className="flex items-center gap-2 text-xs text-neutral-500 hover:text-white disabled:opacity-20 disabled:cursor-not-allowed transition-colors px-3 py-1.5 rounded-lg hover:bg-white/5"
+                                                                >
+                                                                    <ArrowLeft className="w-3.5 h-3.5" />
+                                                                    Previous step
+                                                                </button>
+                                                                <span className="text-xs text-neutral-700 font-mono">{index + 1} / {steps.length}</span>
+                                                                <button
+                                                                    onClick={() => index < steps.length - 1 && scrollToStep(index + 1)}
+                                                                    disabled={index === steps.length - 1}
+                                                                    className={`flex items-center gap-2 text-xs disabled:opacity-20 disabled:cursor-not-allowed transition-colors px-3 py-1.5 rounded-lg hover:bg-white/5 ${c.text}`}
+                                                                >
+                                                                    Next step
+                                                                    <ArrowRight className="w-3.5 h-3.5" />
+                                                                </button>
+                                                            </div>
+                                                        )}
                                                     </div>
-                                                    <h2 className="text-xl md:text-2xl font-black text-white tracking-tight">{step.title}</h2>
-                                                </div>
-                                            </div>
-
-                                            {/* Description */}
-                                            <p className="text-neutral-300 leading-relaxed mb-6 text-[15px]">{step.description}</p>
-
-                                            <div className="space-y-6">
-                                                {/* Tips — displayed in a 2-col grid when space allows */}
-                                                <div>
-                                                    <p className={`text-[10px] uppercase tracking-widest font-black mb-3 flex items-center gap-2 ${c.text}`}>
-                                                        <Lightbulb className="w-3 h-3" />
-                                                        Key Tips
-                                                    </p>
-                                                    <ul className="grid sm:grid-cols-2 gap-x-6 gap-y-2.5">
-                                                        {step.tips.map((tip, i) => (
-                                                            <li key={i} className="flex items-start gap-2.5 text-sm text-neutral-400 leading-relaxed">
-                                                                <ChevronRight className={`w-4 h-4 ${c.text} shrink-0 mt-0.5`} />
-                                                                {tip}
-                                                            </li>
-                                                        ))}
-                                                    </ul>
-                                                </div>
-
-                                                {/* Code — full width below tips */}
-                                                <div>
-                                                    <p className={`text-[10px] uppercase tracking-widest font-black mb-3 flex items-center gap-2 ${c.text}`}>
-                                                        <Terminal className="w-3 h-3" />
-                                                        Terminal
-                                                    </p>
-                                                    <CodeBlock code={step.code.snippet} label={step.code.label} />
-                                                </div>
-                                            </div>
-
-                                            {/* Navigation */}
-                                            {(index > 0 || index < steps.length - 1) && (
-                                                <div className="flex justify-between items-center mt-8 pt-6 border-t border-white/5">
-                                                    <button
-                                                        onClick={() => index > 0 && scrollToStep(index - 1)}
-                                                        disabled={index === 0}
-                                                        className="flex items-center gap-2 text-xs text-neutral-500 hover:text-white disabled:opacity-20 disabled:cursor-not-allowed transition-colors px-3 py-1.5 rounded-lg hover:bg-white/5"
-                                                    >
-                                                        <ArrowLeft className="w-3.5 h-3.5" />
-                                                        Previous step
-                                                    </button>
-                                                    <span className="text-xs text-neutral-700 font-mono">{index + 1} / {steps.length}</span>
-                                                    <button
-                                                        onClick={() => index < steps.length - 1 && scrollToStep(index + 1)}
-                                                        disabled={index === steps.length - 1}
-                                                        className={`flex items-center gap-2 text-xs disabled:opacity-20 disabled:cursor-not-allowed transition-colors px-3 py-1.5 rounded-lg hover:bg-white/5 ${c.text}`}
-                                                    >
-                                                        Next step
-                                                        <ArrowRight className="w-3.5 h-3.5" />
-                                                    </button>
-                                                </div>
+                                                </motion.div>
                                             )}
-                                        </div>
+                                        </AnimatePresence>
                                     </div>
                                 </motion.div>
                             );
