@@ -162,7 +162,7 @@ export default function InboxPage() {
                             <div
                                 key={f.id}
                                 style={{ animationDelay: `${i * 100}ms` }}
-                                className="group relative bg-[#050505]/60 border border-white/5 rounded-[2.5rem] p-8 hover:border-violet-500/40 transition-all duration-700 animate-in fade-in slide-in-from-bottom-8 backdrop-blur-sm overflow-hidden"
+                                className="group relative bg-[#050505]/60 border border-white/5 rounded-[2.5rem] p-6 hover:border-violet-500/40 transition-all duration-700 animate-in fade-in slide-in-from-bottom-8 backdrop-blur-sm overflow-hidden"
                             >
                                 {/* Card Scanning Effect */}
                                 <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-transparent via-violet-500/20 to-transparent -translate-x-full group-hover:animate-[scan_3s_linear_infinite]" />
@@ -199,17 +199,21 @@ export default function InboxPage() {
                                             <div className="flex items-center gap-4">
                                                 <span className="flex items-center gap-1.5 text-[11px] font-mono text-neutral-500 uppercase tracking-widest border-r border-white/10 pr-4">
                                                     <Clock size={12} className="text-violet-500" />
-                                                    {new Date(f.timestamp).toLocaleDateString()} // {new Date(f.timestamp).toLocaleTimeString()}
+                                                    {new Date(f.timestamp).toLocaleDateString()}
                                                 </span>
-                                                {f.email && (
-                                                    <span className="text-[11px] font-mono text-neutral-400 lowercase tracking-tight flex items-center gap-2">
-                                                        <span className="w-1.5 h-1.5 rounded-full bg-violet-500/40" />
-                                                        {f.email}
-                                                    </span>
+                                                {f.isVerified && (
+                                                    <Link
+                                                        href={`https://github.com/${f.author.replace(/\s+/g, '')}`}
+                                                        target="_blank"
+                                                        className="text-[11px] font-mono text-violet-400 hover:text-white transition-colors flex items-center gap-2"
+                                                    >
+                                                        <span className="w-1.5 h-1.5 rounded-full bg-violet-500 animate-pulse" />
+                                                        github.com/{f.author.toLowerCase().replace(/\s+/g, '')}
+                                                    </Link>
                                                 )}
-                                                {!f.email && !f.isVerified && (
+                                                {!f.isVerified && (
                                                     <span className="text-[11px] font-mono text-neutral-600 uppercase tracking-widest italic">
-                                                        NODE_ID: {f.id.toString().slice(-6)}
+                                                        NODE_ID: {f.id.toString().slice(-4)}
                                                     </span>
                                                 )}
                                             </div>
