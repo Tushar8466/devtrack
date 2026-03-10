@@ -11,7 +11,7 @@ export default function HeroSection() {
   return (
     <div>
       <div className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 w-full h-full bg-white dark:bg-black z-10 [mask-image:radial-gradient(transparent,white)] pointer-events-none transition-colors duration-300" />
+        <div className="absolute inset-0 w-full h-full bg-black z-10 mask-[radial-gradient(transparent,white)] pointer-events-none transition-colors duration-300" />
 
         <div className="absolute inset-0 w-full h-full z-0">
           <BoxesCore />
@@ -19,7 +19,7 @@ export default function HeroSection() {
 
         {/* Main Content foreground */}
         <div className="z-20 flex flex-col items-center gap-6 max-w-4xl mx-auto px-4 mt-[-5vh] text-center mix-blend-difference">
-          <div className="px-4 py-1.5 rounded-full border border-white/10 bg-white/5 backdrop-blur-md text-sm font-medium text-violet-300 inline-flex items-center gap-2 mb-2 animate-in fade-in slide-in-from-bottom-4 duration-1000 ease-out">
+          <div className="px-4 py-1.5 rounded-full border border-white/10 bg-black/40 backdrop-blur-md text-sm font-medium text-violet-300 inline-flex items-center gap-2 mb-2 animate-in fade-in slide-in-from-bottom-4 duration-1000 ease-out">
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-violet-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-violet-500"></span>

@@ -19,6 +19,16 @@ const Globe = dynamic(() => import("@/components/globe"), {
   ),
 });
 
+const SpecialEcosystem = dynamic(() => import("@/components/special"), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-full flex flex-col items-center justify-center gap-4 text-neutral-500 bg-black/20">
+      <div className="w-8 h-8 border-2 border-cyan-500/20 border-t-cyan-500 rounded-full animate-spin" />
+      <p className="text-xs font-medium uppercase tracking-widest animate-pulse font-mono">Neural Syncing...</p>
+    </div>
+  ),
+});
+
 // ... (Icon definition same as before)
 const Icon = ({ className }: { className?: string }) => {
   return (
@@ -114,13 +124,13 @@ export default function Home() {
       </div>
 
       {/* Features section */}
-      <section className="bg-black py-24 px-6 border-t border-white/5">
+      <section className="bg-black py-24 px-6">
         <div className="relative z-20 w-full mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
+            <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
               Everything you need to detect AI code
             </h2>
-            <p className="mt-4 text-lg text-neutral-600 dark:text-neutral-400">
+            <p className="mt-4 text-lg text-neutral-400">
               Powerful tools built for modern engineering teams.
             </p>
           </div>
@@ -129,13 +139,13 @@ export default function Home() {
             {features.map((feature, idx) => (
               <div
                 key={idx}
-                className="border border-black/20 dark:border-white/20 flex flex-col items-start p-4 relative h-[30rem] bg-white/50 dark:bg-black/50 backdrop-blur-sm rounded-2xl group"
+                className="border border-white/10 flex flex-col items-start p-4 relative h-[30rem] bg-black/60 backdrop-blur-md rounded-2xl group"
               >
                 {/* Corner icons */}
-                <Icon className="absolute h-6 w-6 -top-3 -left-3 text-slate-900 dark:text-white" />
-                <Icon className="absolute h-6 w-6 -bottom-3 -left-3 text-slate-900 dark:text-white" />
-                <Icon className="absolute h-6 w-6 -top-3 -right-3 text-slate-900 dark:text-white" />
-                <Icon className="absolute h-6 w-6 -bottom-3 -right-3 text-slate-900 dark:text-white" />
+                <Icon className="absolute h-6 w-6 -top-3 -left-3 text-white" />
+                <Icon className="absolute h-6 w-6 -bottom-3 -left-3 text-white" />
+                <Icon className="absolute h-6 w-6 -top-3 -right-3 text-white" />
+                <Icon className="absolute h-6 w-6 -bottom-3 -right-3 text-white" />
 
                 {/* Evervault interactive card */}
                 <div className="w-full flex-1 flex items-center justify-center">
@@ -144,10 +154,10 @@ export default function Home() {
 
                 {/* Text */}
                 <div className="w-full mt-2 flex flex-col gap-3 pb-10">
-                  <h3 className="text-slate-900 dark:text-white text-xl font-bold">
+                  <h3 className="text-white text-xl font-bold">
                     {feature.title}
                   </h3>
-                  <p className="text-sm font-light border border-black/20 dark:border-white/20 rounded-full px-4 py-2 text-neutral-600 dark:text-neutral-400">
+                  <p className="text-sm font-light border border-white/10 rounded-full px-4 py-2 text-neutral-400">
                     {feature.description}
                   </p>
                 </div>
@@ -157,8 +167,49 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Special Neural Section */}
+      <section className="bg-black py-24 px-6 relative overflow-hidden">
+        {/* Removed gradient accent line */}
+
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <div className="space-y-8 animate-in fade-in slide-in-from-left-8 duration-1000">
+              <div>
+                <span className="px-3 py-1 rounded-full bg-transparent border border-white/10 text-cyan-400 text-[10px] font-bold uppercase tracking-[0.2em] mb-4 inline-block">
+                  Proprietary Neural Engine
+                </span>
+                <h2 className="text-4xl md:text-6xl font-black text-white tracking-tighter leading-none">
+                  DECONSTRUCTING <br />
+                  <span className="bg-linear-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">CODE GENETICS</span>
+                </h2>
+              </div>
+
+              <p className="text-neutral-400 text-lg leading-relaxed max-w-xl">
+                Our core engine analyzes billions of code tokens to identify the unique fingerprints of human vs. synthetic authorship. Toggle the nodes to visualize the neural distribution.
+              </p>
+
+              <div className="flex flex-wrap gap-4">
+                <div className="px-6 py-4 rounded-3xl bg-white/5 border border-white/10 group hover:border-cyan-500/30 transition-colors">
+                  <div className="text-3xl font-black text-white">4.2M+</div>
+                  <div className="text-[10px] text-neutral-500 uppercase tracking-widest font-bold">Neural Weights</div>
+                </div>
+                <div className="px-6 py-4 rounded-3xl bg-white/5 border border-white/10 group hover:border-blue-500/30 transition-colors">
+                  <div className="text-3xl font-black text-white">99.4%</div>
+                  <div className="text-[10px] text-neutral-500 uppercase tracking-widest font-bold">Signal Accuracy</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="h-[500px] md:h-[650px] w-full relative group">
+              <div className="absolute -inset-4 bg-transparent transition-opacity duration-1000" />
+              <SpecialEcosystem />
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* How it works section */}
-      <section className="bg-black py-24 px-6 border-t border-white/5">
+      <section className="bg-black py-24 px-6">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
             <span className="text-violet-400 text-sm font-semibold uppercase tracking-widest">
@@ -172,7 +223,7 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {steps.map((s, i) => (
               <div key={i} className="flex flex-col items-center text-center relative">
-                <div className="w-16 h-16 rounded-full bg-violet-500/10 border border-violet-500/30 flex items-center justify-center mb-6">
+                <div className="w-16 h-16 rounded-full bg-transparent border border-white/10 flex items-center justify-center mb-6">
                   <span className="text-violet-400 text-xl font-bold">{s.step}</span>
                 </div>
                 <h3 className="text-white font-semibold text-xl mb-3">{s.title}</h3>
@@ -184,7 +235,7 @@ export default function Home() {
       </section>
 
       {/* CTA section */}
-      <section className="bg-black py-24 px-6 border-t border-white/5">
+      <section className="bg-black py-24 px-6">
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
             Ready to decode <span className="text-violet-400">developer DNA</span>?
@@ -202,8 +253,8 @@ export default function Home() {
       </section>
 
       {/* Global Interactive Section */}
-      <section id="global-map" className="bg-black py-24 px-6 border-t border-white/5 overflow-hidden relative min-h-[600px] flex flex-col items-center">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(124,58,237,0.05),transparent)] pointer-events-none" />
+      <section id="global-map" className="bg-black py-24 px-6 overflow-hidden relative min-h-[600px] flex flex-col items-center">
+        <div className="absolute inset-0 bg-black pointer-events-none" />
 
         <div className="max-w-5xl mx-auto text-center mb-16 relative z-10">
           <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">
@@ -214,19 +265,17 @@ export default function Home() {
           </p>
         </div>
 
-        <div className="w-full max-w-6xl h-[600px] md:h-[800px] relative z-10 bg-white/2 border border-white/5 border-indigo-500/10 rounded-[3rem] p-1 backdrop-blur-sm group hover:border-violet-500/20 transition-all duration-700">
+        <div className="w-full max-w-6xl h-[600px] md:h-[800px] relative z-10 bg-black border border-indigo-500/10 rounded-[3rem] p-1 backdrop-blur-sm group hover:border-violet-500/20 transition-all duration-700">
           <div className="w-full h-full rounded-[2.8rem] overflow-hidden">
             <Globe />
           </div>
 
-          {/* Accent decoration */}
-          <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-violet-600/20 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute -top-6 -left-6 w-32 h-32 bg-blue-600/20 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity" />
+          {/* Removed accents */}
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-black border-t border-white/5 py-8 px-6">
+      <footer className="bg-black py-8 px-6">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-neutral-500 text-sm">© 2026 DevTrack. All rights reserved.</p>
           <div className="flex items-center gap-6">
