@@ -252,6 +252,85 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Contribute Section */}
+      <section id="contribute" className="bg-black py-32 px-6">
+        <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-24">
+          <div className="flex-1 space-y-10 group">
+            <div>
+              <span className="text-violet-400 font-bold uppercase tracking-[0.3em] mb-4 inline-block text-[11px] animate-pulse">// OPEN SOURCE INITIATIVE</span>
+              <h2 className="text-5xl md:text-7xl font-black text-white leading-[0.9] tracking-tighter">
+                BE PART OF THE <br className="hidden md:block" />
+                <span className="bg-linear-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">EVOLUTION</span>
+              </h2>
+            </div>
+
+            <p className="text-neutral-500 text-xl leading-relaxed max-w-xl group-hover:text-neutral-400 transition-colors duration-500">
+              DevTrack is an open-source project aimed at creating a transparent, verifiable ecosystem for software authorship. Every line of our code is open for review and contribution.
+            </p>
+
+            <div className="flex flex-wrap gap-6 pt-4">
+              <Link
+                href="/contribute"
+                className="px-10 py-4 rounded-[2rem] bg-white text-black font-black hover:scale-105 transition-all shadow-xl shadow-white/5 active:scale-95"
+              >
+                CONTRIBUTE NOW
+              </Link>
+              <a
+                href="https://github.com/Tushar8466/devtrack"
+                target="_blank"
+                rel="noreferrer"
+                className="px-10 py-4 rounded-[2rem] bg-white/5 border border-white/10 text-white font-black hover:bg-white/10 transition-all active:scale-95"
+              >
+                GITHUB REPO
+              </a>
+            </div>
+          </div>
+
+          <div className="flex-1 w-full flex items-center justify-center relative group">
+            <div className="w-full aspect-square max-w-[500px] border border-white/10 rounded-[4rem] bg-black relative flex flex-col items-center justify-center p-12 text-center overflow-hidden shadow-[0_0_50px_-12px_rgba(124,58,237,0.2)] hover:border-violet-500/50 transition-all duration-700">
+              {/* Dynamic Background Effects */}
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(124,58,237,0.15),transparent_70%)] opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
+              <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-transparent via-violet-500/50 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-[2000ms] ease-in-out" />
+
+              <div className="relative mb-8">
+                <div className="relative w-28 h-28 flex items-center justify-center">
+                  <div className="absolute inset-0 bg-violet-600/20 blur-3xl animate-pulse" />
+                  <div className="absolute inset-0 border border-violet-500/10 rounded-full animate-[spin_10s_linear_infinite]" />
+                  <div className="absolute inset-2 border border-violet-500/5 rounded-full animate-[spin_15s_linear_infinite_reverse]" />
+                  <Settings className="relative w-16 h-16 text-violet-500 group-hover:rotate-180 transition-transform duration-1000 ease-out" strokeWidth={1} />
+                </div>
+              </div>
+
+              <div className="space-y-4 relative z-10">
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <div className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
+                  <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest">Live Integration</span>
+                </div>
+                <h4 className="text-3xl font-black text-white tracking-tighter uppercase leading-none">JOIN THE CORE</h4>
+                <div className="text-neutral-500 text-sm font-medium border-y border-white/5 py-4 px-6 inline-block uppercase tracking-widest">
+                  <span className="text-violet-400 font-bold mr-2 animate-pulse">GROWING</span>
+                  OPEN SOURCE MISSION
+                </div>
+              </div>
+
+              <p className="mt-8 text-neutral-500 text-xs italic leading-relaxed max-w-[280px]">
+                "Our mission is to help human ingenuity thrive in the age of synthetic code authorship."
+              </p>
+
+              {/* Decorative Corner Accents */}
+              <div className="absolute top-8 left-8 w-4 h-4 border-t-2 border-l-2 border-white/10 group-hover:border-violet-500/50 transition-colors" />
+              <div className="absolute bottom-8 right-8 w-4 h-4 border-b-2 border-r-2 border-white/10 group-hover:border-violet-500/50 transition-colors" />
+            </div>
+
+            {/* Outer Glows */}
+            <div className="absolute -inset-4 bg-violet-500/5 blur-3xl rounded-[4rem] opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none" />
+          </div>
+          {/* Absolute decorative items */}
+          <div className="absolute -top-10 -right-10 w-32 h-32 bg-violet-600/5 blur-3xl rounded-full" />
+          <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-fuchsia-600/5 blur-3xl rounded-full" />
+        </div>
+      </section>
+
       {/* Global Interactive Section */}
       <section id="global-map" className="bg-black py-24 px-6 overflow-hidden relative min-h-[600px] flex flex-col items-center">
         <div className="absolute inset-0 bg-black pointer-events-none" />
@@ -269,8 +348,6 @@ export default function Home() {
           <div className="w-full h-full rounded-[2.8rem] overflow-hidden">
             <Globe />
           </div>
-
-          {/* Removed accents */}
         </div>
       </section>
 
@@ -280,8 +357,9 @@ export default function Home() {
           <p className="text-neutral-500 text-sm">© 2026 DevTrack. All rights reserved.</p>
           <div className="flex items-center gap-6">
             <Link href={nextRoute} className="text-neutral-500 hover:text-white text-sm transition-colors">Explore</Link>
+            <Link href="/contribute" className="text-neutral-500 hover:text-white text-sm transition-colors">Contribute</Link>
             <Link href="/opensource" className="text-neutral-500 hover:text-white text-sm transition-colors">Open Source</Link>
-            <a href="https://github.com" target="_blank" rel="noreferrer" className="text-neutral-500 hover:text-white text-sm transition-colors">GitHub</a>
+            <a href="https://github.com/Tushar8466/devtrack" target="_blank" rel="noreferrer" className="text-neutral-500 hover:text-white text-sm transition-colors">GitHub</a>
           </div>
         </div>
       </footer>
