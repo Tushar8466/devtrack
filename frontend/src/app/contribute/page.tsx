@@ -2,8 +2,9 @@
 
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { Github, Code2, MessageSquare, Coffee, Heart, Globe, Terminal } from "lucide-react";
-import { Suspense } from "react";
+import { Github, Code2, MessageSquare, Coffee, Heart, Globe, Terminal, X, Zap } from "lucide-react";
+import { Suspense, useState } from "react";
+import confetti from "canvas-confetti";
 
 const Portal = dynamic(() => import("@/components/portal"), {
     ssr: false,
@@ -11,6 +12,8 @@ const Portal = dynamic(() => import("@/components/portal"), {
 });
 
 export default function ContributePage() {
+    const [activeTier, setActiveTier] = useState<null | { title: string; color: string; icon: any }>(null);
+
     const steps = [
         {
             title: "Fork & Clone",
@@ -35,8 +38,96 @@ export default function ContributePage() {
         }
     ];
 
+    const handleSupportClick = (title: string, color: string, icon: any) => {
+        setActiveTier({ title, color, icon });
+
+        // Premium celebration effect
+        const scalar = 2;
+        const triangle = confetti.shapeFromPath({ path: 'M0 10 L5 0 L10 10z' });
+
+        confetti({
+            shapes: [triangle],
+            particleCount: 50,
+            spread: 60,
+            origin: { y: 0.6 },
+            colors: [color === 'violet' ? '#8b5cf6' : color === 'cyan' ? '#06b6d4' : '#f59e0b'],
+            scalar
+        });
+    };
+
     return (
         <div className="min-h-screen bg-black text-white selection:bg-violet-500/30 overflow-x-hidden">
+            {/* Sponsorship Modal Overlay */}
+            {activeTier && (
+                <div
+                    className="fixed inset-0 z-[100] flex items-center justify-center p-6 animate-in fade-in duration-300"
+                    onClick={() => setActiveTier(null)}
+                >
+                    <div className="absolute inset-0 bg-black/60 backdrop-blur-3xl" />
+                    <div
+                        className="w-full max-w-lg bg-black border border-white/10 rounded-[3rem] p-8 relative z-10 shadow-2xl overflow-hidden group/modal"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        {/* Animated Background for Modal */}
+                        <div className={`absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_50%_0%,${activeTier.color},transparent_70%)] animate-pulse`} />
+
+                        <button
+                            onClick={() => setActiveTier(null)}
+                            className="absolute top-6 right-6 p-2 rounded-full hover:bg-white/5 transition-colors group"
+                        >
+                            <X size={24} className="text-neutral-500 group-hover:text-white transition-colors" />
+                        </button>
+
+                        <div className="flex flex-col items-center text-center py-10">
+                            <div className="relative mb-8">
+                                <div className={`absolute inset-0 blur-3xl opacity-20 scale-150 rounded-full bg-${activeTier.color}-500/40`} />
+                                <div className="w-24 h-24 rounded-3xl bg-white/5 border border-white/10 flex items-center justify-center group-hover/modal:scale-110 transition-transform duration-700">
+                                    {activeTier.icon}
+                                </div>
+                            </div>
+
+                            <span className={`px-4 py-1.5 rounded-full border border-${activeTier.color}-500/20 bg-${activeTier.color}-500/10 text-${activeTier.color}-400 text-[10px] font-black uppercase tracking-[0.3em] mb-6`}>
+                                Neural Connection Initiated
+                            </span>
+
+                            <h3 className="text-4xl font-black mb-4 tracking-tighter">SUPPORT THE {activeTier.title.split(' ')[0].toUpperCase()}</h3>
+                            <p className="text-neutral-400 leading-relaxed mb-8 max-w-sm">
+                                You're about to establish a direct link to the DevTrack engine. Sponsors receive unique "Architect" signatures in the source code.
+                            </p>
+
+                            {/* Message Field */}
+                            <div className="w-full mb-8 relative group/input">
+                                <textarea
+                                    placeholder="Drop a neural signature or feedback..."
+                                    className="w-full h-32 bg-white/5 border border-white/10 rounded-2xl p-4 text-sm text-white placeholder:text-neutral-600 focus:outline-none focus:border-white/20 transition-all resize-none relative z-10"
+                                />
+                                <div className="absolute bottom-4 right-4 text-[10px] font-mono text-neutral-600 uppercase tracking-widest z-10">
+                                    Ready to Transmit
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 w-full gap-4">
+                                <a
+                                    href="https://github.com/sponsors/Tushar8466"
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className={`w-full py-5 rounded-2xl bg-white text-black font-black hover:scale-[1.02] transition-all flex items-center justify-center gap-3 shadow-[0_0_30px_rgba(255,255,255,0.1)]`}
+                                >
+                                    <Zap size={20} fill="black" />
+                                    INITIATE SPONSORSHIP
+                                </a>
+                                <button
+                                    onClick={() => setActiveTier(null)}
+                                    className="w-full py-5 rounded-2xl bg-white/5 border border-white/10 text-neutral-400 font-bold hover:bg-white/10 transition-all uppercase tracking-widest text-[11px]"
+                                >
+                                    Return to Dashboard
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Header */}
             <nav className="border-b border-white/5 bg-black/50 backdrop-blur-xl sticky top-0 z-50">
                 <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
@@ -89,22 +180,31 @@ export default function ContributePage() {
                         <div>
                             <h2 className="text-4xl font-black mb-12 tracking-tight">WAYS TO SUPPORT</h2>
                             <div className="space-y-6">
-                                <div className="flex gap-6 p-6 rounded-4xl bg-white/1 border border-white/5 hover:bg-violet-500/5 hover:border-violet-500/20 transition-all duration-300 group">
-                                    <div className="text-violet-400 shrink-0 group-hover:animate-bounce"><MessageSquare size={32} strokeWidth={1.5} /></div>
+                                <div
+                                    onClick={() => handleSupportClick('Feedback & RFCs', 'violet', <MessageSquare size={48} strokeWidth={1} className="text-violet-400" />)}
+                                    className="flex gap-6 p-6 rounded-4xl bg-white/1 border border-white/5 hover:bg-violet-500/5 hover:border-violet-500/20 transition-all duration-300 group cursor-pointer active:scale-[0.98]"
+                                >
+                                    <div className="text-violet-400 shrink-0 group-hover:animate-bounce mt-1"><MessageSquare size={32} strokeWidth={1.5} /></div>
                                     <div>
                                         <h4 className="font-bold text-lg mb-1">Feedback & RFCs</h4>
                                         <p className="text-neutral-500 text-sm leading-relaxed">Join our Discord to discuss the roadmap and share your ideas for new detection algorithms.</p>
                                     </div>
                                 </div>
-                                <div className="flex gap-6 p-6 rounded-4xl bg-white/1 border border-white/5 hover:bg-cyan-500/5 hover:border-cyan-500/20 transition-all duration-300 group">
-                                    <div className="text-cyan-400 shrink-0 group-hover:scale-125 transition-transform"><Heart size={32} strokeWidth={1.5} /></div>
+                                <div
+                                    onClick={() => handleSupportClick('Spread the Word', 'cyan', <Heart size={48} strokeWidth={1} className="text-cyan-400" />)}
+                                    className="flex gap-6 p-6 rounded-4xl bg-white/1 border border-white/5 hover:bg-cyan-500/5 hover:border-cyan-500/20 transition-all duration-300 group cursor-pointer active:scale-[0.98]"
+                                >
+                                    <div className="text-cyan-400 shrink-0 group-hover:scale-125 transition-transform mt-1"><Heart size={32} strokeWidth={1.5} /></div>
                                     <div>
                                         <h4 className="font-bold text-lg mb-1">Spread the Word</h4>
                                         <p className="text-neutral-500 text-sm leading-relaxed">Share DevTrack with your team. Knowledge about AI influence is critical in modern engineering.</p>
                                     </div>
                                 </div>
-                                <div className="flex gap-6 p-6 rounded-4xl bg-white/1 border border-white/5 hover:bg-amber-500/5 hover:border-amber-500/20 transition-all duration-300 group">
-                                    <div className="text-amber-400 shrink-0 rotate-[-10deg] group-hover:rotate-0 transition-transform"><Coffee size={32} strokeWidth={1.5} /></div>
+                                <div
+                                    onClick={() => handleSupportClick('Sponsoring', 'amber', <Coffee size={48} strokeWidth={1} className="text-amber-400" />)}
+                                    className="flex gap-6 p-6 rounded-4xl bg-white/1 border border-white/5 hover:bg-amber-500/5 hover:border-amber-500/20 transition-all duration-300 group cursor-pointer active:scale-[0.98]"
+                                >
+                                    <div className="text-amber-400 shrink-0 rotate-[-10deg] group-hover:rotate-0 transition-transform mt-1"><Coffee size={32} strokeWidth={1.5} /></div>
                                     <div>
                                         <h4 className="font-bold text-lg mb-1">Sponsoring</h4>
                                         <p className="text-neutral-500 text-sm leading-relaxed">Financial support helps us keep the high-performance neural engine servers running for everyone.</p>
@@ -132,7 +232,7 @@ export default function ContributePage() {
                                     Access the codebase, 3D assets, and the CodeBERT engine.
                                 </p>
 
-                                <a href="https://github.com/Tushar8466/devtrack" target="_blank" rel="noreferrer" className="block w-full py-5 rounded-2xl bg-white text-black font-black hover:bg-violet-500 hover:text-white transition-all duration-500 shadow-[0_4px_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_30px_rgba(139,92,246,0.4)] uppercase tracking-widest text-sm">
+                                <a href="https://github.com/Tushar8466/devtrack" target="_blank" rel="noreferrer" className="block w-full py-5 rounded-2xl bg-white text-black font-black hover:bg-violet-500 hover:text-white transition-all duration-500 shadow-[0_4px_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_30px_rgba(139,92,246,0.4)] uppercase tracking-widest text-sm text-center">
                                     GO TO REPOSITORY
                                 </a>
                             </div>

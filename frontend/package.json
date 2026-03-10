@@ -16,6 +16,7 @@
     "@tsparticles/engine": "^3.9.1",
     "@tsparticles/react": "^3.0.0",
     "@tsparticles/slim": "^3.9.1",
+    "canvas-confetti": "^1.9.4",
     "clsx": "^2.1.1",
     "lucide-react": "^0.577.0",
     "motion": "^12.35.2",
@@ -35,6 +36,7 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/canvas-confetti": "^1.9.0",
     "@types/node": "^20",
     "@types/nodemailer": "^7.0.11",
     "@types/react": "^19",

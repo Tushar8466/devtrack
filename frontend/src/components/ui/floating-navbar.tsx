@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { useSession, signOut } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
+import { Inbox, Star } from "lucide-react";
 
 type NavItem = {
   name: string;
@@ -74,44 +75,66 @@ export const FloatingNav: React.FC<FloatingNavProps> = ({
         {/* Divider */}
         <div className="h-5 w-px bg-neutral-300 dark:bg-white/10" />
 
-        {/* Auth Buttons */}
-        {session ? (
-          <div className="flex items-center gap-3">
-            <Link
-              href="/dashboard"
-              className="flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium text-neutral-700 transition hover:bg-neutral-200 hover:text-black dark:text-neutral-300 dark:hover:bg-white/10 dark:hover:text-white"
-            >
-              {customAvatar || session.user?.image ? (
-                <div className="relative w-6 h-6">
-                  <Image
-                    src={customAvatar || session.user?.image || ""}
-                    alt="Avatar"
-                    fill
-                    className="rounded-full shadow-md object-cover"
-                  />
-                </div>
-              ) : (
-                <div className="w-6 h-6 rounded-full bg-neutral-700 flex items-center justify-center text-xs text-white">
-                  {session.user?.name?.charAt(0) || "U"}
-                </div>
-              )}
-              <span>Profile</span>
-            </Link>
-            <button
-              onClick={() => signOut({ callbackUrl: '/' })}
-              className="rounded-full bg-red-500/10 px-4 py-2 text-sm font-medium text-red-500 transition hover:bg-red-500/20"
-            >
-              Sign Out
-            </button>
-          </div>
-        ) : (
+        <div className="flex items-center gap-2">
           <Link
-            href="/sign-in"
-            className="rounded-full bg-neutral-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-neutral-800 dark:bg-white dark:text-black dark:hover:bg-neutral-100"
+            href="/inbox"
+            className="p-2 rounded-full text-neutral-500 hover:text-violet-500 hover:bg-violet-500/10 transition-all border border-transparent hover:border-violet-500/20 group"
+            title="Feedback Inbox"
           >
-            Sign In
+            <Inbox size={20} className="group-hover:scale-110 transition-transform" />
           </Link>
-        )}
+
+          {/* Auth Buttons */}
+          {session ? (
+            <div className="flex items-center gap-3">
+              <Link
+                href="/dashboard"
+                className="flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium text-neutral-700 transition hover:bg-neutral-200 hover:text-black dark:text-neutral-300 dark:hover:bg-white/10 dark:hover:text-white"
+              >
+                {customAvatar || session.user?.image ? (
+                  <div className="relative w-6 h-6">
+                    <Image
+                      src={customAvatar || session.user?.image || ""}
+                      alt="Avatar"
+                      fill
+                      className="rounded-full shadow-md object-cover"
+                    />
+                  </div>
+                ) : (
+                  <div className="w-6 h-6 rounded-full bg-neutral-700 flex items-center justify-center text-xs text-white">
+                    {session.user?.name?.charAt(0) || "U"}
+                  </div>
+                )}
+                <span>Profile</span>
+              </Link>
+              <button
+                onClick={() => signOut({ callbackUrl: '/' })}
+                className="rounded-full bg-red-500/10 px-4 py-2 text-sm font-medium text-red-500 transition hover:bg-red-500/20"
+              >
+                Sign Out
+              </button>
+            </div>
+          ) : (
+            <Link
+              href="/sign-in"
+              className="rounded-full bg-neutral-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-neutral-800 dark:bg-white dark:text-black dark:hover:bg-neutral-100"
+            >
+              Sign In
+            </Link>
+          )}
+
+          <div className="h-5 w-px bg-neutral-300 dark:bg-white/10 mx-1" />
+
+          <Link
+            href="https://github.com/Tushar8466/devtrack"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 rounded-full bg-linear-to-r from-amber-500/20 to-yellow-500/20 border border-amber-500/30 px-4 py-2 text-sm font-bold text-amber-500 transition hover:scale-105 hover:from-amber-500/30 hover:to-yellow-500/30 hover:text-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.1)] group"
+          >
+            <Star size={16} className="fill-amber-500/20 group-hover:fill-amber-500/40 transition-all" />
+            <span className="hidden sm:block">Star on GitHub</span>
+          </Link>
+        </div>
       </div>
     </motion.div>
   );

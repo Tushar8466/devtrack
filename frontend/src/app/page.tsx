@@ -8,6 +8,8 @@ import AnimatedDevTrackScreen from "@/components/ui/AnimatedDevTrackScreen";
 import { EvervaultCard } from "@/components/ui/evervault-card";
 import { Search, Brain, BarChart, User, Settings, Lock } from "lucide-react";
 import dynamic from "next/dynamic";
+import { useState, useEffect } from "react";
+import { FeedbackForm } from "@/components/FeedbackForm";
 
 const Globe = dynamic(() => import("@/components/globe"), {
   ssr: false,
@@ -329,6 +331,13 @@ export default function Home() {
           <div className="absolute -top-10 -right-10 w-32 h-32 bg-violet-600/5 blur-3xl rounded-full" />
           <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-fuchsia-600/5 blur-3xl rounded-full" />
         </div>
+      </section>
+
+      {/* Feedback Section */}
+      <section id="feedback" className="bg-black py-32 px-6 relative overflow-hidden">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[1px] bg-linear-to-r from-transparent via-white/5 to-transparent" />
+
+        <FeedbackForm />
       </section>
 
       {/* Global Interactive Section */}
