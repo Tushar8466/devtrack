@@ -3,7 +3,8 @@
 import React from "react";
 import { useRouter } from "next/navigation";
 import { ContainerScroll } from "@/components/ui/container-scroll-animation";
-import { ExternalLink, ArrowRight, GitPullRequest, Star, GitMerge, Zap, Code2, Globe, BookOpen } from "lucide-react";
+import { ExternalLink, ArrowRight, GitPullRequest, Star, GitMerge, Zap, Code2, Globe, BookOpen, Search, Terminal, MessageSquare, Award, PlayCircle, Heart, Shield, Users } from "lucide-react";
+import { GlareCard } from "@/components/ui/glare-card";
 
 function OpenSourceLandingPage() {
   const router = useRouter();
@@ -162,6 +163,159 @@ function OpenSourceLandingPage() {
           </div>
 
         </div>
+
+        {/* How It Works Section */}
+        <section className="py-20 border-t border-white/10">
+          <div className="text-center mb-16 space-y-4">
+            <h2 className="text-3xl md:text-5xl font-black uppercase tracking-tighter">The Journey to Your First PR</h2>
+            <p className="text-neutral-500 max-w-xl mx-auto">
+              Open source can be intimidating. We break it down into simple, actionable steps.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            {[
+              { step: "01", title: "Find", desc: "Search for 'good first issues' in repos you love.", icon: <Search className="w-6 h-6" />, color: "amber" },
+              { step: "02", title: "Fork", desc: "Create your own copy of the repository to work in.", icon: <GitMerge className="w-6 h-6" />, color: "blue" },
+              { step: "03", title: "Code", desc: "Implement your fix or feature and run tests.", icon: <Terminal className="w-6 h-6" />, color: "emerald" },
+              { step: "04", title: "Merge", desc: "Open a PR and collaborate with maintainers.", icon: <Star className="w-6 h-6" />, color: "rose" },
+            ].map((item, i) => (
+              <div key={i} className={`relative p-8 rounded-3xl bg-white/5 border transition-all group overflow-hidden ${item.color === "amber" ? "hover:bg-amber-500/3 border-white/5 hover:border-amber-500/20" :
+                  item.color === "blue" ? "hover:bg-blue-500/3 border-white/5 hover:border-blue-500/20" :
+                    item.color === "emerald" ? "hover:bg-emerald-500/3 border-white/5 hover:border-emerald-500/20" :
+                      "hover:bg-rose-500/3 border-white/5 hover:border-rose-500/20"
+                }`}>
+                <div className={`absolute -top-10 -right-10 w-32 h-32 rounded-full blur-3xl opacity-0 group-hover:opacity-20 transition-opacity ${item.color === "amber" ? "bg-amber-500" :
+                  item.color === "blue" ? "bg-blue-500" :
+                    item.color === "emerald" ? "bg-emerald-500" :
+                      "bg-rose-500"
+                  }`} />
+                <span className="absolute top-4 right-6 text-4xl font-black text-white/5 group-hover:text-white/10 transition-colors uppercase">{item.step}</span>
+                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-6 transition-all ${item.color === "amber" ? "bg-amber-500/10 text-amber-500 group-hover:scale-110" :
+                  item.color === "blue" ? "bg-blue-500/10 text-blue-500 group-hover:scale-110" :
+                    item.color === "emerald" ? "bg-emerald-500/10 text-emerald-500 group-hover:scale-110" :
+                      "bg-rose-500/10 text-rose-500 group-hover:scale-110"
+                  }`}>
+                  {item.icon}
+                </div>
+                <h3 className="text-xl font-bold mb-2 group-hover:text-white transition-colors">{item.title}</h3>
+                <p className="text-neutral-500 text-sm leading-relaxed">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Contribution Types with GlareCard */}
+        <section className="py-20 space-y-16">
+          <div className="text-center space-y-4">
+            <h2 className="text-3xl md:text-5xl font-black uppercase tracking-tighter">Choose Your Path</h2>
+            <p className="text-neutral-500 max-w-xl mx-auto">
+              Every contribution counts, whether it's code, documentation, or community support.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap justify-center gap-8">
+            <GlareCard className="flex flex-col items-start justify-end p-8 pb-12 overflow-hidden bg-slate-950">
+              <div className="absolute inset-0 bg-linear-to-b from-transparent via-cyan-950/20 to-cyan-950/40 z-10" />
+              <div className="relative z-20 space-y-4">
+                <div className="p-3 bg-cyan-500/20 rounded-2xl border border-cyan-500/30 w-fit text-cyan-400">
+                  <Code2 className="w-6 h-6" />
+                </div>
+                <h3 className="text-2xl font-black text-white uppercase tracking-tighter">The Architect</h3>
+                <p className="text-neutral-400 text-sm leading-relaxed">
+                  Build new features, optimize performance, and solve complex technical challenges.
+                </p>
+                <div className="flex gap-2">
+                  {["Advanced", "Logic", "Scalability"].map(tag => (
+                    <span key={tag} className="text-[10px] font-bold uppercase tracking-widest px-2 py-1 bg-cyan-500/5 rounded-full text-cyan-500/70 border border-cyan-500/20">{tag}</span>
+                  ))}
+                </div>
+              </div>
+            </GlareCard>
+
+            <GlareCard className="flex flex-col items-start justify-end p-8 pb-12 overflow-hidden bg-slate-950">
+              <div className="absolute inset-0 bg-linear-to-b from-transparent via-violet-950/20 to-violet-950/40 z-10" />
+              <div className="relative z-20 space-y-4">
+                <div className="p-3 bg-violet-500/20 rounded-2xl border border-violet-500/30 w-fit text-violet-400">
+                  <BookOpen className="w-6 h-6" />
+                </div>
+                <h3 className="text-2xl font-black text-white uppercase tracking-tighter">The Educator</h3>
+                <p className="text-neutral-400 text-sm leading-relaxed">
+                  Improve documentation, write guides, and help others understand the codebase.
+                </p>
+                <div className="flex gap-2">
+                  {["Clarity", "Onboarding", "Docs"].map(tag => (
+                    <span key={tag} className="text-[10px] font-bold uppercase tracking-widest px-2 py-1 bg-violet-500/5 rounded-full text-violet-500/70 border border-violet-500/20">{tag}</span>
+                  ))}
+                </div>
+              </div>
+            </GlareCard>
+
+            <GlareCard className="flex flex-col items-start justify-end p-8 pb-12 overflow-hidden bg-slate-950">
+              <div className="absolute inset-0 bg-linear-to-b from-transparent via-emerald-950/20 to-emerald-950/40 z-10" />
+              <div className="relative z-20 space-y-4">
+                <div className="p-3 bg-emerald-500/20 rounded-2xl border border-emerald-500/30 w-fit text-emerald-400">
+                  <Heart className="w-6 h-6" />
+                </div>
+                <h3 className="text-2xl font-black text-white uppercase tracking-tighter">The Guardian</h3>
+                <p className="text-neutral-400 text-sm leading-relaxed">
+                  Fix bugs, secure the codebase, and maintain the health of the project ecosystem.
+                </p>
+                <div className="flex gap-2">
+                  {["Security", "Reliability", "Fixes"].map(tag => (
+                    <span key={tag} className="text-[10px] font-bold uppercase tracking-widest px-2 py-1 bg-emerald-500/5 rounded-full text-emerald-500/70 border border-emerald-500/20">{tag}</span>
+                  ))}
+                </div>
+              </div>
+            </GlareCard>
+          </div>
+        </section>
+
+        {/* Impact Statistics */}
+        <section className="py-20 bg-white/2 rounded-[3rem] border border-white/5 px-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-12 text-center">
+            {[
+              { label: "Active Contributors", value: "85k+", icon: <Users className="w-5 h-5 text-blue-400" /> },
+              { label: "Analyzed Commits", value: "1.2M", icon: <GitMerge className="w-5 h-5 text-purple-400" /> },
+              { label: "Tracked Projects", value: "12k+", icon: <Shield className="w-5 h-5 text-emerald-400" /> },
+              { label: "Community Rep", value: "Gold", icon: <Award className="w-5 h-5 text-yellow-400" /> },
+            ].map((stat, i) => (
+              <div key={i} className="space-y-2">
+                <div className="mx-auto w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center mb-4">
+                  {stat.icon}
+                </div>
+                <div className="text-4xl font-black text-white">{stat.value}</div>
+                <div className="text-[10px] text-neutral-500 uppercase tracking-[0.2em] font-bold">{stat.label}</div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Final Footnote CTA */}
+        <section className="py-32 text-center space-y-12">
+          <div className="relative inline-block">
+            <div className="absolute -inset-4 bg-white/10 blur-3xl rounded-full" />
+            <h2 className="relative text-5xl md:text-8xl font-black uppercase tracking-tighter leading-none">
+              Start Your <br /> Story Today
+            </h2>
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <button
+              onClick={() => router.push("/opensource/track")}
+              className="group px-12 py-6 bg-white text-black font-black rounded-4xl hover:scale-105 active:scale-95 transition-all flex items-center gap-3 text-xl"
+            >
+              Get Started
+              <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
+            </button>
+            <button
+              onClick={() => router.push("/opensource/docs")}
+              className="px-12 py-6 bg-white/5 border border-white/10 text-white font-black rounded-4xl hover:bg-white/10 transition-all text-xl backdrop-blur-xl"
+            >
+              Read Documentation
+            </button>
+          </div>
+        </section>
       </div>
     </div>
   );
