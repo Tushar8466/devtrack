@@ -5,21 +5,39 @@ import { useRouter } from "next/navigation";
 import { motion } from "motion/react";
 import { IconBrandGithub, IconSearch, IconArrowRight, IconGitCommit } from "@tabler/icons-react";
 import { WavyBackground } from "@/components/ui/wavy-background";
+import { MultiStepLoader } from "@/components/ui/multi-step-loader";
+
+const PROFILE_LOADING_STATES = [
+    { text: "Locating GitHub user" },
+    { text: "Fetching profile data" },
+    { text: "Loading repositories" },
+    { text: "Gathering stats" },
+];
+
+const COMMITS_LOADING_STATES = [
+    { text: "Connecting to GitHub API" },
+    { text: "Fetching repository data" },
+    { text: "Scanning commit history" },
+    { text: "Generating timeline" },
+];
 
 export default function ExplorePage() {
     const [searchType, setSearchType] = useState<'profile' | 'commits'>('profile');
     const [inputValue, setInputValue] = useState("");
     const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
     const router = useRouter();
 
-    const handleSearch = (e: React.FormEvent) => {
+    const handleSearch = async (e: React.FormEvent) => {
         e.preventDefault();
         setError("");
 
         const query = inputValue.trim();
-        if (!query) return;
+        if (!query || loading) return;
 
         if (searchType === 'profile') {
+            setLoading(true);
+            await new Promise((resolve) => setTimeout(resolve, PROFILE_LOADING_STATES.length * 500 + 300));
             router.push(`/analyze/${query}`);
         } else {
             let username = "";
@@ -45,6 +63,8 @@ export default function ExplorePage() {
             }
 
             if (username && repo) {
+                setLoading(true);
+                await new Promise((resolve) => setTimeout(resolve, COMMITS_LOADING_STATES.length * 500 + 300));
                 router.push(`/explore/commits/${username}/${repo}`);
             } else {
                 setError("Please enter a valid username/repo format (e.g., torvalds/linux)");
@@ -145,6 +165,12 @@ export default function ExplorePage() {
                         : "Search by username/repo or paste a full GitHub URL"}
                 </p>
             </motion.div>
+            <MultiStepLoader
+                loadingStates={searchType === 'profile' ? PROFILE_LOADING_STATES : COMMITS_LOADING_STATES}
+                loading={loading}
+                duration={500}
+                loop={false}
+            />
         </WavyBackground>
     );
 }

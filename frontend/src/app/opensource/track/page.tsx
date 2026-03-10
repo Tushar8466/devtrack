@@ -10,6 +10,16 @@ import { Layers, Sparkles, Zap } from "lucide-react";
 import { Button } from "@/components/ui/stateful-button";
 import { MultiStepLoader } from "@/components/ui/multi-step-loader";
 
+const LOADING_STATES = [
+    { text: "Initializing analysis engine" },
+    { text: "Fetching GitHub profile data" },
+    { text: "Synchronizing repositories" },
+    { text: "Aggregating pull requests" },
+    { text: "Calculating contribution impact" },
+    { text: "Generating insights" },
+    { text: "Finalizing report" },
+];
+
 export default function TrackerSearchPage() {
     const router = useRouter();
     const [searchQuery, setSearchQuery] = useState("");
@@ -17,12 +27,15 @@ export default function TrackerSearchPage() {
 
     const handleSearch = async (e?: React.FormEvent | React.MouseEvent<HTMLButtonElement>) => {
         if (e) e.preventDefault();
-        if (searchQuery.trim()) {
-            setLoading(true);
-            router.push(`/opensource/track/${searchQuery.trim()}`);
-            await new Promise((resolve) => setTimeout(resolve, 1500));
-        }
+        if (!searchQuery.trim() || loading) return;
+
+        const destination = searchQuery.trim();
+        setLoading(true);
+        // Wait for all steps to complete: steps × duration + small buffer
+        await new Promise((resolve) => setTimeout(resolve, LOADING_STATES.length * 500 + 300));
+        router.push(`/opensource/track/${destination}`);
     };
+
 
     return (
         <div className="relative min-h-screen bg-black overflow-hidden">
@@ -109,17 +122,10 @@ export default function TrackerSearchPage() {
                 </div>
             </Vortex>
             <MultiStepLoader
-                loadingStates={[
-                    { text: "Initializing analysis engine" },
-                    { text: "Fetching GitHub profile data" },
-                    { text: "Synchronizing repositories" },
-                    { text: "Aggregating pull requests" },
-                    { text: "Calculating contribution impact" },
-                    { text: "Generating insights" },
-                    { text: "Finalizing report" },
-                ]}
+                loadingStates={LOADING_STATES}
                 loading={loading}
                 duration={500}
+                loop={false}
             />
         </div>
     );
