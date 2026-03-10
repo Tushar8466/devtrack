@@ -16,7 +16,7 @@ function OpenSourceLandingPage() {
             <h1 className="text-4xl font-semibold text-white text-center">
               DevTrack <br />
               <span className="text-4xl md:text-[6rem] font-bold mt-1 leading-none">
-                Open Source Tracker
+              OpenSource Tracker
               </span>
             </h1>
           }
