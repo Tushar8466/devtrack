@@ -279,62 +279,62 @@ function OSExplorerContent() {
                            </div>
                         );
                      })}
-                           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                     {/* Asset Identity Comparison */}
-                     <div className="bg-black border border-white/10 rounded-4xl p-10 flex flex-col md:flex-row gap-12 items-center">
-                        <div className="flex-1 text-center md:text-left space-y-4">
-                           <div className="w-16 h-16 rounded-3xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 mx-auto md:mx-0">
-                              <Globe size={32} />
+                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        {/* Asset Identity Comparison */}
+                        <div className="bg-black border border-white/10 rounded-4xl p-10 flex flex-col md:flex-row gap-12 items-center">
+                           <div className="flex-1 text-center md:text-left space-y-4">
+                              <div className="w-16 h-16 rounded-3xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 mx-auto md:mx-0">
+                                 <Globe size={32} />
+                              </div>
+                              <h3 className="text-2xl font-black text-white uppercase italic tracking-tighter">{repoData.name}</h3>
+                              <p className="text-sm text-neutral-500 line-clamp-2 italic">{repoData.description}</p>
                            </div>
-                           <h3 className="text-2xl font-black text-white uppercase italic tracking-tighter">{repoData.name}</h3>
-                           <p className="text-sm text-neutral-500 line-clamp-2 italic">{repoData.description}</p>
-                        </div>
-                        <div className="hidden md:flex flex-col items-center gap-2">
-                           <div className="h-20 w-px bg-linear-to-b from-transparent via-white/20 to-transparent" />
-                           <span className="text-[10px] font-black text-white px-3 py-1 bg-white/5 border border-white/10 rounded-full">VS</span>
-                           <div className="h-20 w-px bg-linear-to-b from-transparent via-white/20 to-transparent" />
-                        </div>
-                        <div className="flex-1 text-center md:text-right space-y-4">
-                           <div className="w-16 h-16 rounded-3xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center text-violet-400 mx-auto md:ml-auto md:mr-0">
-                              <Cpu size={32} />
+                           <div className="hidden md:flex flex-col items-center gap-2">
+                              <div className="h-20 w-px bg-linear-to-b from-transparent via-white/20 to-transparent" />
+                              <span className="text-[10px] font-black text-white px-3 py-1 bg-white/5 border border-white/10 rounded-full">VS</span>
+                              <div className="h-20 w-px bg-linear-to-b from-transparent via-white/20 to-transparent" />
                            </div>
-                           <h3 className="text-2xl font-black text-white uppercase italic tracking-tighter">{compareRepoData.name}</h3>
-                           <p className="text-sm text-neutral-500 line-clamp-2 italic">{compareRepoData.description}</p>
+                           <div className="flex-1 text-center md:text-right space-y-4">
+                              <div className="w-16 h-16 rounded-3xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center text-violet-400 mx-auto md:ml-auto md:mr-0">
+                                 <Cpu size={32} />
+                              </div>
+                              <h3 className="text-2xl font-black text-white uppercase italic tracking-tighter">{compareRepoData.name}</h3>
+                              <p className="text-sm text-neutral-500 line-clamp-2 italic">{compareRepoData.description}</p>
+                           </div>
                         </div>
-                     </div>
 
-                     {/* Comparative Radar Matrix */}
-                     <div className="bg-white/2 border border-white/5 rounded-4xl p-10 backdrop-blur-3xl relative overflow-hidden group">
-                        <div className="flex items-center justify-between mb-8">
-                           <div className="space-y-1">
-                              <h4 className="text-sm font-black text-white uppercase tracking-[0.3em]">Spectral Comparison Matrix</h4>
-                              <p className="text-[9px] font-mono text-neutral-600 uppercase">Dual_Asset_Stoichiometry</p>
+                        {/* Comparative Radar Matrix */}
+                        <div className="bg-white/2 border border-white/5 rounded-4xl p-10 backdrop-blur-3xl relative overflow-hidden group">
+                           <div className="flex items-center justify-between mb-8">
+                              <div className="space-y-1">
+                                 <h4 className="text-sm font-black text-white uppercase tracking-[0.3em]">Spectral Comparison Matrix</h4>
+                                 <p className="text-[9px] font-mono text-neutral-600 uppercase">Dual_Asset_Stoichiometry</p>
+                              </div>
+                              <Zap size={18} className="text-amber-400 animate-pulse" />
                            </div>
-                           <Zap size={18} className="text-amber-400 animate-pulse" />
-                        </div>
-                        
-                        <div className="h-[250px] w-full">
-                           <ResponsiveContainer width="100%" height="100%">
-                              <RadarChart cx="50%" cy="50%" outerRadius="80%" data={[
-                                 { subject: 'Stars', A: repoData.stargazers_count / 1000, B: compareRepoData.stargazers_count / 1000, fullMark: 150 },
-                                 { subject: 'Forks', A: repoData.forks_count / 100, B: compareRepoData.forks_count / 100, fullMark: 150 },
-                                 { subject: 'Issues', A: repoData.open_issues_count / 10, B: compareRepoData.open_issues_count / 10, fullMark: 150 },
-                                 { subject: 'Subscribers', A: repoData.subscribers_count || 0, B: compareRepoData.subscribers_count || 0, fullMark: 150 },
-                                 { subject: 'Size', A: repoData.size / 1000, B: compareRepoData.size / 1000, fullMark: 150 },
-                              ]}>
-                                 <PolarGrid stroke="#ffffff10" />
-                                 <PolarAngleAxis dataKey="subject" tick={{ fill: '#666', fontSize: 10, fontWeight: 900 }} />
-                                 <Radar name="Alpha" dataKey="A" stroke="#06b6d4" fill="#06b6d4" fillOpacity={0.6} />
-                                 <Radar name="Beta" dataKey="B" stroke="#8b5cf6" fill="#8b5cf6" fillOpacity={0.6} />
-                                 <Tooltip 
-                                    contentStyle={{ backgroundColor: '#000', border: '1px solid #ffffff10', fontSize: '10px' }}
-                                 />
-                              </RadarChart>
-                           </ResponsiveContainer>
+
+                           <div className="h-[250px] w-full">
+                              <ResponsiveContainer width="100%" height="100%">
+                                 <RadarChart cx="50%" cy="50%" outerRadius="80%" data={[
+                                    { subject: 'Stars', A: repoData.stargazers_count / 1000, B: compareRepoData.stargazers_count / 1000, fullMark: 150 },
+                                    { subject: 'Forks', A: repoData.forks_count / 100, B: compareRepoData.forks_count / 100, fullMark: 150 },
+                                    { subject: 'Issues', A: repoData.open_issues_count / 10, B: compareRepoData.open_issues_count / 10, fullMark: 150 },
+                                    { subject: 'Subscribers', A: repoData.subscribers_count || 0, B: compareRepoData.subscribers_count || 0, fullMark: 150 },
+                                    { subject: 'Size', A: repoData.size / 1000, B: compareRepoData.size / 1000, fullMark: 150 },
+                                 ]}>
+                                    <PolarGrid stroke="#ffffff10" />
+                                    <PolarAngleAxis dataKey="subject" tick={{ fill: '#666', fontSize: 10, fontWeight: 900 }} />
+                                    <Radar name="Alpha" dataKey="A" stroke="#06b6d4" fill="#06b6d4" fillOpacity={0.6} />
+                                    <Radar name="Beta" dataKey="B" stroke="#8b5cf6" fill="#8b5cf6" fillOpacity={0.6} />
+                                    <Tooltip
+                                       contentStyle={{ backgroundColor: '#000', border: '1px solid #ffffff10', fontSize: '10px' }}
+                                    />
+                                 </RadarChart>
+                              </ResponsiveContainer>
+                           </div>
                         </div>
                      </div>
                   </div>
-           </div>
                </div>
             ) : !repoData ? (
                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -494,8 +494,8 @@ function OSExplorerContent() {
                            <div className="relative w-32 h-32 flex items-center justify-center">
                               <svg className="w-full h-full -rotate-90">
                                  <circle cx="64" cy="64" r="60" fill="none" stroke="currentColor" strokeWidth="2" className="text-white/5" />
-                                 <motion.circle 
-                                    cx="64" cy="64" r="60" fill="none" stroke="currentColor" strokeWidth="4" 
+                                 <motion.circle
+                                    cx="64" cy="64" r="60" fill="none" stroke="currentColor" strokeWidth="4"
                                     className="text-cyan-500"
                                     strokeDasharray="377"
                                     initial={{ strokeDashoffset: 377 }}
@@ -614,7 +614,7 @@ function OSExplorerContent() {
                               })}
                            </div>
 
-                            <div className="absolute -bottom-20 -right-20 w-80 h-80 bg-cyan-500/5 rounded-full blur-3xl opacity-50 group-hover:opacity-100 transition-opacity" />
+                           <div className="absolute -bottom-20 -right-20 w-80 h-80 bg-cyan-500/5 rounded-full blur-3xl opacity-50 group-hover:opacity-100 transition-opacity" />
                         </div>
                      )}
 
@@ -636,7 +636,7 @@ function OSExplorerContent() {
                                        <img src={user.avatar_url} alt={user.login} className="w-full h-full object-cover grayscale group-hover/user:grayscale-0 transition-all duration-500" />
                                        <div className="absolute inset-0 bg-linear-to-t from-black/80 to-transparent" />
                                        <div className="absolute bottom-2 left-2 right-2 flex justify-between items-end">
-                                          <span className="text-[8px] font-black text-emerald-400">IMPACT_0{i+1}</span>
+                                          <span className="text-[8px] font-black text-emerald-400">IMPACT_0{i + 1}</span>
                                           <TrendingUp size={10} className="text-emerald-500" />
                                        </div>
                                     </div>
@@ -662,7 +662,7 @@ function OSExplorerContent() {
                            {Array.from({ length: 28 }).map((_, i) => {
                               const intensity = Math.random();
                               return (
-                                 <motion.div 
+                                 <motion.div
                                     key={i}
                                     initial={{ scale: 0.8, opacity: 0 }}
                                     animate={{ scale: 1, opacity: 1 }}
@@ -670,8 +670,8 @@ function OSExplorerContent() {
                                     className={cn(
                                        "aspect-square rounded-md border border-white/5",
                                        intensity > 0.8 ? "bg-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.5)]" :
-                                       intensity > 0.5 ? "bg-cyan-500/40" :
-                                       intensity > 0.2 ? "bg-cyan-500/10" : "bg-white/2"
+                                          intensity > 0.5 ? "bg-cyan-500/40" :
+                                             intensity > 0.2 ? "bg-cyan-500/10" : "bg-white/2"
                                     )}
                                  />
                               );
@@ -701,14 +701,14 @@ function OSExplorerContent() {
                            <h3 className="text-xl font-black text-white uppercase tracking-tighter italic">Global Telemetry Intercept</h3>
                            <p className="text-[9px] font-mono text-neutral-500 uppercase tracking-widest">Distributed_Node_Propagation_Map</p>
                         </div>
-                        
+
                         {/* Simulated Map Visual */}
                         <div className="absolute inset-0 top-20 flex items-center justify-center pointer-events-none opacity-20">
                            <div className="relative w-full h-full">
                               {[
                                  { t: 40, l: 30 }, { t: 60, l: 70 }, { t: 20, l: 50 }, { t: 80, l: 20 }, { t: 10, l: 80 }
                               ].map((pos, i) => (
-                                 <motion.div 
+                                 <motion.div
                                     key={i}
                                     initial={{ scale: 0, opacity: 0 }}
                                     animate={{ scale: [1, 2, 1], opacity: [0.3, 0.8, 0.3] }}
@@ -807,7 +807,7 @@ function OSExplorerContent() {
                            <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
                            <span className="text-[10px] font-black text-red-500 uppercase tracking-widest italic">Live_Satellite_Feed</span>
                         </div>
-                        
+
                         <div className="space-y-2 mb-8">
                            <h3 className="text-xl font-black text-white uppercase tracking-tighter italic">Orbital Frequency Intercept</h3>
                            <p className="text-[9px] font-mono text-neutral-500 uppercase tracking-widest">Global_Event_Stream_Sync</p>
@@ -815,7 +815,7 @@ function OSExplorerContent() {
 
                         <div className="space-y-4 max-h-[400px] overflow-y-auto pr-4 scrollbar-hide font-mono">
                            {repoEvents.length > 0 ? repoEvents.map((event, i) => (
-                              <motion.div 
+                              <motion.div
                                  key={i}
                                  initial={{ x: -20, opacity: 0 }}
                                  animate={{ x: 0, opacity: 1 }}
@@ -927,17 +927,17 @@ export default function OSExplorerPage() {
          <div className="min-h-screen bg-black flex flex-col items-center justify-center p-12 relative overflow-hidden">
             {/* Multi-Orbital Scanner Animation */}
             <div className="relative w-64 h-64 mb-12">
-               <motion.div 
+               <motion.div
                   animate={{ rotate: 360 }}
                   transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
                   className="absolute inset-0 border-2 border-dashed border-cyan-500/20 rounded-full"
                />
-               <motion.div 
+               <motion.div
                   animate={{ rotate: -360 }}
                   transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
                   className="absolute inset-4 border border-violet-500/20 rounded-full"
                />
-               <motion.div 
+               <motion.div
                   animate={{ scale: [1, 1.1, 1], opacity: [0.5, 1, 0.5] }}
                   transition={{ duration: 2, repeat: Infinity }}
                   className="absolute inset-10 border-4 border-cyan-500/40 rounded-full blur-sm"
@@ -951,7 +951,7 @@ export default function OSExplorerPage() {
                <h2 className="text-2xl font-black text-white uppercase italic tracking-tighter">Initializing Tactical Uplink</h2>
                <div className="flex flex-col items-center gap-2">
                   <div className="w-48 h-1 bg-white/5 rounded-full overflow-hidden">
-                     <motion.div 
+                     <motion.div
                         animate={{ x: ["-100%", "100%"] }}
                         transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
                         className="w-1/2 h-full bg-cyan-500"

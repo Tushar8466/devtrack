@@ -64,6 +64,10 @@ export default function DashboardPage() {
   const [customAvatar, setCustomAvatar] = useState<string | null>(null);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [langData, setLangData] = useState<{ name: string; value: number }[]>([]);
+  const [streakAtRisk, setStreakAtRisk] = useState(false);
+  const [streakChecked, setStreakChecked] = useState(false);
+  const [hasPushedToday, setHasPushedToday] = useState(false);
+  const [streakDismissedToday, setStreakDismissedToday] = useState(false);
 
   useEffect(() => {
     if (repos.length > 0) {
@@ -106,6 +110,18 @@ export default function DashboardPage() {
   const sessionUsername = (session?.user as SessionUser)?.username || "";
   const effectiveUsername = manualUsername || sessionUsername;
 
+  // Load streak dismissal state for today from localStorage
+  useEffect(() => {
+    if (!effectiveUsername) return;
+    const todayKey = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+    const key = `devtrack_streak_dismissed_${effectiveUsername}_${todayKey}`;
+    if (typeof window !== "undefined" && window.localStorage.getItem(key) === "1") {
+      setStreakDismissedToday(true);
+    } else {
+      setStreakDismissedToday(false);
+    }
+  }, [effectiveUsername]);
+
   useEffect(() => {
     if (!effectiveUsername) return;
 
@@ -139,6 +155,38 @@ export default function DashboardPage() {
       });
   }, [effectiveUsername]);
 
+  // Streak-at-risk check
+  useEffect(() => {
+    if (!effectiveUsername) return;
+
+    let cancelled = false;
+    const checkStreak = async () => {
+      try {
+        const res = await fetch(
+          `/api/streak/check?username=${encodeURIComponent(effectiveUsername)}`
+        );
+        if (!res.ok) return;
+        const data = (await res.json()) as { hasCommittedToday?: boolean };
+        if (!cancelled) {
+          const pushed = data.hasCommittedToday === true;
+          setHasPushedToday(pushed);
+          setStreakAtRisk(!pushed);
+          setStreakChecked(true);
+        }
+      } catch {
+        if (!cancelled) {
+          setStreakChecked(true);
+        }
+      }
+    };
+
+    checkStreak();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [effectiveUsername]);
+
   if (status === "loading") {
     return (
       <div className="min-h-screen flex items-center justify-center bg-black text-white">
@@ -161,6 +209,52 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-[#030303] pt-28 pb-20 px-4 text-white font-sans selection:bg-violet-500/30">
       <div className="max-w-[1400px] mx-auto space-y-12">
+
+        {/* STREAK AT RISK BANNER */}
+        {streakChecked && streakAtRisk && !streakDismissedToday && (
+          <div className="flex flex-col md:flex-row items-center justify-between gap-3 px-6 py-4 rounded-2xl border border-amber-500/40 bg-amber-500/10 shadow-[0_0_30px_rgba(245,158,11,0.25)]">
+            <div className="flex items-center gap-3">
+              <div className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
+              <p className="text-sm md:text-base font-semibold text-amber-100">
+                Streak at risk — you haven&apos;t committed today!
+              </p>
+            </div>
+            <div className="flex flex-col md:flex-row items-center gap-3">
+              <p className="text-[11px] md:text-xs text-amber-200/80 font-mono uppercase tracking-widest">
+                Push at least once before midnight to keep your contribution streak alive.
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  const todayKey = new Date().toISOString().slice(0, 10);
+                  const key = `devtrack_streak_dismissed_${effectiveUsername}_${todayKey}`;
+                  if (typeof window !== "undefined") {
+                    window.localStorage.setItem(key, "1");
+                  }
+                  setStreakDismissedToday(true);
+                }}
+                className="text-[10px] md:text-xs font-black uppercase tracking-[0.2em] px-3 py-1 rounded-full border border-amber-400/60 text-amber-100 hover:bg-amber-400/10 transition-colors"
+              >
+                Dismiss for today
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* STREAK SUCCESS BANNER */}
+        {streakChecked && hasPushedToday && (
+          <div className="flex flex-col md:flex-row items-center justify-between gap-3 px-6 py-4 rounded-2xl border border-emerald-500/40 bg-emerald-500/10 shadow-[0_0_30px_rgba(16,185,129,0.25)]">
+            <div className="flex items-center gap-3">
+              <div className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+              <p className="text-sm md:text-base font-semibold text-emerald-100">
+                You&apos;re on fire — you&apos;ve already pushed today.
+              </p>
+            </div>
+            <p className="text-[11px] md:text-xs text-emerald-200/80 font-mono uppercase tracking-widest">
+              Streak secured for this cycle. Keep shipping.
+            </p>
+          </div>
+        )}
 
         {/* TACTICAL STATUS BAR */}
         <div className="flex flex-wrap items-center justify-between gap-6 px-8 py-4 bg-white/2 border border-white/5 rounded-2xl backdrop-blur-3xl">
