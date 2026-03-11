@@ -46,6 +46,17 @@ export function AtlasAssistant() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
+  // Mouse tracking for interactive spotlight
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isOpen) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    setMousePos({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+    });
+  };
+
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
@@ -119,13 +130,13 @@ export function AtlasAssistant() {
         whileTap={{ scale: 0.9 }}
         onClick={() => setIsOpen(true)}
         className={cn(
-          "fixed bottom-8 right-8 z-[10000] w-16 h-16 rounded-full flex items-center justify-center shadow-2xl overflow-hidden group border-2 border-white/10",
-          isOpen ? "hidden" : "block"
+          "fixed bottom-8 right-8 z-[9999] w-16 h-16 rounded-full flex items-center justify-center shadow-2xl overflow-hidden group border-2 border-white/10",
+          isOpen ? "hidden" : "flex"
         )}
       >
         <div className="absolute inset-0 bg-linear-to-br from-violet-600 to-fuchsia-600 animate-pulse" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.2),transparent)]" />
-        <Bot size={28} className="relative z-10 text-white group-hover:rotate-12 transition-transform" />
+        <Sparkles size={28} className="relative z-10 text-white transition-transform duration-500 group-hover:scale-110" />
         
         {/* HUD Ring Effect */}
         <div className="absolute inset-2 border border-white/20 rounded-full animate-[spin_4s_linear_infinite]" />
@@ -138,30 +149,38 @@ export function AtlasAssistant() {
             initial={{ opacity: 0, y: 50, scale: 0.9, filter: "blur(10px)" }}
             animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
             exit={{ opacity: 0, y: 50, scale: 0.9, filter: "blur(10px)" }}
-            className="fixed bottom-8 right-8 z-[10001] w-[400px] h-[600px] bg-black/80 border border-white/10 rounded-[2.5rem] backdrop-blur-3xl shadow-[0_0_80px_-20px_rgba(139,92,246,0.3)] flex flex-col overflow-hidden"
+            onMouseMove={handleMouseMove}
+            className="fixed bottom-8 right-8 z-[10001] w-[400px] h-[600px] bg-black/90 border border-white/20 rounded-[2.5rem] backdrop-blur-3xl shadow-[0_0_100px_-20px_rgba(139,92,246,0.5)] flex flex-col overflow-hidden group/card"
           >
+            {/* INTERACTIVE SPOTLIGHT */}
+            <div 
+              className="absolute inset-0 pointer-events-none opacity-0 group-hover/card:opacity-100 transition-opacity duration-500"
+              style={{
+                background: `radial-gradient(600px circle at ${mousePos.x}px ${mousePos.y}px, rgba(139, 92, 246, 0.15), transparent 40%)`
+              }}
+            />
             {/* Header */}
-            <header className="p-6 border-b border-white/5 flex items-center justify-between">
+            <header className="p-6 border-b border-white/10 flex items-center justify-between bg-white/[0.02]">
               <div className="flex items-center gap-3">
                 <div className="relative">
-                    <div className="w-10 h-10 rounded-xl bg-linear-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center">
-                        <Bot size={20} className="text-white" />
+                    <div className="w-10 h-10 rounded-xl bg-linear-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center shadow-[0_0_20px_rgba(139,92,246,0.5)]">
+                        <Sparkles size={20} className="text-white" />
                     </div>
-                    <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-emerald-500 rounded-full border-2 border-black animate-pulse" />
+                    <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-emerald-500 rounded-full border-2 border-black animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
                 </div>
                 <div>
                    <h3 className="text-sm font-black text-white uppercase tracking-tighter italic">A.T.L.A.S.</h3>
                    <div className="flex items-center gap-2">
-                      <span className="text-[8px] font-mono text-violet-400 uppercase tracking-widest">Neural_Assistant_v4</span>
+                      <span className="text-[8px] font-mono text-violet-400 font-bold uppercase tracking-widest leading-none">Neural_Assistant_v4</span>
                       <Activity size={8} className="text-violet-500 animate-pulse" />
                    </div>
                 </div>
               </div>
               <button 
                 onClick={() => setIsOpen(false)}
-                className="p-2 hover:bg-white/5 rounded-full transition-colors"
+                className="p-2 hover:bg-white/10 rounded-full transition-colors group/close"
               >
-                <X size={18} className="text-neutral-500" />
+                <X size={18} className="text-neutral-500 group-hover/close:text-white transition-colors" />
               </button>
             </header>
 
@@ -238,15 +257,21 @@ export function AtlasAssistant() {
                   <Send size={16} />
                 </button>
               </form>
-              <div className="mt-4 flex items-center justify-center gap-4">
-                 <div className="flex items-center gap-1 opacity-20 group cursor-help">
-                    <Command size={10} className="text-neutral-500" />
-                    <span className="text-[8px] font-bold text-neutral-600 uppercase tracking-widest">Secure Uplink</span>
+              <div className="mt-4 flex flex-col items-center gap-3">
+                 <div className="flex items-center justify-center gap-4">
+                    <div className="flex items-center gap-1.5 opacity-60 hover:opacity-100 transition-opacity cursor-help">
+                       <Command size={10} className="text-violet-400" />
+                       <span className="text-[8px] font-bold text-neutral-400 uppercase tracking-widest">Secure Uplink</span>
+                    </div>
+                    <div className="w-1 h-1 bg-white/20 rounded-full" />
+                    <div className="flex items-center gap-1.5 opacity-60 hover:opacity-100 transition-opacity cursor-help">
+                       <Activity size={10} className="text-emerald-400" />
+                       <span className="text-[8px] font-bold text-neutral-400 uppercase tracking-widest">Live Sync</span>
+                    </div>
                  </div>
-                 <div className="w-1 h-1 bg-white/20 rounded-full" />
-                 <div className="flex items-center gap-1 opacity-20 group cursor-help">
-                    <Activity size={10} className="text-neutral-500" />
-                    <span className="text-[8px] font-bold text-neutral-600 uppercase tracking-widest">Live Sync</span>
+                 <div className="flex items-center gap-1.5 py-1.5 px-3 bg-white/[0.03] border border-white/5 rounded-full shadow-inner">
+                    <Sparkles size={8} className="text-fuchsia-400 animate-pulse" />
+                    <span className="text-[7px] font-black text-neutral-300 uppercase tracking-[0.2em]">Powered by <span className="text-violet-400">Gemini 1.5 Pro</span></span>
                  </div>
               </div>
             </footer>
