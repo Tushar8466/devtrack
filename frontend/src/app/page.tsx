@@ -11,6 +11,8 @@ import { motion } from "motion/react";
 import dynamic from "next/dynamic";
 import { useState, useEffect } from "react";
 import { FeedbackForm } from "@/components/FeedbackForm";
+import { BackgroundRippleEffect } from "@/components/ui/background-ripple-effect";
+import { SparklesCore } from "@/components/ui/sparkles";
 
 const Globe = dynamic(() => import("@/components/globe"), {
   ssr: false,
@@ -121,10 +123,11 @@ export default function Home() {
           href="https://github.com/Tushar8466/devtrack"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-2 rounded-full border border-white/10 bg-black/50 px-5 py-4 shadow-xl backdrop-blur-md transition-all hover:scale-105 hover:bg-white/10 group"
+          className="flex items-center gap-2 rounded-full border border-white/10 bg-black/50 px-5 py-4 shadow-xl backdrop-blur-md transition-all hover:bg-white/10 group relative overflow-hidden"
         >
-          <Star size={18} className="text-amber-500 fill-amber-500/20 group-hover:fill-amber-500/40 transition-all" />
-          <span className="hidden sm:block uppercase tracking-widest text-[10px] font-bold text-neutral-300 group-hover:text-white">
+          <div className="absolute inset-0 bg-linear-to-r from-amber-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+          <Star size={18} className="text-amber-500 fill-amber-500/20 group-hover:fill-amber-500/40 transition-all group-hover:rotate-12" />
+          <span className="hidden sm:block uppercase tracking-widest text-[10px] font-black text-neutral-300 group-hover:text-white">
             Star on GitHub
           </span>
         </Link>
@@ -232,46 +235,85 @@ export default function Home() {
       </section>
 
       {/* How it works section */}
-      <section className="bg-black py-24 px-6">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-16">
-            <span className="text-violet-400 text-sm font-semibold uppercase tracking-widest">
-              How it works
-            </span>
-            <h2 className="mt-3 text-4xl md:text-5xl font-bold text-white">
-              Three steps to insight
-            </h2>
+      <section className="bg-black py-32 px-6 relative overflow-hidden group/steps">
+        <div className="absolute inset-0 z-0 opacity-20 group-hover/steps:opacity-40 transition-opacity duration-1000">
+           <BackgroundRippleEffect rows={20} cols={40} cellSize={60} />
+        </div>
+
+        <div className="max-w-5xl mx-auto relative z-10">
+          <div className="text-center mb-20">
+            <motion.span 
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              className="text-violet-400 text-sm font-black uppercase tracking-[0.4em]"
+            >
+              The Architecture
+            </motion.span>
+            <motion.h2 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="mt-4 text-5xl md:text-7xl font-black text-white tracking-tighter"
+            >
+              THREE STEPS TO <span className="text-violet-500">INSIGHT</span>
+            </motion.h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
             {steps.map((s, i) => (
-              <div key={i} className="flex flex-col items-center text-center relative">
-                <div className="w-16 h-16 rounded-full bg-transparent border border-white/10 flex items-center justify-center mb-6">
-                  <span className="text-violet-400 text-xl font-bold">{s.step}</span>
+              <motion.div 
+                key={i} 
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                transition={{ delay: i * 0.1 }}
+                whileHover={{ y: -10 }}
+                className="flex flex-col items-center text-center relative group/step"
+              >
+                <div className="w-24 h-24 rounded-4xl bg-white/2 border border-white/10 flex items-center justify-center mb-8 group-hover/step:border-violet-500/50 transition-all duration-500 relative">
+                  <div className="absolute inset-0 bg-violet-600/10 blur-2xl rounded-full opacity-0 group-hover/step:opacity-100 transition-opacity" />
+                  <span className="text-violet-400 text-3xl font-black italic relative z-10">{s.step}</span>
                 </div>
-                <h3 className="text-white font-semibold text-xl mb-3">{s.title}</h3>
-                <p className="text-neutral-400 text-sm leading-relaxed">{s.description}</p>
-              </div>
+                <h3 className="text-white font-black text-2xl mb-4 uppercase tracking-tight">{s.title}</h3>
+                <p className="text-neutral-500 text-sm leading-relaxed group-hover:text-neutral-400 transition-colors">{s.description}</p>
+                
+                {i < 2 && (
+                    <div className="hidden md:block absolute top-12 -right-6 w-12 h-px bg-linear-to-r from-violet-500/50 to-transparent" />
+                )}
+              </motion.div>
             ))}
           </div>
         </div>
       </section>
 
       {/* CTA section */}
-      <section className="bg-black py-24 px-6">
-        <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-            Ready to decode <span className="text-violet-400">developer DNA</span>?
-          </h2>
-          <p className="text-neutral-400 text-lg mb-10 max-w-xl mx-auto">
-            Start analyzing GitHub profiles instantly — no setup, no credit card required.
-          </p>
-          <Link
-            href={nextRoute}
-            className="inline-block px-10 py-4 rounded-xl bg-violet-600 hover:bg-violet-500 text-white font-semibold text-lg transition-all duration-300 shadow-[0_0_40px_-5px_rgba(124,58,237,0.5)] hover:shadow-[0_0_60px_-5px_rgba(124,58,237,0.7)] hover:-translate-y-0.5"
+      <section className="bg-black py-32 px-6 relative overflow-hidden group/cta">
+        <div className="absolute inset-0 z-0 opacity-0 group-hover/cta:opacity-100 transition-opacity duration-1000">
+           {/* Sparkles removed */}
+        </div>
+
+        <div className="max-w-3xl mx-auto text-center relative z-10">
+          <motion.h2 
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            className="text-5xl md:text-7xl font-black text-white mb-8 tracking-tighter"
           >
-            Start Scanning Now →
-          </Link>
+            READY TO DECODE <br />
+            <span className="bg-linear-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">DEVELOPER DNA</span>?
+          </motion.h2>
+          <p className="text-neutral-500 text-lg mb-12 max-w-xl mx-auto font-medium">
+            Join thousands of developers using DevTrack to verify authorship and ensure code integrity in the age of AI.
+          </p>
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <Link
+                href={nextRoute}
+                className="inline-block px-12 py-5 rounded-2xl bg-white text-black font-black text-lg transition-all duration-300 shadow-[0_0_50px_-5px_rgba(255,255,255,0.2)] hover:shadow-[0_0_70px_-5px_rgba(255,255,255,0.4)]"
+            >
+                START SCANNING NOW →
+            </Link>
+          </motion.div>
         </div>
       </section>
 

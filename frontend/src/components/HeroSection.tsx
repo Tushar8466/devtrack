@@ -3,6 +3,7 @@
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { BoxesCore } from "./ui/background-boxes";
+import { SparklesCore } from "./ui/sparkles";
 
 export default function HeroSection() {
   const { data: session } = useSession();
@@ -15,6 +16,10 @@ export default function HeroSection() {
 
         <div className="absolute inset-0 w-full h-full z-0">
           <BoxesCore />
+        </div>
+
+        <div className="absolute inset-0 w-full h-full z-1 pointer-events-none">
+          {/* Sparkles removed */}
         </div>
 
         {/* Main Content foreground */}
