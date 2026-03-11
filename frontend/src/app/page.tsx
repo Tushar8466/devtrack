@@ -13,6 +13,7 @@ import { useState, useEffect } from "react";
 import { FeedbackForm } from "@/components/FeedbackForm";
 import { BackgroundRippleEffect } from "@/components/ui/background-ripple-effect";
 import { SparklesCore } from "@/components/ui/sparkles";
+import { FeedbackWall } from "@/components/FeedbackWall";
 
 const Globe = dynamic(() => import("@/components/globe"), {
   ssr: false,
@@ -401,6 +402,11 @@ export default function Home() {
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[1px] bg-linear-to-r from-transparent via-white/5 to-transparent" />
 
         <FeedbackForm />
+        
+        {/* Public Feedback Wall Integration */}
+        <div className="mt-32">
+          <FeedbackWall />
+        </div>
       </section>
 
       {/* Global Interactive Section */}

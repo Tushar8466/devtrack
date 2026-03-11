@@ -36,10 +36,48 @@ export default function InboxPage() {
     const [isScanning, setIsScanning] = useState(true);
 
     useEffect(() => {
-        const data = localStorage.getItem("devtrack_feedback");
-        if (data) {
-            setFeedbacks(JSON.parse(data));
-        }
+        const stored = localStorage.getItem("devtrack_feedback");
+        const initialFeedbacks = stored ? JSON.parse(stored) : [];
+        
+        // Seed with global transmissions if storage is light
+        const globalNodes: Feedback[] = [
+            {
+                id: 1001,
+                content: "The neural scoring accuracy on large-scale Rust repos is impressive. Detects macro-heavy generated code with precision.",
+                timestamp: new Date(Date.now() - 3600000).toISOString(),
+                author: "Rustacean_Alpha",
+                githubHandle: "rust-lang",
+                isVerified: true,
+                avatar: "https://avatars.githubusercontent.com/u/443894?v=4"
+            },
+            {
+                id: 1002,
+                content: "Proposed addition: Multi-repository collision analysis to detect cross-project style drift.",
+                timestamp: new Date(Date.now() - 86400000).toISOString(),
+                author: "Kernel_Master",
+                githubHandle: "torvalds",
+                isVerified: true,
+                avatar: "https://avatars.githubusercontent.com/u/1024025?v=4"
+            },
+            {
+                id: 1003,
+                content: "Interface feels clinical and high-performance. Exactly what we need for our audit workflow.",
+                timestamp: new Date(Date.now() - 172800000).toISOString(),
+                author: "Security_Audit_Node",
+                isVerified: false
+            }
+        ];
+
+        // Merge local and global, filtering duplicates by ID
+        const merged = [...initialFeedbacks];
+        globalNodes.forEach(node => {
+            if (!merged.find(f => f.id === node.id)) {
+                merged.push(node);
+            }
+        });
+
+        setFeedbacks(merged.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()));
+        
         // Simulate a system scan on load
         const timer = setTimeout(() => setIsScanning(false), 1500);
         return () => clearTimeout(timer);

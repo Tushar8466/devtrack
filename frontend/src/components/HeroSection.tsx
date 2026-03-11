@@ -14,13 +14,7 @@ export default function HeroSection() {
       <div className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden">
         <div className="absolute inset-0 w-full h-full bg-black z-10 mask-[radial-gradient(transparent,white)] pointer-events-none transition-colors duration-300" />
 
-        <div className="absolute inset-0 w-full h-full z-0">
-          <BoxesCore />
-        </div>
-
-        <div className="absolute inset-0 w-full h-full z-1 pointer-events-none">
-          {/* Sparkles removed */}
-        </div>
+        <BoxesCore />
 
         {/* Main Content foreground */}
         <div className="z-20 flex flex-col items-center gap-6 max-w-4xl mx-auto px-4 mt-[-5vh] text-center mix-blend-difference">

@@ -208,53 +208,19 @@ export default function ComparePage() {
         }
     };
 
-    const maskImage = useMotionTemplate`radial-gradient(400px at ${mouseX}px ${mouseY}px, white, transparent)`;
-    const backgroundStyle = { maskImage, WebkitMaskImage: maskImage };
-
     return (
         <div 
             onMouseMove={handleMouseMove}
             className="min-h-screen bg-black text-white overflow-hidden relative"
-        >    <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-size-[40px_40px] mask-[radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none" />
-            <BackgroundBeams className={cn("transition-opacity duration-1000", loading ? "opacity-100" : "opacity-40")} />
-            
-            {/* Sparkles removed */}
-
-            {/* Scrolling Data Stream Overlay */}
-            <div className="absolute inset-0 opacity-[0.03] pointer-events-none select-none font-mono text-[8px] leading-none overflow-hidden flex flex-wrap gap-1 p-2 h-screen">
-                {randomString}
-            </div>
+        >
+            {/* Tactical Grid Background */}
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-size-[40px_40px] mask-[radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_110%)] pointer-events-none" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(139,92,246,0.05),transparent_70%)] pointer-events-none" />
             
             <div className="flex flex-col items-center px-4 md:px-8 pt-32 pb-20 w-full relative z-10">
                     <motion.div
-                        style={{
-                            rotateX,
-                            rotateY,
-                            transformStyle: "preserve-3d"
-                        }}
                         className="max-w-7xl mx-auto w-full relative z-10"
                     >
-                        {/* Neural Threads SVG Connector */}
-                        {data1 && data2 && (
-                            <svg className="absolute inset-0 w-full h-full pointer-events-none overflow-visible z-0 opacity-20">
-                                <motion.path 
-                                    initial={{ pathLength: 0 }}
-                                    animate={{ pathLength: 1 }}
-                                    transition={{ duration: 2, ease: "easeInOut", repeat: Infinity }}
-                                    d="M 50% 100 L 25% 300 Q 50% 400 75% 300 L 50% 100"
-                                    fill="none"
-                                    stroke="url(#threadGradient)"
-                                    strokeWidth="1"
-                                />
-                                <defs>
-                                    <linearGradient id="threadGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                                        <stop offset="0%" stopColor="#8b5cf6" />
-                                        <stop offset="50%" stopColor="#ffffff" />
-                                        <stop offset="100%" stopColor="#d946ef" />
-                                    </linearGradient>
-                                </defs>
-                            </svg>
-                        )}
                         <div className="text-center mb-16 space-y-4">
                             <motion.div
                                 initial={{ opacity: 0, y: 20 }}
