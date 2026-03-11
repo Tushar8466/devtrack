@@ -43,8 +43,9 @@ const generatePulseData = () => {
 };
 
 import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 
-export default function OSExplorerPage() {
+function OSExplorerContent() {
   const searchParams = useSearchParams();
   const initialQuery = searchParams.get("q") || "";
   
@@ -402,5 +403,18 @@ export default function OSExplorerPage() {
         />
       </div>
     </div>
+  );
+}
+
+export default function OSExplorerPage() {
+  return (
+    <Suspense fallback={
+       <div className="min-h-screen bg-black flex flex-col items-center justify-center gap-4">
+          <div className="w-12 h-12 border-2 border-cyan-500/20 border-t-cyan-500 rounded-full animate-spin" />
+          <p className="text-[10px] font-black text-cyan-500 uppercase tracking-[0.3em] animate-pulse">Initializing Tactical Uplink...</p>
+       </div>
+    }>
+      <OSExplorerContent />
+    </Suspense>
   );
 }

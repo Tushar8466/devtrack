@@ -1,6 +1,7 @@
 import { FloatingNav } from "@/components/ui/floating-navbar";
 import "./globals.css";
 import { SessionProvider } from "@/components/providers/SessionProvider";
+import { AtlasAssistant } from "@/components/AtlasAssistant";
 
 export default function RootLayout({
   children,
@@ -21,6 +22,7 @@ export default function RootLayout({
         <SessionProvider>
           <FloatingNav navItems={navItems} />
           {children}
+          <AtlasAssistant />
         </SessionProvider>
       </body>
     </html>
