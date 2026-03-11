@@ -542,7 +542,7 @@ export default function ProfileResults({ data, onBack }: ProfileResultsProps) {
 
             {/* === LEFT SIDEBAR === */}
             {/* === LEFT SIDEBAR: TACTICAL DOSSIER === */}
-            <aside className="w-80 shrink-0 border-r border-white/10 flex flex-col items-center py-10 px-6 gap-8 sticky top-0 h-screen overflow-y-auto bg-black/50 backdrop-blur-xl">
+            <aside className="w-80 shrink-0 border-r border-white/10 flex flex-col items-center pt-24 pb-10 px-6 gap-8 sticky top-0 h-screen overflow-y-auto bg-black/50 backdrop-blur-xl">
 
                 {/* System Navigation */}
                 <div className="w-full flex justify-between items-center mb-2">
@@ -654,7 +654,7 @@ export default function ProfileResults({ data, onBack }: ProfileResultsProps) {
             </aside>
 
             {/* === MAIN CONTENT === */}
-            <main className="flex-1 overflow-y-auto px-12 py-12 space-y-10">
+            <main className="flex-1 overflow-y-auto px-12 pt-32 pb-12 space-y-10">
 
                 {/* Header Section: Premium Tactical Header */}
                 <header className="flex items-start justify-between relative">
