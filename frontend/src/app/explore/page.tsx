@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "motion/react";
 import { IconBrandGithub, IconSearch, IconArrowRight, IconGitCommit } from "@tabler/icons-react";
+import { Zap } from "lucide-react";
 import { WavyBackground } from "@/components/ui/wavy-background";
 import { MultiStepLoader } from "@/components/ui/multi-step-loader";
 
@@ -21,8 +22,15 @@ const COMMITS_LOADING_STATES = [
     { text: "Generating timeline" },
 ];
 
+const REPO_LOADING_STATES = [
+    { text: "Establishing tactical uplink" },
+    { text: "Fetching repository metadata" },
+    { text: "Analyzing architectural pulse" },
+    { text: "Calculating health vectors" },
+];
+
 export default function ExplorePage() {
-    const [searchType, setSearchType] = useState<'profile' | 'commits'>('profile');
+    const [searchType, setSearchType] = useState<'profile' | 'commits' | 'repo'>('profile');
     const [inputValue, setInputValue] = useState("");
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
@@ -39,6 +47,10 @@ export default function ExplorePage() {
             setLoading(true);
             await new Promise((resolve) => setTimeout(resolve, PROFILE_LOADING_STATES.length * 500 + 300));
             router.push(`/analyze/${query}`);
+        } else if (searchType === 'repo') {
+            setLoading(true);
+            await new Promise((resolve) => setTimeout(resolve, REPO_LOADING_STATES.length * 500 + 300));
+            router.push(`/opensource/explorer?q=${encodeURIComponent(query)}`);
         } else {
             let username = "";
             let repo = "";
@@ -94,7 +106,7 @@ export default function ExplorePage() {
                 </div>
 
                 {/* Search Type Toggle */}
-                <div className="flex bg-white/5 border border-white/10 rounded-xl p-1 mb-8 w-fit mx-auto">
+                <div className="flex bg-white/5 border border-white/10 rounded-xl p-1 mb-8 w-fit mx-auto overflow-x-auto">
                     <button
                         type="button"
                         onClick={() => { setSearchType('profile'); setError(""); }}
@@ -105,6 +117,17 @@ export default function ExplorePage() {
                     >
                         <IconSearch className="w-4 h-4" />
                         Profiles
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => { setSearchType('repo'); setError(""); }}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${searchType === 'repo'
+                            ? 'bg-white/10 text-white shadow-sm'
+                            : 'text-neutral-500 hover:text-white'
+                            }`}
+                    >
+                        <Zap className="w-4 h-4" />
+                        Node Intel
                     </button>
                     <button
                         type="button"
@@ -120,11 +143,13 @@ export default function ExplorePage() {
                 </div>
 
                 <h1 className="text-4xl font-bold text-white mb-3">
-                    {searchType === 'profile' ? "Analyze a Profile" : "Repository Commits"}
+                    {searchType === 'profile' ? "Analyze a Profile" : searchType === 'repo' ? "Node Intelligence" : "Repository Commits"}
                 </h1>
                 <p className="text-neutral-300 text-lg mb-8">
                     {searchType === 'profile'
                         ? "Enter a GitHub username to scan for AI-generated contribution signals."
+                        : searchType === 'repo'
+                        ? "Retrieve architectural health and health pulses for any repository."
                         : "Enter a GitHub repository to instantly view its most recent commit history."}
                 </p>
 

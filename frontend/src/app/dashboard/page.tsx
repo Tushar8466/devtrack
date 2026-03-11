@@ -12,6 +12,8 @@ import { GlowingCard } from "@/components/ui/glowing-card";
 import { FileUpload } from "@/components/ui/file-upload";
 import { X, Fingerprint, Activity, Clock, Award, Terminal } from "lucide-react";
 import { MultiStepLoader } from "@/components/ui/multi-step-loader";
+import { motion } from "motion/react";
+import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer } from 'recharts';
 import Link from "next/link";
 
 interface GitHubUser {
@@ -61,6 +63,23 @@ export default function DashboardPage() {
   const [isSearching, setIsSearching] = useState(false);
   const [customAvatar, setCustomAvatar] = useState<string | null>(null);
   const [showUploadModal, setShowUploadModal] = useState(false);
+  const [langData, setLangData] = useState<{ name: string; value: number }[]>([]);
+
+  useEffect(() => {
+    if (repos.length > 0) {
+      const languages: Record<string, number> = {};
+      repos.forEach(repo => {
+        if (repo.language) {
+          languages[repo.language] = (languages[repo.language] || 0) + 1;
+        }
+      });
+      const topLangs = Object.entries(languages)
+        .sort(([, a], [, b]) => b - a)
+        .slice(0, 6)
+        .map(([name, value]) => ({ name, value }));
+      setLangData(topLangs);
+    }
+  }, [repos]);
 
   useEffect(() => {
     const savedAvatar = localStorage.getItem("devtrack_custom_avatar");
@@ -142,7 +161,7 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-[#030303] pt-28 pb-20 px-4 text-white font-sans selection:bg-violet-500/30">
       <div className="max-w-[1400px] mx-auto space-y-12">
-        
+
         {/* TACTICAL STATUS BAR */}
         <div className="flex flex-wrap items-center justify-between gap-6 px-8 py-4 bg-white/2 border border-white/5 rounded-2xl backdrop-blur-3xl">
           <div className="flex items-center gap-8">
@@ -156,7 +175,7 @@ export default function DashboardPage() {
               <span className="text-xs font-black text-emerald-500 italic">99.98%</span>
             </div>
           </div>
-          
+
           <div className="hidden lg:flex items-center gap-2">
             <div className="flex gap-1">
               {[...Array(12)].map((_, i) => (
@@ -279,7 +298,7 @@ export default function DashboardPage() {
                     </span>
                   </h1>
                 </div>
-                
+
                 <p className="text-neutral-500 text-lg font-medium italic max-w-xl">
                   {githubData?.bio || "DevTrack autonomous intelligence engine. Mapping neural authorship across global repositories."}
                 </p>
@@ -337,12 +356,12 @@ export default function DashboardPage() {
             ].map((stat, i) => (
               <div key={i} className="relative group overflow-hidden">
                 <div className="absolute inset-0 bg-white/2 opacity-0 group-hover:opacity-100 transition-opacity" />
-                <div className="relative border border-white/10 bg-black/40 rounded-[2rem] p-8 transition-all hover:border-violet-500/30">
+                <div className="relative border border-white/10 bg-black/40 rounded-4xl p-8 transition-all hover:border-violet-500/30">
                   <div className="flex items-center justify-between mb-8">
                     <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${stat.bg} ${stat.color} border border-white/5`}>
                       {stat.icon}
                     </div>
-                    <span className="text-[10px] font-mono text-neutral-700 font-bold tracking-widest uppercase">REG_0{i+1}</span>
+                    <span className="text-[10px] font-mono text-neutral-700 font-bold tracking-widest uppercase">REG_0{i + 1}</span>
                   </div>
                   <div className="space-y-1">
                     <p className="text-[9px] font-black text-neutral-600 uppercase tracking-widest">{stat.title}</p>
@@ -353,6 +372,87 @@ export default function DashboardPage() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+
+        {/* NEURAL DNA SCANNER & ACHIEVEMENT REGISTRY */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {/* LANGUAGE DNA RADAR */}
+          <div className="lg:col-span-1 space-y-6">
+            <div className="flex items-center gap-3 px-1">
+              <div className="w-1.5 h-6 bg-cyan-500 rounded-full" />
+              <h2 className="text-xl font-black text-white uppercase tracking-tighter italic">Linguistic DNA</h2>
+            </div>
+            <div className="bg-black/40 border border-white/5 rounded-4xl p-8 backdrop-blur-3xl h-[400px] relative overflow-hidden transition-all hover:border-cyan-500/20 group">
+              <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity">
+                <Activity size={120} className="text-cyan-500/20" />
+              </div>
+              <div className="h-full w-full">
+                {langData.length > 0 ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <RadarChart cx="50%" cy="50%" outerRadius="80%" data={langData}>
+                      <PolarGrid stroke="#ffffff10" />
+                      <PolarAngleAxis dataKey="name" tick={{ fill: '#6b7280', fontSize: 10, fontWeight: 'bold' }} />
+                      <Radar
+                        name="Usage"
+                        dataKey="value"
+                        stroke="#06b6d4"
+                        fill="#06b6d4"
+                        fillOpacity={0.3}
+                      />
+                    </RadarChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="h-full flex flex-col items-center justify-center opacity-20 scale-90">
+                    <Terminal size={40} className="mb-4" />
+                    <p className="text-[10px] font-black uppercase tracking-[0.3em]">Awaiting DNA samples...</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* ACHIEVEMENT LOG */}
+          <div className="lg:col-span-2 space-y-6">
+            <div className="flex items-center gap-3 px-1">
+              <div className="w-1.5 h-6 bg-violet-500 rounded-full" />
+              <h2 className="text-xl font-black text-white uppercase tracking-tighter italic">Achievement Log</h2>
+            </div>
+            <div className="bg-black/40 border border-white/5 rounded-4xl p-8 backdrop-blur-3xl h-[400px] flex flex-wrap gap-4 overflow-y-auto content-start transition-all hover:border-violet-500/20 scrollbar-hide">
+              {[
+                { id: 'ARCH_01', title: 'Grand Architect', condition: (githubData?.public_repos || 0) >= 50, icon: <Box size={20} />, label: '50+ Assets' },
+                { id: 'COMM_01', title: 'Network Beacon', condition: (githubData?.followers || 0) >= 100, icon: <Users size={20} />, label: '100+ Followers' },
+                { id: 'FLOW_01', title: 'Tactical Pivot', condition: (githubData?.following || 0) >= 50, icon: <GitFork size={20} />, label: 'High Connectivity' },
+                { id: 'TIME_01', title: 'Legacy Node', condition: new Date(githubData?.created_at || '').getFullYear() < 2020, icon: <Clock size={20} />, label: 'Pre-2020 Sync' },
+                { id: 'AUTH_01', title: 'Verified Ghost', condition: (githubData?.public_gists || 0) > 0, icon: <Fingerprint size={20} />, label: 'Gist Active' },
+              ].map((badge) => (
+                <div
+                  key={badge.id}
+                  className={cn(
+                    "relative group rounded-3xl p-6 border transition-all duration-700 overflow-hidden flex flex-col items-center text-center gap-3 w-[calc(50%-8px)] md:w-[calc(33.33%-11px)]",
+                    badge.condition
+                      ? "bg-violet-500/5 border-violet-500/30 shadow-[0_0_20px_rgba(139,92,246,0.1)]"
+                      : "bg-white/2 border-white/5 opacity-20 grayscale"
+                  )}
+                >
+                  <div className={cn(
+                    "w-10 h-10 rounded-xl flex items-center justify-center border transition-all duration-500",
+                    badge.condition ? "bg-violet-500/20 border-violet-500/40 text-violet-400 group-hover:scale-110" : "bg-white/5 border-white/10 text-neutral-600"
+                  )}>
+                    {badge.icon}
+                  </div>
+                  <div>
+                    <h4 className="text-[10px] font-black text-white uppercase tracking-tight mb-0.5">{badge.title}</h4>
+                    <p className="text-[8px] font-mono text-neutral-600 uppercase tracking-widest">{badge.label}</p>
+                  </div>
+                  {badge.condition && (
+                    <div className="absolute top-2 right-2">
+                      <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full shadow-[0_0_8px_#10b981]" />
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
@@ -412,6 +512,83 @@ export default function DashboardPage() {
           </div>
         </div>
 
+        {/* TACTICAL ACTIVITY PULSE */}
+        <section className="mt-8">
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center gap-3">
+              <span className="text-violet-400 font-black uppercase tracking-[0.4em] text-[10px] animate-pulse">// FREQUENCY_ANALYSIS</span>
+              <h2 className="text-3xl font-black text-white tracking-tighter uppercase italic">Activity Pulse</h2>
+            </div>
+            <div className="flex gap-2">
+              <div className="px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full flex items-center gap-2">
+                <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-ping" />
+                <span className="text-[9px] font-black text-emerald-500 uppercase tracking-widest">Live_Signal</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white/2 border border-white/5 rounded-[2.5rem] p-10 backdrop-blur-3xl relative overflow-hidden group">
+            <div className="absolute inset-0 bg-linear-to-br from-violet-500/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
+
+            <div className="flex flex-col md:flex-row items-end gap-12 relative z-10">
+              <div className="flex-1 w-full h-40 flex items-end gap-1">
+                {[...Array(40)].map((_, i) => {
+                  const height1 = 10 + Math.random() * 80;
+                  const height2 = 10 + Math.random() * 80;
+                  const height3 = 10 + Math.random() * 80;
+                  return (
+                    <motion.div
+                      key={i}
+                      initial={{ height: 10, opacity: 0.2 }}
+                      animate={{
+                        height: [height1, height2, height3],
+                        opacity: [0.2, 0.5, 0.2]
+                      }}
+                      transition={{
+                        duration: 2 + Math.random() * 2,
+                        repeat: Infinity,
+                        ease: "linear",
+                        delay: i * 0.05
+                      }}
+                      className="flex-1 bg-linear-to-t from-violet-600/40 via-violet-400/20 to-transparent rounded-t-full"
+                    />
+                  );
+                })}
+              </div>
+
+              <div className="w-full md:w-80 space-y-6">
+                <div className="space-y-2">
+                  <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-neutral-500">
+                    <span>Neural Bandwidth</span>
+                    <span className="text-violet-400">88.4%</span>
+                  </div>
+                  <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: "88.4%" }}
+                      className="h-full bg-violet-500"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="p-4 bg-white/5 rounded-2xl border border-white/5">
+                    <p className="text-[9px] font-black text-neutral-600 uppercase mb-1">Peak_Freq</p>
+                    <p className="text-lg font-black text-white italic tracking-tighter">14.2Hz</p>
+                  </div>
+                  <div className="p-4 bg-white/5 rounded-2xl border border-white/5">
+                    <p className="text-[9px] font-black text-neutral-600 uppercase mb-1">Integrity</p>
+                    <p className="text-lg font-black text-white italic tracking-tighter">HIGH</p>
+                  </div>
+                </div>
+
+                <p className="text-[10px] text-neutral-500 leading-relaxed italic border-l border-violet-500/30 pl-4 py-1">
+                  Temporal data indicates a high-intensity output cycle.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
 
         {/* REPOSITORY REGISTRY GRID */}
         <div className="space-y-8">
@@ -422,14 +599,14 @@ export default function DashboardPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {repos.map((repo, i) => (
               <a key={repo.id} href={repo.html_url} target="_blank" className="group">
-                <div className="relative h-full border border-white/10 bg-black/40 rounded-[2rem] p-8 transition-all hover:border-fuchsia-500/30 flex flex-col gap-6">
+                <div className="relative h-full border border-white/10 bg-black/40 rounded-4xl p-8 transition-all hover:border-fuchsia-500/30 flex flex-col gap-6">
                   <div className="flex items-center justify-between">
                     <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/5 flex items-center justify-center text-neutral-400 group-hover:text-fuchsia-400 transition-colors">
                       <Box size={20} />
                     </div>
-                    <span className="text-[10px] font-mono text-neutral-700 font-bold tracking-widest uppercase">REG_A{i+1}</span>
+                    <span className="text-[10px] font-mono text-neutral-700 font-bold tracking-widest uppercase">REG_A{i + 1}</span>
                   </div>
-                  
+
                   <div className="space-y-2 flex-1">
                     <h3 className="text-lg font-black text-white uppercase tracking-tight group-hover:text-fuchsia-400 transition-colors">{repo.name}</h3>
                     <p className="text-xs text-neutral-500 leading-relaxed italic line-clamp-2">
@@ -449,6 +626,41 @@ export default function DashboardPage() {
           </div>
         </div>
 
+        {/* NEURAL EVENT LOG */}
+        <section className="mt-20">
+          <div className="flex items-center gap-3 mb-8 px-1">
+            <span className="text-rose-500 font-black uppercase tracking-[0.4em] text-[10px] animate-pulse">// SYSTEM_LOG_FEED</span>
+            <h2 className="text-3xl font-black text-white tracking-tighter uppercase italic">Neural Event Archive</h2>
+          </div>
+          <div className="bg-black/80 border border-white/5 rounded-4xl p-6 font-mono text-[10px] space-y-2 backdrop-blur-3xl relative overflow-hidden group hover:border-rose-500/20 transition-all max-h-[300px] overflow-y-auto scrollbar-hide">
+            <div className="absolute inset-0 bg-linear-to-b from-rose-500/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            {[
+              { time: "08:42:11", event: "SYNCHRONIZING_NODE_ASSETS", status: "OK", color: "text-emerald-500" },
+              { time: "09:15:44", event: "DECONSTRUCTING_REPOS_METADATA", status: "SUCCESS", color: "text-emerald-500" },
+              { time: "10:02:19", event: "NEURAL_DNA_SEQUENCE_IDENTIFIED", status: "MATCH", color: "text-cyan-500" },
+              { time: "11:33:01", event: "CALCULATING_TEMPORAL_DRIFT", status: "STABLE", color: "text-violet-500" },
+              { time: "12:59:59", event: "UPDATING_AUTH_REGISTRY_v4.2", status: "DONE", color: "text-emerald-500" },
+              { time: "14:20:03", event: "SCANNING_GLOBAL_PULSE_CHANNELS", status: "ACTIVE", color: "text-amber-500" },
+              { time: "16:05:44", event: "LOCAL_REPOSITORY_CLUSTER_SYNC", status: "WAIT", color: "text-neutral-500" },
+              { time: "17:30:12", event: "NEURAL_AUTH_SIGNATURE_VERIFIED", status: "GENUINE", color: "text-rose-500" },
+            ].map((log, i) => (
+              <div key={i} className="flex gap-4 items-center border-b border-white/2 pb-2 last:border-0 opacity-60 hover:opacity-100 transition-opacity">
+                <span className="text-neutral-600 shrink-0">[{log.time}]</span>
+                <span className="text-neutral-400 flex-1 truncate">{log.event}...</span>
+                <span className={cn("font-black tracking-widest px-2 py-0.5 rounded-sm bg-white/2", log.color)}>{log.status}</span>
+              </div>
+            ))}
+          </div>
+        </section>
+      </div>
+
+      {/* SCAN LINE EFFECT */}
+      <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden opacity-5">
+        <motion.div
+          animate={{ y: ["-100%", "100%"] }}
+          transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+          className="w-full h-[50vh] bg-linear-to-b from-transparent via-violet-500/20 to-transparent"
+        />
       </div>
 
       {/* UPLOAD MODAL */}

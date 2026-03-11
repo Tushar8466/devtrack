@@ -46,16 +46,22 @@ function OpenSourceLandingPage() {
               onClick={() => router.push("/opensource/track")}
               className="group relative px-10 py-5 bg-white text-black font-bold rounded-2xl overflow-hidden transition-all hover:scale-105 active:scale-95 flex items-center gap-3 text-lg"
             >
-              <span className="relative z-10">Start Tracking Now</span>
+              <span className="relative z-10">Contribution Tracker</span>
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              <div className="absolute inset-0 bg-linear-to-r from-purple-500 to-blue-500 opacity-0 group-hover:opacity-10 transition-opacity"></div>
+            </button>
+            <button
+              onClick={() => router.push("/opensource/explorer")}
+              className="group relative px-10 py-5 bg-cyan-500 text-black font-bold rounded-2xl overflow-hidden transition-all hover:scale-105 active:scale-95 flex items-center gap-3 text-lg shadow-[0_0_20px_rgba(6,182,212,0.3)] hover:shadow-[0_0_30px_rgba(6,182,212,0.5)]"
+            >
+              <Zap className="w-5 h-5 fill-black" />
+              <span className="relative z-10">Node Intelligence</span>
             </button>
             <button
               onClick={() => router.push("/opensource/docs")}
               className="group relative px-10 py-5 bg-white/5 border border-white/10 text-white font-bold rounded-2xl overflow-hidden transition-all hover:scale-105 hover:bg-white/10 active:scale-95 flex items-center gap-3 text-lg backdrop-blur-sm"
             >
               <BookOpen className="w-5 h-5 text-violet-400" />
-              <span className="relative z-10">Read the Guide</span>
+              <span className="relative z-10">Guide</span>
             </button>
           </div>
         </div>
