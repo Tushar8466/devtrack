@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { GlareCard } from "@/components/ui/glare-card";
 import { GitPullRequest, GitMerge, AlertCircle, Search, ArrowLeft, X, ExternalLink, Plus, RefreshCcw, Github } from "lucide-react";
@@ -9,6 +9,17 @@ import { WavyBackground } from "@/components/ui/wavy-background";
 import { motion, AnimatePresence } from "motion/react";
 import { useOutsideClick } from "@/hooks/use-outside-click";
 import { MultiStepLoader } from "@/components/ui/multi-step-loader";
+import { 
+    ResponsiveContainer, 
+    BarChart, 
+    Bar, 
+    XAxis, 
+    YAxis, 
+    Tooltip, 
+    Cell,
+    PieChart,
+    Pie
+} from 'recharts';
 
 import { Cover } from "@/components/ui/cover";
 
@@ -81,6 +92,29 @@ export default function TrackerResultsPage() {
             setLoading(false);
         }
     };
+
+    // Analytics derivation
+    const repoStats = useMemo(() => {
+        const stats: Record<string, number> = {};
+        [...prs, ...issues, ...merged].forEach(item => {
+            if (item.repo_name) {
+                stats[item.repo_name] = (stats[item.repo_name] || 0) + 1;
+            }
+        });
+        return Object.entries(stats)
+            .map(([name, count]) => ({ name, count }))
+            .sort((a, b) => b.count - a.count)
+            .slice(0, 5);
+    }, [prs, issues, merged]);
+
+    const achievement = useMemo(() => {
+        const total = prs.length + issues.length + merged.length;
+        if (total === 0) return null;
+        if (merged.length > 5) return { label: "Elite Architect", desc: "Proven record of merged production code", icon: "💎" };
+        if (prs.length > 3) return { label: "Active Deployer", desc: "High frequency of engineering proposals", icon: "🚀" };
+        if (issues.length > prs.length) return { label: "Systems Guardian", desc: "Focused on architectural integrity and bug tracking", icon: "🛡️" };
+        return { label: "OS Voyager", desc: "Beginning the journey into the global ecosystem", icon: "🛰️" };
+    }, [prs, issues, merged]);
 
     // Synchronize rows for perfect horizontal alignment
     const maxItems = Math.max(prs.length, issues.length, merged.length, 1);
@@ -160,6 +194,57 @@ export default function TrackerResultsPage() {
                         </div>
                         <p className="text-neutral-500 font-mono uppercase tracking-[0.3em] text-sm italic">Synchronized GitHub Intelligence</p>
                     </div>
+
+                    {/* Neural Analytics Dashboard */}
+                    {!error && (prs.length > 0 || issues.length > 0 || merged.length > 0) && (
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                            {/* Achievement Card */}
+                            <div className="bg-white/2 border border-white/10 rounded-4xl p-10 backdrop-blur-3xl relative overflow-hidden group">
+                                <div className="absolute -top-10 -right-10 w-40 h-40 bg-violet-600/10 rounded-full blur-3xl" />
+                                <div className="relative z-10 space-y-6">
+                                    <div className="flex items-center gap-4">
+                                        <div className="text-5xl">{achievement?.icon}</div>
+                                        <div>
+                                            <p className="text-[10px] font-black text-violet-400 uppercase tracking-widest leading-none mb-2">Neural_Class</p>
+                                            <h3 className="text-2xl font-black text-white italic tracking-tighter uppercase leading-none">{achievement?.label}</h3>
+                                        </div>
+                                    </div>
+                                    <p className="text-neutral-400 text-sm italic leading-relaxed">
+                                        {achievement?.desc}. Profile analysis indicates stable contribution trajectory in the {repoStats[0]?.name.split('/')[1] || "target"} sector.
+                                    </p>
+                                    <div className="flex gap-2">
+                                        {["Verified", "Level_04", "Strategic"].map(tag => (
+                                            <span key={tag} className="px-3 py-1 bg-white/5 border border-white/10 rounded-full text-[8px] font-black uppercase text-neutral-500">{tag}</span>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Repo Distribution */}
+                            <div className="bg-white/2 border border-white/10 rounded-4xl p-8 backdrop-blur-3xl space-y-6 lg:col-span-2 overflow-hidden">
+                                <div className="flex items-center justify-between">
+                                    <div className="space-y-1">
+                                        <h4 className="text-sm font-black text-white uppercase tracking-[0.2em]">Node Distribution</h4>
+                                        <p className="text-[9px] font-mono text-neutral-600 uppercase">Top_5_Impact_Sectors</p>
+                                    </div>
+                                    <RefreshCcw size={14} className="text-neutral-700" />
+                                </div>
+                                <div className="h-[120px] w-full">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <BarChart data={repoStats} layout="vertical">
+                                            <XAxis type="number" hide />
+                                            <YAxis dataKey="name" type="category" width={120} tick={{ fontSize: 9, fill: '#666', fontWeight: 900 }} axisLine={false} tickLine={false} />
+                                            <Tooltip 
+                                                contentStyle={{ backgroundColor: '#000', border: '1px solid #ffffff10', fontSize: '10px' }}
+                                                itemStyle={{ color: '#8b5cf6' }}
+                                            />
+                                            <Bar dataKey="count" fill="#8b5cf6" radius={[0, 4, 4, 0]} barSize={12} />
+                                        </BarChart>
+                                    </ResponsiveContainer>
+                                </div>
+                            </div>
+                        </div>
+                    )}
 
                     {error && (
                         <div className="bg-red-500/10 border border-red-500/20 text-red-500 p-8 rounded-3xl text-center backdrop-blur-md max-w-2xl mx-auto">

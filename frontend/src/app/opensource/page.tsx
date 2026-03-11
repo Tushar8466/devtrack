@@ -2,6 +2,7 @@
 
 import React from "react";
 import { useRouter } from "next/navigation";
+import { motion } from "motion/react";
 import { ContainerScroll } from "@/components/ui/container-scroll-animation";
 import { ExternalLink, ArrowRight, GitPullRequest, Star, GitMerge, Zap, Code2, Globe, BookOpen, Search, Terminal, MessageSquare, Award, PlayCircle, Heart, Shield, Users } from "lucide-react";
 import { GlareCard } from "@/components/ui/glare-card";
@@ -10,8 +11,28 @@ function OpenSourceLandingPage() {
   const router = useRouter();
 
   return (
-    <div className="flex flex-col min-h-screen bg-black text-white pb-20">
-      <div className="flex flex-col overflow-hidden bg-black">
+    <div className="flex flex-col min-h-screen bg-black text-white pb-20 selection:bg-cyan-500/30">
+      {/* Tactical OS Pulse Ticker */}
+      <div className="w-full bg-cyan-950/20 border-b border-white/5 py-2 overflow-hidden relative z-50">
+        <motion.div
+          animate={{ x: ["100%", "-100%"] }}
+          transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
+          className="flex gap-12 whitespace-nowrap"
+        >
+          {[
+            "// REPO_DETECTION: facebook/react | SAT_STABLE",
+            "// NODE_UPDATE: vercel/next.js | NEW_RELEASE v14.1",
+            "// TRAFFIC_SPIKE: apple/swift | 1.2k NODES_JOINED",
+            "// UPLINK_ESTABLISHED: microsoft/vscode | SYNC_COMPLETE",
+            "// ANOMALY_DETECTED: bun/sh | VELOCITY_CRITICAL",
+            "// SECTOR_SCAN: tailwindlabs/tailwindcss | HEALTH_OPTIMAL"
+          ].map((text, i) => (
+            <span key={i} className="text-[10px] font-mono font-black text-cyan-500/80 uppercase tracking-widest">{text}</span>
+          ))}
+        </motion.div>
+      </div>
+
+      <div className="flex flex-col overflow-hidden bg-black relative">
         <ContainerScroll
           titleComponent={
             <h1 className="text-4xl font-semibold text-white text-center">
@@ -186,10 +207,10 @@ function OpenSourceLandingPage() {
               { step: "03", title: "Code", desc: "Implement your fix or feature and run tests.", icon: <Terminal className="w-6 h-6" />, color: "emerald" },
               { step: "04", title: "Merge", desc: "Open a PR and collaborate with maintainers.", icon: <Star className="w-6 h-6" />, color: "rose" },
             ].map((item, i) => (
-              <div key={i} className={`relative p-8 rounded-3xl bg-white/5 border transition-all group overflow-hidden ${item.color === "amber" ? "hover:bg-amber-500/3 border-white/5 hover:border-amber-500/20" :
-                item.color === "blue" ? "hover:bg-blue-500/3 border-white/5 hover:border-blue-500/20" :
-                  item.color === "emerald" ? "hover:bg-emerald-500/3 border-white/5 hover:border-emerald-500/20" :
-                    "hover:bg-rose-500/3 border-white/5 hover:border-rose-500/20"
+              <div key={i} className={`relative p-8 rounded-3xl bg-white/5 border transition-all group overflow-hidden ${item.color === "amber" ? "hover:bg-amber-500/5 border-white/5 hover:border-amber-500/20" :
+                item.color === "blue" ? "hover:bg-blue-500/5 border-white/5 hover:border-blue-500/20" :
+                  item.color === "emerald" ? "hover:bg-emerald-500/5 border-white/5 hover:border-emerald-500/20" :
+                    "hover:bg-rose-500/5 border-white/5 hover:border-rose-500/20"
                 }`}>
                 <div className={`absolute -top-10 -right-10 w-32 h-32 rounded-full blur-3xl opacity-0 group-hover:opacity-20 transition-opacity ${item.color === "amber" ? "bg-amber-500" :
                   item.color === "blue" ? "bg-blue-500" :
