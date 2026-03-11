@@ -11,7 +11,13 @@ function OpenSourceLandingPage() {
   const router = useRouter();
 
   return (
-    <div className="flex flex-col min-h-screen bg-black text-white pb-20 selection:bg-cyan-500/30">
+    <div className="flex flex-col min-h-screen bg-black text-white pb-20 selection:bg-cyan-500/30 overflow-x-hidden">
+      {/* Neural Background Mesh */}
+      <div className="fixed inset-0 z-0 pointer-events-none opacity-20">
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:40px_40px]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(6,182,212,0.1),transparent_70%)]" />
+      </div>
+
       {/* Tactical OS Pulse Ticker */}
       <div className="w-full bg-cyan-950/20 border-b border-white/5 py-2 overflow-hidden relative z-50">
         <motion.div
@@ -314,6 +320,58 @@ function OpenSourceLandingPage() {
                 <div className="text-4xl font-black text-white">{stat.value}</div>
                 <div className="text-[10px] text-neutral-500 uppercase tracking-[0.2em] font-bold">{stat.label}</div>
               </div>
+            ))}
+          </div>
+        </section>
+
+        {/* RECENT ASSETS LEADERBOARD */}
+        <section className="py-20 space-y-16 relative">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/5 pb-8">
+            <div className="space-y-4">
+               <h2 className="text-3xl md:text-5xl font-black uppercase tracking-tighter italic">Tactical Asset Registry</h2>
+               <p className="text-neutral-500 max-w-xl font-mono text-[10px] uppercase tracking-[0.4em]">High-Velocity_Global_Nodes</p>
+            </div>
+            <div className="flex items-center gap-3 px-4 py-2 bg-white/5 border border-white/10 rounded-full">
+               <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+               <span className="text-[10px] font-black text-white uppercase tracking-widest leading-none">Scanning_Live...</span>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[
+                { name: "React_Core", path: "facebook/react", stats: "14.2k NODES", health: "98.4%", icon: "⚛️" },
+                { name: "Next_Intelligence", path: "vercel/next.js", stats: "8.5k NODES", health: "99.1%", icon: "▲" },
+                { name: "Bun_Runtime", path: "oven-sh/bun", stats: "6.1k NODES", health: "94.2%", icon: "🍔" },
+                { name: "VS_Satellite", path: "microsoft/vscode", stats: "32.4k NODES", health: "97.8%", icon: "💻" },
+                { name: "Three_Matrix", path: "mrdoob/three.js", stats: "4.8k NODES", health: "92.1%", icon: "🧱" },
+                { name: "Tailwind_Lattice", path: "tailwindlabs/tailwindcss", stats: "11.2k NODES", health: "99.8%", icon: "🌊" }
+            ].map((asset, i) => (
+                <div key={i} className="group relative bg-[#040408] rounded-4xl border border-white/5 p-8 overflow-hidden hover:border-cyan-500/30 transition-all">
+                    <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity text-5xl">{asset.icon}</div>
+                    <div className="relative z-10 space-y-6">
+                        <div className="space-y-1">
+                            <span className="text-[8px] font-mono text-neutral-600 uppercase tracking-widest">ASSET_ID_00{i+1}</span>
+                            <h3 className="text-xl font-black text-white uppercase tracking-tighter italic">{asset.name}</h3>
+                            <p className="text-[10px] font-mono text-neutral-500 uppercase tracking-tight">{asset.path}</p>
+                        </div>
+                        <div className="flex items-center justify-between pt-6 border-t border-white/5">
+                            <div className="space-y-1">
+                                <p className="text-[8px] font-black text-neutral-600 uppercase tracking-widest">Spectral_Density</p>
+                                <p className="text-sm font-black text-white">{asset.stats}</p>
+                            </div>
+                            <div className="text-right space-y-1">
+                                <p className="text-[8px] font-black text-neutral-600 uppercase tracking-widest">Integrity</p>
+                                <p className="text-sm font-black text-emerald-500 italic">{asset.health}</p>
+                            </div>
+                        </div>
+                        <button 
+                            onClick={() => router.push(`/opensource/explorer?q=${asset.path}`)}
+                            className="w-full py-3 bg-white/2 border border-white/5 rounded-2xl text-[9px] font-black text-white uppercase tracking-widest hover:bg-white/5 transition-all active:scale-95"
+                        >
+                            Intercept Node Telemetry
+                        </button>
+                    </div>
+                </div>
             ))}
           </div>
         </section>

@@ -30,7 +30,12 @@ import {
    Tooltip,
    ResponsiveContainer,
    AreaChart,
-   Area
+   Area,
+   Radar,
+   RadarChart,
+   PolarGrid,
+   PolarAngleAxis,
+   PolarRadiusAxis,
 } from 'recharts';
 
 // Mock data generator for repo intelligence
@@ -55,6 +60,8 @@ function OSExplorerContent() {
 
    const [repoData, setRepoData] = useState<any>(null);
    const [repoLanguages, setRepoLanguages] = useState<any>(null);
+   const [repoEvents, setRepoEvents] = useState<any[]>([]);
+   const [repoContributors, setRepoContributors] = useState<any[]>([]);
    const [compareRepoData, setCompareRepoData] = useState<any>(null);
 
    const [loading, setLoading] = useState(false);
@@ -91,6 +98,16 @@ function OSExplorerContent() {
                const langRes = await fetch(data.languages_url);
                const langData = await langRes.json();
                setRepoLanguages(langData);
+
+               // Fetch recent events (Satellite Interception)
+               const eventsRes = await fetch(`https://api.github.com/repos/${targetQuery}/events?per_page=10`);
+               const eventsData = await eventsRes.json();
+               setRepoEvents(Array.isArray(eventsData) ? eventsData : []);
+
+               // Fetch top contributors (Elite Architects)
+               const contribRes = await fetch(`https://api.github.com/repos/${targetQuery}/contributors?per_page=8`);
+               const contribData = await contribRes.json();
+               setRepoContributors(Array.isArray(contribData) ? contribData : []);
             }
          } else {
             alert("Tactical Intelligence Failure: Node not found.");
@@ -262,9 +279,7 @@ function OSExplorerContent() {
                            </div>
                         );
                      })}
-                  </div>
-
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                      {/* Asset Identity Comparison */}
                      <div className="bg-black border border-white/10 rounded-4xl p-10 flex flex-col md:flex-row gap-12 items-center">
                         <div className="flex-1 text-center md:text-left space-y-4">
@@ -288,32 +303,38 @@ function OSExplorerContent() {
                         </div>
                      </div>
 
-                     {/* Neural Variance Summary */}
-                     <div className="bg-white/2 border border-white/5 rounded-4xl p-10 relative overflow-hidden group">
-                        <div className="absolute inset-0 bg-linear-to-br from-cyan-500/5 to-violet-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
-                        <div className="relative z-10 space-y-6">
-                           <div className="flex items-center gap-3">
-                              <Zap size={20} className="text-amber-400" />
-                              <h4 className="text-sm font-black text-white uppercase tracking-[0.3em]">Variance Analysis Report</h4>
+                     {/* Comparative Radar Matrix */}
+                     <div className="bg-white/2 border border-white/5 rounded-4xl p-10 backdrop-blur-3xl relative overflow-hidden group">
+                        <div className="flex items-center justify-between mb-8">
+                           <div className="space-y-1">
+                              <h4 className="text-sm font-black text-white uppercase tracking-[0.3em]">Spectral Comparison Matrix</h4>
+                              <p className="text-[9px] font-mono text-neutral-600 uppercase">Dual_Asset_Stoichiometry</p>
                            </div>
-                           <p className="text-neutral-400 text-sm leading-relaxed italic">
-                              Strategic intelligence indicates that <span className="text-white font-bold">{repoData.stargazers_count > compareRepoData.stargazers_count ? repoData.name : compareRepoData.name}</span> currently maintains
-                              dominant spectral gravity within the ecosystem. However, <span className="text-white font-bold">{repoData.open_issues_count < compareRepoData.open_issues_count ? repoData.name : compareRepoData.name}</span> exhibits
-                              higher architectural stability with lower noise-to-signal issue ratios.
-                           </p>
-                           <div className="grid grid-cols-3 gap-2 pt-6">
-                              {["Trajectory", "Stability", "Velocity"].map(tag => (
-                                 <div key={tag} className="px-4 py-3 bg-black border border-white/5 rounded-2xl flex flex-col items-center gap-1">
-                                    <span className="text-[8px] font-black text-neutral-600 uppercase tracking-widest">{tag}</span>
-                                    <div className="h-1 w-full bg-white/5 rounded-full mt-2 overflow-hidden">
-                                       <div className="h-full bg-cyan-500" style={{ width: `${Math.random() * 60 + 40}%` }} />
-                                    </div>
-                                 </div>
-                              ))}
-                           </div>
+                           <Zap size={18} className="text-amber-400 animate-pulse" />
+                        </div>
+                        
+                        <div className="h-[250px] w-full">
+                           <ResponsiveContainer width="100%" height="100%">
+                              <RadarChart cx="50%" cy="50%" outerRadius="80%" data={[
+                                 { subject: 'Stars', A: repoData.stargazers_count / 1000, B: compareRepoData.stargazers_count / 1000, fullMark: 150 },
+                                 { subject: 'Forks', A: repoData.forks_count / 100, B: compareRepoData.forks_count / 100, fullMark: 150 },
+                                 { subject: 'Issues', A: repoData.open_issues_count / 10, B: compareRepoData.open_issues_count / 10, fullMark: 150 },
+                                 { subject: 'Subscribers', A: repoData.subscribers_count || 0, B: compareRepoData.subscribers_count || 0, fullMark: 150 },
+                                 { subject: 'Size', A: repoData.size / 1000, B: compareRepoData.size / 1000, fullMark: 150 },
+                              ]}>
+                                 <PolarGrid stroke="#ffffff10" />
+                                 <PolarAngleAxis dataKey="subject" tick={{ fill: '#666', fontSize: 10, fontWeight: 900 }} />
+                                 <Radar name="Alpha" dataKey="A" stroke="#06b6d4" fill="#06b6d4" fillOpacity={0.6} />
+                                 <Radar name="Beta" dataKey="B" stroke="#8b5cf6" fill="#8b5cf6" fillOpacity={0.6} />
+                                 <Tooltip 
+                                    contentStyle={{ backgroundColor: '#000', border: '1px solid #ffffff10', fontSize: '10px' }}
+                                 />
+                              </RadarChart>
+                           </ResponsiveContainer>
                         </div>
                      </div>
                   </div>
+           </div>
                </div>
             ) : !repoData ? (
                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -445,8 +466,11 @@ function OSExplorerContent() {
                      {/* TACTICAL STATUS FEED */}
                      <div className="bg-black border border-white/5 rounded-4xl p-8 space-y-6">
                         <div className="flex items-center justify-between">
-                           <h4 className="text-[10px] font-black text-white uppercase tracking-[0.3em]">Status_Logs</h4>
-                           <Activity size={14} className="text-cyan-500 animate-pulse" />
+                           <div className="flex items-center gap-2">
+                              <Activity size={14} className="text-cyan-500 animate-pulse" />
+                              <h4 className="text-[10px] font-black text-white uppercase tracking-[0.3em]">Status_Logs</h4>
+                           </div>
+                           <span className="text-[8px] font-mono text-neutral-700">NODE_VER_2.4.0</span>
                         </div>
                         <div className="space-y-3 font-mono text-[9px]">
                            {[
@@ -460,6 +484,34 @@ function OSExplorerContent() {
                                  <span className="text-cyan-400">{log.s}</span>
                               </div>
                            ))}
+                        </div>
+                     </div>
+
+                     {/* NEURAL HEALTH SCOUTER */}
+                     <div className="bg-white/2 border border-white/5 rounded-4xl p-10 backdrop-blur-3xl relative overflow-hidden group">
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(6,182,212,0.1),transparent)]" />
+                        <div className="relative z-10 flex flex-col items-center text-center space-y-6">
+                           <div className="relative w-32 h-32 flex items-center justify-center">
+                              <svg className="w-full h-full -rotate-90">
+                                 <circle cx="64" cy="64" r="60" fill="none" stroke="currentColor" strokeWidth="2" className="text-white/5" />
+                                 <motion.circle 
+                                    cx="64" cy="64" r="60" fill="none" stroke="currentColor" strokeWidth="4" 
+                                    className="text-cyan-500"
+                                    strokeDasharray="377"
+                                    initial={{ strokeDashoffset: 377 }}
+                                    animate={{ strokeDashoffset: 377 - (377 * (healthScore / 100)) }}
+                                    transition={{ duration: 2, ease: "easeOut" }}
+                                 />
+                              </svg>
+                              <div className="absolute flex flex-col items-center">
+                                 <span className="text-2xl font-black text-white italic leading-none">{healthScore.toFixed(0)}</span>
+                                 <span className="text-[8px] font-black text-neutral-500 uppercase">Health</span>
+                              </div>
+                           </div>
+                           <div className="space-y-1">
+                              <h4 className="text-sm font-black text-white uppercase tracking-widest italic">Neural Integrity</h4>
+                              <p className="text-[9px] font-mono text-neutral-600 uppercase">Operational_Gravity_Stable</p>
+                           </div>
                         </div>
                      </div>
                   </div>
@@ -562,9 +614,128 @@ function OSExplorerContent() {
                               })}
                            </div>
 
-                           <div className="absolute -bottom-20 -right-20 w-80 h-80 bg-cyan-500/5 rounded-full blur-3xl opacity-50 group-hover:opacity-100 transition-opacity" />
+                            <div className="absolute -bottom-20 -right-20 w-80 h-80 bg-cyan-500/5 rounded-full blur-3xl opacity-50 group-hover:opacity-100 transition-opacity" />
                         </div>
                      )}
+
+                     {/* BIG FEATURE: NEURAL CONTRIBUTOR MATRIX */}
+                     {repoContributors.length > 0 && (
+                        <div className="bg-black border border-white/5 rounded-4xl p-10 backdrop-blur-3xl space-y-8 relative overflow-hidden group">
+                           <div className="flex items-center justify-between mb-8">
+                              <div className="space-y-1">
+                                 <h3 className="text-xl font-black text-white uppercase tracking-tighter italic">Architectural Elite</h3>
+                                 <p className="text-[9px] font-mono text-neutral-500 uppercase tracking-widest">Primary_Neutral_Network_Architects</p>
+                              </div>
+                              <Users size={20} className="text-emerald-500" />
+                           </div>
+
+                           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                              {repoContributors.map((user, i) => (
+                                 <div key={user.id} className="p-4 bg-white/2 border border-white/5 rounded-3xl hover:border-emerald-500/30 transition-all group/user">
+                                    <div className="relative w-full aspect-square mb-4 rounded-2xl overflow-hidden border border-white/10">
+                                       <img src={user.avatar_url} alt={user.login} className="w-full h-full object-cover grayscale group-hover/user:grayscale-0 transition-all duration-500" />
+                                       <div className="absolute inset-0 bg-linear-to-t from-black/80 to-transparent" />
+                                       <div className="absolute bottom-2 left-2 right-2 flex justify-between items-end">
+                                          <span className="text-[8px] font-black text-emerald-400">IMPACT_0{i+1}</span>
+                                          <TrendingUp size={10} className="text-emerald-500" />
+                                       </div>
+                                    </div>
+                                    <h4 className="text-[10px] font-black text-white uppercase truncate">{user.login}</h4>
+                                    <p className="text-[8px] font-mono text-neutral-600 uppercase mt-1">{user.contributions} NODES</p>
+                                 </div>
+                              ))}
+                           </div>
+                        </div>
+                     )}
+
+                     {/* BIG FEATURE: ARCHITECTURAL IMPULSE MAP (HEATMAP) */}
+                     <div className="bg-black border border-white/5 rounded-4xl p-10 backdrop-blur-3xl space-y-8 relative overflow-hidden group">
+                        <div className="flex items-center justify-between mb-8">
+                           <div className="space-y-1">
+                              <h3 className="text-xl font-black text-white uppercase tracking-tighter italic">Architectural Impulse Map</h3>
+                              <p className="text-[9px] font-mono text-neutral-500 uppercase tracking-widest">30_Day_Neural_Activity_Density</p>
+                           </div>
+                           <Activity size={20} className="text-cyan-500" />
+                        </div>
+
+                        <div className="grid grid-cols-7 gap-2 overflow-x-auto pb-4 scrollbar-hide">
+                           {Array.from({ length: 28 }).map((_, i) => {
+                              const intensity = Math.random();
+                              return (
+                                 <motion.div 
+                                    key={i}
+                                    initial={{ scale: 0.8, opacity: 0 }}
+                                    animate={{ scale: 1, opacity: 1 }}
+                                    transition={{ delay: i * 0.02 }}
+                                    className={cn(
+                                       "aspect-square rounded-md border border-white/5",
+                                       intensity > 0.8 ? "bg-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.5)]" :
+                                       intensity > 0.5 ? "bg-cyan-500/40" :
+                                       intensity > 0.2 ? "bg-cyan-500/10" : "bg-white/2"
+                                    )}
+                                 />
+                              );
+                           })}
+                        </div>
+                        <div className="flex items-center justify-between pt-4 border-t border-white/5 text-[8px] font-black text-neutral-600 uppercase tracking-widest">
+                           <span>Temporal_Origin</span>
+                           <div className="flex items-center gap-2">
+                              <span>Density:</span>
+                              <div className="flex gap-1">
+                                 <div className="w-2 h-2 bg-white/2 rounded-xs" />
+                                 <div className="w-2 h-2 bg-cyan-500/10 rounded-xs" />
+                                 <div className="w-2 h-2 bg-cyan-500/40 rounded-xs" />
+                                 <div className="w-2 h-2 bg-cyan-500 rounded-xs" />
+                              </div>
+                           </div>
+                           <span>Current_Epoch</span>
+                        </div>
+                     </div>
+
+                     {/* BIG FEATURE: GLOBAL GEO-TELEMETRY */}
+                     <div className="bg-black border border-white/10 rounded-4xl p-10 backdrop-blur-3xl overflow-hidden relative group h-[400px]">
+                        <div className="absolute top-0 right-0 p-10 opacity-5">
+                           <Globe size={300} />
+                        </div>
+                        <div className="relative z-10 space-y-2 mb-8">
+                           <h3 className="text-xl font-black text-white uppercase tracking-tighter italic">Global Telemetry Intercept</h3>
+                           <p className="text-[9px] font-mono text-neutral-500 uppercase tracking-widest">Distributed_Node_Propagation_Map</p>
+                        </div>
+                        
+                        {/* Simulated Map Visual */}
+                        <div className="absolute inset-0 top-20 flex items-center justify-center pointer-events-none opacity-20">
+                           <div className="relative w-full h-full">
+                              {[
+                                 { t: 40, l: 30 }, { t: 60, l: 70 }, { t: 20, l: 50 }, { t: 80, l: 20 }, { t: 10, l: 80 }
+                              ].map((pos, i) => (
+                                 <motion.div 
+                                    key={i}
+                                    initial={{ scale: 0, opacity: 0 }}
+                                    animate={{ scale: [1, 2, 1], opacity: [0.3, 0.8, 0.3] }}
+                                    transition={{ duration: 3, repeat: Infinity, delay: i * 0.5 }}
+                                    className="absolute w-4 h-4 rounded-full bg-cyan-500/50"
+                                    style={{ top: `${pos.t}%`, left: `${pos.l}%` }}
+                                 >
+                                    <div className="absolute inset-0 rounded-full border border-cyan-500 animate-ping" />
+                                 </motion.div>
+                              ))}
+                              <svg className="w-full h-full">
+                                 <path d="M 100 100 L 200 300 L 400 150 L 500 400" fill="none" stroke="rgba(6,182,212,0.1)" strokeWidth="1" strokeDasharray="4 4" />
+                              </svg>
+                           </div>
+                        </div>
+
+                        <div className="absolute bottom-10 left-10 space-y-2">
+                           <div className="flex items-center gap-2">
+                              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                              <span className="text-[8px] font-black text-white uppercase tracking-widest italic">Signal_Locked: 14.8.2.190</span>
+                           </div>
+                           <div className="flex items-center gap-2 opacity-50">
+                              <div className="w-2 h-2 rounded-full bg-cyan-500" />
+                              <span className="text-[8px] font-black text-white uppercase tracking-widest italic">Uplink_Relay: SAT_EPSILON_7</span>
+                           </div>
+                        </div>
+                     </div>
 
                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         {/* COLLABORATOR DENSITY */}
@@ -629,6 +800,109 @@ function OSExplorerContent() {
                            </div>
                         </div>
                      </div>
+
+                     {/* SATELLITE INTERCEPTION FEED */}
+                     <div className="bg-black border border-white/10 rounded-4xl p-10 backdrop-blur-3xl overflow-hidden relative group">
+                        <div className="absolute top-4 right-4 flex items-center gap-2">
+                           <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                           <span className="text-[10px] font-black text-red-500 uppercase tracking-widest italic">Live_Satellite_Feed</span>
+                        </div>
+                        
+                        <div className="space-y-2 mb-8">
+                           <h3 className="text-xl font-black text-white uppercase tracking-tighter italic">Orbital Frequency Intercept</h3>
+                           <p className="text-[9px] font-mono text-neutral-500 uppercase tracking-widest">Global_Event_Stream_Sync</p>
+                        </div>
+
+                        <div className="space-y-4 max-h-[400px] overflow-y-auto pr-4 scrollbar-hide font-mono">
+                           {repoEvents.length > 0 ? repoEvents.map((event, i) => (
+                              <motion.div 
+                                 key={i}
+                                 initial={{ x: -20, opacity: 0 }}
+                                 animate={{ x: 0, opacity: 1 }}
+                                 transition={{ delay: i * 0.1 }}
+                                 className="p-4 bg-white/2 border border-white/5 rounded-2xl hover:bg-white/5 transition-all space-y-2 group/event"
+                              >
+                                 <div className="flex items-center justify-between">
+                                    <span className="text-[8px] font-black text-cyan-500 uppercase bg-cyan-500/10 px-2 py-0.5 rounded-full border border-cyan-500/20">
+                                       {event.type.replace('Event', '')}
+                                    </span>
+                                    <span className="text-[8px] text-neutral-700">{new Date(event.created_at).toLocaleTimeString()}</span>
+                                 </div>
+                                 <p className="text-[10px] text-neutral-400 flex items-center gap-2">
+                                    <span className="text-white font-bold">@{event.actor.display_login}</span>
+                                    <span className="text-[8px] opacity-40">triggered interception</span>
+                                 </p>
+                                 {event.payload.commits && (
+                                    <div className="mt-2 pl-4 border-l border-white/10 space-y-1">
+                                       {event.payload.commits.slice(0, 2).map((commit: any, ci: number) => (
+                                          <p key={ci} className="text-[9px] text-neutral-500 truncate italic">
+                                             {">"} {commit.message}
+                                          </p>
+                                       ))}
+                                    </div>
+                                 )}
+                              </motion.div>
+                           )) : (
+                              <div className="py-20 text-center space-y-4">
+                                 <Terminal size={40} className="mx-auto text-neutral-800 animate-pulse" />
+                                 <p className="text-[10px] text-neutral-600 uppercase tracking-widest">Awaiting satellite triangulation...</p>
+                              </div>
+                           )}
+                        </div>
+
+                        <div className="absolute inset-x-0 bottom-0 h-20 bg-linear-to-t from-black to-transparent pointer-events-none" />
+                     </div>
+
+                     {/* BIG FEATURE: STRATEGIC AI BRIEFING */}
+                     <div className="lg:col-span-full bg-[#050508] border border-white/5 rounded-4xl p-12 relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 p-12 opacity-5 scale-150 rotate-12 group-hover:rotate-0 transition-all duration-1000">
+                           <ShieldCheck size={200} />
+                        </div>
+                        <div className="relative z-10 space-y-10">
+                           <div className="flex items-center gap-4">
+                              <div className="w-12 h-12 rounded-2xl bg-cyan-500/20 flex items-center justify-center text-cyan-400">
+                                 <Cpu size={24} />
+                              </div>
+                              <div className="space-y-1">
+                                 <h3 className="text-2xl font-black text-white uppercase italic tracking-tighter">Strategic AI Intelligence Brief</h3>
+                                 <p className="text-[10px] font-mono text-neutral-500 uppercase tracking-widest">Neural_Analysis_Report // ASSET_ID_{repoData.id}</p>
+                              </div>
+                           </div>
+
+                           <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+                              <div className="space-y-4">
+                                 <h4 className="text-[10px] font-black text-cyan-500 uppercase tracking-[0.3em]">Architectural Velocity</h4>
+                                 <p className="text-sm text-neutral-400 leading-relaxed italic">
+                                    Current node telemetry indicates high-density commit velocity. The architectural patterns suggest a multi-layered propagation model, optimized for low-latency node-to-node communication.
+                                 </p>
+                                 <div className="pt-4 border-t border-white/5 flex items-center justify-between">
+                                    <span className="text-[8px] font-black text-white uppercase">Growth_Vector</span>
+                                    <span className="text-emerald-500 text-xs font-black italic">+12.4%</span>
+                                 </div>
+                              </div>
+                              <div className="space-y-4">
+                                 <h4 className="text-[10px] font-black text-violet-500 uppercase tracking-[0.3em]">Operational Stability</h4>
+                                 <p className="text-sm text-neutral-400 leading-relaxed italic">
+                                    Stability metrics are within optimal range. PR-to-Issue ratio maintains a stable equilibrium, preventing entropy accumulation within the core repository branches.
+                                 </p>
+                                 <div className="pt-4 border-t border-white/5 flex items-center justify-between">
+                                    <span className="text-[8px] font-black text-white uppercase">Entropy_Risk</span>
+                                    <span className="text-cyan-500 text-xs font-black italic">NOMINAL</span>
+                                 </div>
+                              </div>
+                              <div className="space-y-4">
+                                 <h4 className="text-[10px] font-black text-amber-500 uppercase tracking-[0.3em]">Ecological Impact</h4>
+                                 <p className="text-sm text-neutral-400 leading-relaxed italic">
+                                    This asset acts as a primary gravity well for the <span className="text-white font-bold">{repoData.language}</span> ecosystem. Downstream dependency clusters rely heavily on this node for structural integrity.
+                                 </p>
+                                 <div className="pt-4 border-t border-white/5 flex items-center justify-between">
+                                    <span className="text-[8px] font-black text-white uppercase">Ecosystem_Weight</span>
+                                    <span className="text-amber-500 text-xs font-black italic">MASSIVE</span>
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
                   </div>
 
                </div>
@@ -650,9 +924,45 @@ function OSExplorerContent() {
 export default function OSExplorerPage() {
    return (
       <Suspense fallback={
-         <div className="min-h-screen bg-black flex flex-col items-center justify-center gap-4">
-            <div className="w-12 h-12 border-2 border-cyan-500/20 border-t-cyan-500 rounded-full animate-spin" />
-            <p className="text-[10px] font-black text-cyan-500 uppercase tracking-[0.3em] animate-pulse">Initializing Tactical Uplink...</p>
+         <div className="min-h-screen bg-black flex flex-col items-center justify-center p-12 relative overflow-hidden">
+            {/* Multi-Orbital Scanner Animation */}
+            <div className="relative w-64 h-64 mb-12">
+               <motion.div 
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+                  className="absolute inset-0 border-2 border-dashed border-cyan-500/20 rounded-full"
+               />
+               <motion.div 
+                  animate={{ rotate: -360 }}
+                  transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+                  className="absolute inset-4 border border-violet-500/20 rounded-full"
+               />
+               <motion.div 
+                  animate={{ scale: [1, 1.1, 1], opacity: [0.5, 1, 0.5] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                  className="absolute inset-10 border-4 border-cyan-500/40 rounded-full blur-sm"
+               />
+               <div className="absolute inset-0 flex items-center justify-center">
+                  <Globe size={40} className="text-cyan-500 animate-pulse" />
+               </div>
+            </div>
+
+            <div className="text-center space-y-4 relative z-10">
+               <h2 className="text-2xl font-black text-white uppercase italic tracking-tighter">Initializing Tactical Uplink</h2>
+               <div className="flex flex-col items-center gap-2">
+                  <div className="w-48 h-1 bg-white/5 rounded-full overflow-hidden">
+                     <motion.div 
+                        animate={{ x: ["-100%", "100%"] }}
+                        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                        className="w-1/2 h-full bg-cyan-500"
+                     />
+                  </div>
+                  <p className="text-[10px] font-mono text-cyan-500 tracking-[0.4em] uppercase animate-pulse">Scanning_Orbital_Sectors...</p>
+               </div>
+            </div>
+
+            {/* Background elements */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-cyan-500/5 rounded-full blur-[120px] pointer-events-none" />
          </div>
       }>
          <OSExplorerContent />
