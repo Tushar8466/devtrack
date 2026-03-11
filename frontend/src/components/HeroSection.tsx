@@ -43,9 +43,12 @@ export default function HeroSection() {
             >
               Start Scanning Now
             </Link>
-            <button className="px-8 py-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-semibold transition-all duration-300 hover:-translate-y-0.5">
+            <Link
+              href="/analyze/torvalds"
+              className="px-8 py-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-semibold transition-all duration-300 hover:-translate-y-0.5"
+            >
               View Example Report
-            </button>
+            </Link>
           </div>
         </div>
       </div>

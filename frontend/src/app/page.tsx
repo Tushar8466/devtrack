@@ -6,7 +6,8 @@ import HeroSection from "@/components/HeroSection";
 import { MacbookScroll } from "@/components/ui/macbook-scroll";
 import AnimatedDevTrackScreen from "@/components/ui/AnimatedDevTrackScreen";
 import { EvervaultCard } from "@/components/ui/evervault-card";
-import { Search, Brain, BarChart, User, Settings, Lock } from "lucide-react";
+import { Search, Brain, BarChart, User, Settings, Lock, Star } from "lucide-react";
+import { motion } from "motion/react";
 import dynamic from "next/dynamic";
 import { useState, useEffect } from "react";
 import { FeedbackForm } from "@/components/FeedbackForm";
@@ -109,6 +110,26 @@ export default function Home() {
 
   return (
     <div className="bg-black">
+      {/* GitHub Star Badge */}
+      <motion.div
+        initial={{ opacity: 0, y: -80 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, ease: "easeOut" }}
+        className="fixed top-8 right-8 z-5000"
+      >
+        <Link
+          href="https://github.com/Tushar8466/devtrack"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-2 rounded-full border border-white/10 bg-black/50 px-5 py-4 shadow-xl backdrop-blur-md transition-all hover:scale-105 hover:bg-white/10 group"
+        >
+          <Star size={18} className="text-amber-500 fill-amber-500/20 group-hover:fill-amber-500/40 transition-all" />
+          <span className="hidden sm:block uppercase tracking-widest text-[10px] font-bold text-neutral-300 group-hover:text-white">
+            Star on GitHub
+          </span>
+        </Link>
+      </motion.div>
+
       <HeroSection />
 
       {/* MacBook Scroll section */}

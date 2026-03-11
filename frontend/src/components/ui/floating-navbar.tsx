@@ -123,17 +123,6 @@ export const FloatingNav: React.FC<FloatingNavProps> = ({
             </Link>
           )}
 
-          <div className="h-5 w-px bg-neutral-300 dark:bg-white/10 mx-1" />
-
-          <Link
-            href="https://github.com/Tushar8466/devtrack"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 rounded-full bg-linear-to-r from-amber-500/20 to-yellow-500/20 border border-amber-500/30 px-4 py-2 text-sm font-bold text-amber-500 transition hover:scale-105 hover:from-amber-500/30 hover:to-yellow-500/30 hover:text-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.1)] group"
-          >
-            <Star size={16} className="fill-amber-500/20 group-hover:fill-amber-500/40 transition-all" />
-            <span className="hidden sm:block">Star on GitHub</span>
-          </Link>
         </div>
       </div>
     </motion.div>
