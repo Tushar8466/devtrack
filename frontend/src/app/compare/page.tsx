@@ -550,6 +550,55 @@ export default function ComparePage() {
                         )}
                     </AnimatePresence>
                 </motion.div>
+
+                {/* Recent Collision Activity Log */}
+                <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 1.2, duration: 0.8 }}
+                    className="max-w-4xl mx-auto w-full mt-32"
+                >
+                    <div className="flex items-center justify-between mb-8 px-4">
+                        <div className="flex flex-col">
+                            <h3 className="text-xl font-bold text-white uppercase tracking-tighter flex items-center gap-2">
+                                <span className="w-2 h-2 bg-violet-500 rounded-full animate-pulse" />
+                                Recent Collision Sequences
+                            </h3>
+                            <p className="text-neutral-600 text-[10px] uppercase tracking-widest mt-1">Live Architectural Audits</p>
+                        </div>
+                        <div className="h-px flex-1 bg-linear-to-r from-violet-500/20 via-white/5 to-transparent mx-8 hidden md:block" />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 px-4 overflow-hidden">
+                        {[
+                            { u1: "torvalds", u2: "gaearon", winner: "torvalds", status: "Neural Optimized", time: "12m ago" },
+                            { u1: "addyosmani", u2: "dan_abramov", winner: "addyosmani", status: "Style Stabilized", time: "45m ago" },
+                            { u1: "tushar8466", u2: "github_user", winner: "tushar8466", status: "Auth Verified", time: "1h ago" }
+                        ].map((collision, i) => (
+                            <div key={i} className="bg-white/2 border border-white/5 rounded-3xl p-5 hover:bg-white/5 transition-all group relative overflow-hidden">
+                                <div className="absolute top-0 left-0 w-1 h-full bg-violet-500/20 group-hover:bg-violet-500 transition-colors" />
+                                <div className="flex justify-between items-start mb-4">
+                                    <div className="flex -space-x-3">
+                                        <div className="w-8 h-8 rounded-full border border-white/20 bg-neutral-900 overflow-hidden">
+                                            <img src={`https://avatars.githubusercontent.com/${collision.u1}`} className="w-full h-full object-cover" alt="" />
+                                        </div>
+                                        <div className="w-8 h-8 rounded-full border border-white/20 bg-neutral-900 overflow-hidden">
+                                            <img src={`https://avatars.githubusercontent.com/${collision.u2}`} className="w-full h-full object-cover" alt="" />
+                                        </div>
+                                    </div>
+                                    <span className="text-[8px] font-mono text-neutral-600 uppercase tracking-widest">{collision.time}</span>
+                                </div>
+                                <div className="text-[10px] font-black text-white uppercase tracking-tight mb-1 truncate">
+                                    {collision.u1} <span className="text-violet-500 italic">vs</span> {collision.u2}
+                                </div>
+                                <div className="flex justify-between items-center text-[8px] font-bold uppercase tracking-widest">
+                                    <span className="text-emerald-400">{collision.status}</span>
+                                    <span className="text-neutral-600">Trace_{i}0X</span>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </motion.div>
             </div>
         </div>
     );

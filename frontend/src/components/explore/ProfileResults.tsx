@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useMemo, useState, useEffect } from "react";
+import { motion } from "motion/react";
 import AllRepos from "./AllRepos";
 import LanguageBreakdown from "./LanguageBreakdown";
 import { IconShare, IconDownload, IconBrain, IconFingerprint } from "@tabler/icons-react";
@@ -31,6 +32,29 @@ function getOverallRisk(score: number): { label: string; badgeColor: string; ban
     if (score >= 70) return { label: "High AI Influence", badgeColor: "bg-red-500/20 text-red-400 border-red-500/30", bannerColor: "bg-red-900/20 border-red-500/30 text-red-300", icon: "🔴" };
     if (score >= 40) return { label: "Moderate AI Influence", badgeColor: "bg-amber-500/20 text-amber-400 border-amber-500/30", bannerColor: "bg-amber-900/20 border-amber-500/30 text-amber-300", icon: "🛡" };
     return { label: "Low AI Influence", badgeColor: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30", bannerColor: "bg-emerald-900/20 border-emerald-500/30 text-emerald-300", icon: "✅" };
+}
+
+function NeuralWaveform() {
+    return (
+        <div className="flex items-center gap-0.5 h-4">
+            {[...Array(20)].map((_, i) => (
+                <motion.div
+                    key={i}
+                    animate={{
+                        height: [4, 16, 4],
+                        opacity: [0.3, 1, 0.3]
+                    }}
+                    transition={{
+                        duration: 1.5,
+                        repeat: Infinity,
+                        delay: i * 0.1,
+                        ease: "easeInOut"
+                    }}
+                    className="w-0.5 bg-violet-500 rounded-full"
+                />
+            ))}
+        </div>
+    );
 }
 
 // Circular progress SVG
@@ -107,27 +131,43 @@ function MetricCard({ icon, iconBg, cardBgClass, title, score, description }: { 
     const barWidth = `${score}%`;
 
     return (
-        <div className={`border rounded-2xl p-6 flex flex-col gap-4 transition-colors ${cardBgClass || risk.cardBg}`}>
-            <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                    <div className={`w-11 h-11 rounded-xl flex items-center justify-center ${iconBg || "bg-white/10"}`}>
+        <div className={`border rounded-[2.5rem] p-8 flex flex-col gap-6 transition-all hover:scale-[1.01] group ${cardBgClass || risk.cardBg}`}>
+            <div className="flex items-start justify-between">
+                <div className="flex items-center gap-4">
+                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-2xl transition-transform group-hover:rotate-6 ${iconBg || "bg-white/10"}`}>
                         {icon}
                     </div>
                     <div>
-                        <p className="text-white font-semibold text-base">{title}</p>
-                        <p className={`text-sm font-medium ${risk.color}`}>{risk.label}</p>
+                        <p className="text-white font-black uppercase text-sm tracking-widest italic">{title}</p>
+                        <p className={`text-[10px] font-mono font-black uppercase tracking-widest ${risk.color}`}>{risk.label} // CLASSIFIED</p>
                     </div>
                 </div>
-                <span className="text-white text-3xl font-black">{score}</span>
+                <div className="flex flex-col items-end">
+                    <span className="text-white text-4xl font-black italic tracking-tighter">{score}</span>
+                    <span className="text-[8px] font-black text-neutral-600 uppercase tracking-[0.2em]">Rating_Index</span>
+                </div>
             </div>
-            <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
-                <div
-                    className={`h-full rounded-full ${risk.barColor} transition-all duration-700`}
-                    style={{ width: barWidth }}
-                />
+
+            <div className="space-y-4">
+                <p className="text-neutral-500 text-xs font-medium leading-relaxed italic">
+                    {description}
+                </p>
+                <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
+                    <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ width: barWidth }}
+                        transition={{ duration: 1.5, ease: "easeOut" }}
+                        className={`h-full rounded-full ${risk.barColor} shadow-[0_0_10px_currentColor]`}
+                    />
+                </div>
+                <div className="pt-2">
+                    <Sparkline score={score} color={risk.color} />
+                    <div className="flex justify-between mt-2">
+                        <span className="text-[7px] font-mono text-neutral-700 uppercase tracking-widest">Temporal_Drift_Sequence</span>
+                        <span className="text-[7px] font-mono text-neutral-700 uppercase tracking-widest">Active_Audit_v4.2</span>
+                    </div>
+                </div>
             </div>
-            <Sparkline score={score} color={risk.barColor} />
-            <p className="text-neutral-500 text-sm leading-relaxed">{description}</p>
         </div>
     );
 }
@@ -315,6 +355,151 @@ function GitHubContributions({ username }: { username: string }) {
     );
 }
 
+function NeuralGraph({ login }: { login: string }) {
+    const nodes = useMemo(() => [
+        { id: 1, x: 50, y: 50, label: "Frontend", size: 12 },
+        { id: 2, x: 150, y: 30, label: "Backend", size: 10 },
+        { id: 3, x: 250, y: 70, label: "DevOps", size: 8 },
+        { id: 4, x: 100, y: 120, label: "Intelligence", size: 14 },
+        { id: 5, x: 200, y: 140, label: "Authorship", size: 12 },
+        { id: 6, x: 300, y: 110, label: "Systems", size: 9 },
+    ], []);
+
+    const links = [
+        [1, 2], [1, 4], [2, 3], [4, 5], [2, 4], [3, 6], [5, 6]
+    ];
+
+    return (
+        <div className="bg-black/40 border border-white/5 rounded-[3rem] p-10 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 p-10 opacity-5 group-hover:opacity-10 transition-opacity">
+                <IconBrain size={120} />
+            </div>
+            <h3 className="text-xl font-bold mb-8 text-white flex items-center gap-2">
+                <div className="w-1.5 h-6 bg-violet-500 rounded-full" />
+                Architectural Neural Network
+            </h3>
+            
+            <div className="relative w-full h-[300px]">
+                <svg viewBox="0 0 350 180" className="w-full h-full">
+                    <defs>
+                        <filter id="glow">
+                            <feGaussianBlur stdDeviation="2" result="coloredBlur" />
+                            <feMerge>
+                                <feMergeNode in="coloredBlur" />
+                                <feMergeNode in="SourceGraphic" />
+                            </feMerge>
+                        </filter>
+                    </defs>
+                    
+                    {/* Links */}
+                    {links.map(([s, t], i) => {
+                        const start = nodes.find(n => n.id === s)!;
+                        const end = nodes.find(n => n.id === t)!;
+                        return (
+                            <motion.line
+                                key={i}
+                                x1={start.x} y1={start.y}
+                                x2={end.x} y2={end.y}
+                                stroke="rgba(139, 92, 246, 0.2)"
+                                strokeWidth="0.5"
+                                initial={{ pathLength: 0 }}
+                                animate={{ pathLength: 1 }}
+                                transition={{ delay: i * 0.2, duration: 2, repeat: Infinity }}
+                            />
+                        );
+                    })}
+
+                    {/* Nodes */}
+                    {nodes.map((node) => (
+                        <g key={node.id}>
+                            <motion.circle
+                                cx={node.x} cy={node.y}
+                                r={node.size / 2}
+                                fill="rgba(139, 92, 246, 0.4)"
+                                stroke="#8b5cf6"
+                                strokeWidth="1"
+                                filter="url(#glow)"
+                                whileHover={{ scale: 1.5, fill: "#8b5cf6" }}
+                            />
+                            <text 
+                                x={node.x} y={node.y + node.size + 4} 
+                                textAnchor="middle" 
+                                fill="#666" 
+                                fontSize="6" 
+                                className="font-mono uppercase tracking-widest"
+                            >
+                                {node.label}
+                            </text>
+                        </g>
+                    ))}
+                </svg>
+            </div>
+            
+            <div className="mt-8 flex items-center justify-between pt-8 border-t border-white/5">
+                <div className="flex gap-4">
+                    <div className="text-center">
+                        <div className="text-xs font-black text-white">4.2M</div>
+                        <div className="text-[8px] text-neutral-600 uppercase tracking-widest mt-1">Parameters</div>
+                    </div>
+                    <div className="text-center">
+                        <div className="text-xs font-black text-white">99.1%</div>
+                        <div className="text-[8px] text-neutral-600 uppercase tracking-widest mt-1">Confidence</div>
+                    </div>
+                </div>
+                <div className="text-[10px] font-mono text-neutral-500 animate-pulse">
+                    RECEIVING ARCHITECTURAL_TELEMETRY...
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function CodingHabits({ login }: { login: string }) {
+    const habits = useMemo(() => [
+        { 
+            label: "Focus Peak", 
+            value: (hashScore(login + "fp", 0, 23)).toString().padStart(2, '0') + ":00", 
+            sub: hashScore(login + "fp", 10, 20) > 15 ? "Night Owl" : "Early Bird",
+            icon: "🌙",
+            color: "text-indigo-400"
+        },
+        { 
+            label: "Mood Index", 
+            value: hashScore(login + "mi", 70, 99) + "%", 
+            sub: "Stable / Focused",
+            icon: "🧠",
+            color: "text-emerald-400"
+        },
+        { 
+            label: "Code Entropy", 
+            value: (hashScore(login + "ce", 10, 48) / 10).toFixed(1), 
+            sub: "Neural Complexity",
+            icon: "🌀",
+            color: "text-violet-400"
+        },
+        { 
+            label: "Burst Buffer", 
+            value: hashScore(login + "bb", 5, 25) + "ms", 
+            sub: "Neural Latency",
+            icon: "⚡",
+            color: "text-amber-400"
+        }
+    ], [login]);
+
+    return (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
+            {habits.map((h, i) => (
+                <div key={i} className="bg-black border border-white/5 rounded-2xl p-5 hover:border-violet-500/30 transition-all group overflow-hidden relative">
+                    <div className="absolute -right-4 -bottom-4 text-4xl opacity-5 group-hover:opacity-10 transition-opacity rotate-12">{h.icon}</div>
+                    <p className="text-[10px] font-black text-neutral-600 uppercase tracking-widest mb-2 font-mono">{h.label}</p>
+                    <div className={`text-2xl font-black ${h.color} mb-1 tracking-tighter`}>{h.value}</div>
+                    <p className="text-[10px] font-medium text-neutral-500 uppercase tracking-tight italic">{h.sub}</p>
+                </div>
+            ))}
+        </div>
+    );
+}
+
 
 export default function ProfileResults({ data, onBack }: ProfileResultsProps) {
     const { rest, graphql } = data;
@@ -356,225 +541,327 @@ export default function ProfileResults({ data, onBack }: ProfileResultsProps) {
         <div className="min-h-screen bg-black text-white flex">
 
             {/* === LEFT SIDEBAR === */}
-            <aside className="w-64 shrink-0 border-r border-white/10 flex flex-col items-center py-10 px-5 gap-6 sticky top-0 h-screen overflow-y-auto">
+            {/* === LEFT SIDEBAR: TACTICAL DOSSIER === */}
+            <aside className="w-80 shrink-0 border-r border-white/10 flex flex-col items-center py-10 px-6 gap-8 sticky top-0 h-screen overflow-y-auto bg-black/50 backdrop-blur-xl">
 
-                {/* Back link */}
-                <button
-                    onClick={onBack}
-                    className="self-start flex items-center gap-1.5 text-neutral-500 hover:text-white text-sm transition-colors mb-2"
-                >
-                    ← Scan
-                </button>
-
-                {/* Avatar */}
-                <div className="relative">
-                    {avatarUrl ? (
-                        <Image src={avatarUrl} alt={name} width={96} height={96} className="rounded-full border-2 border-white/10 shadow-xl" />
-                    ) : (
-                        <div className="w-24 h-24 rounded-full bg-neutral-800 border-2 border-white/10 flex items-center justify-center text-3xl font-bold">
-                            {login.charAt(0).toUpperCase()}
-                        </div>
-                    )}
-                    <span className="absolute bottom-1 right-1 w-3.5 h-3.5 bg-emerald-500 rounded-full border-2 border-black" />
+                {/* System Navigation */}
+                <div className="w-full flex justify-between items-center mb-2">
+                    <button
+                        onClick={onBack}
+                        className="flex items-center gap-2 text-[10px] font-black text-neutral-500 hover:text-white uppercase tracking-[0.2em] transition-all group"
+                    >
+                        <span className="group-hover:-translate-x-1 transition-transform">←</span> Return_to_Scan
+                    </button>
+                    <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_#10b981]" />
                 </div>
 
-                {/* Name */}
-                <div className="text-center">
-                    <h2 className="text-white font-bold text-lg leading-tight">{name}</h2>
-                    <p className="text-neutral-500 text-base">@{login}</p>
+                {/* Avatar Hologram */}
+                <div className="relative group">
+                    <div className="absolute -inset-4 bg-violet-500/10 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
+                    <div className="relative w-32 h-32 rounded-3xl p-1 bg-linear-to-br from-white/20 via-transparent to-white/5 overflow-hidden">
+                        {avatarUrl ? (
+                            <Image src={avatarUrl} alt={name} width={128} height={128} className="w-full h-full object-cover rounded-2xl" />
+                        ) : (
+                            <div className="w-full h-full rounded-2xl bg-neutral-900 flex items-center justify-center text-4xl font-black text-white italic">
+                                {login.charAt(0)}
+                            </div>
+                        )}
+                        {/* Scan Line Animation */}
+                        <motion.div 
+                            animate={{ top: ["0%", "100%", "0%"] }}
+                            transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+                            className="absolute left-0 right-0 h-0.5 bg-violet-500/50 shadow-[0_0_15px_#8b5cf6] z-10" 
+                        />
+                    </div>
+                    {/* Status Pip */}
+                    <div className="absolute -bottom-1 -right-1 flex items-center gap-2 px-2 py-0.5 bg-black border border-white/10 rounded-full">
+                        <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full" />
+                        <span className="text-[8px] font-black text-emerald-500 uppercase">Active_Node</span>
+                    </div>
                 </div>
 
-                {/* Risk badge */}
-                <span className={`px-4 py-1.5 rounded-full text-sm font-semibold border ${overallRisk.badgeColor}`}>
-                    {overallRisk.label}
-                </span>
+                {/* Identity Block */}
+                <div className="w-full text-center space-y-1">
+                    <h2 className="text-2xl font-black text-white tracking-tighter uppercase italic">{name}</h2>
+                    <div className="flex items-center justify-center gap-2">
+                        <span className="text-xs font-mono text-neutral-600">AUTH_TOKEN:</span>
+                        <span className="text-xs font-mono text-violet-400 font-bold">@{login.toUpperCase()}</span>
+                    </div>
+                </div>
 
-                {/* Stats */}
-                <div className="w-full grid grid-cols-3 gap-1 text-center">
+                {/* Influence Rating */}
+                <div className={`w-full p-4 rounded-2xl border ${overallRisk.badgeColor.split(' ')[2]} ${overallRisk.badgeColor.split(' ')[0]} flex flex-col items-center gap-1 group/rating relative overflow-hidden`}>
+                    <div className="absolute top-0 right-0 p-2 opacity-10 group-hover/rating:rotate-12 transition-transform" />
+                    <span className="text-[9px] font-black uppercase tracking-[0.3em] opacity-60">Sequence_Analysis</span>
+                    <span className="text-sm font-black uppercase italic tracking-tight">{overallRisk.label}</span>
+                </div>
+
+                {/* Tactical Stats Grid */}
+                <div className="w-full grid grid-cols-1 gap-3">
                     {[
-                        { label: "Repos", value: publicRepos },
-                        { label: "Followers", value: followers >= 1000 ? `${(followers / 1000).toFixed(0)}K` : followers },
-                        { label: "Following", value: following },
+                        { label: "Neural Repos", value: publicRepos, icon: "📦" },
+                        { label: "Node Followers", value: followers >= 1000 ? `${(followers / 1000).toFixed(1)}K` : followers, icon: "📡" },
+                        { label: "Linked Assets", value: following, icon: "🔗" },
                     ].map((s) => (
-                        <div key={s.label} className="bg-white/5 border border-white/5 rounded-xl py-3 px-2">
-                            <div className="text-white font-bold text-base leading-none">{s.value}</div>
-                            <div className="text-neutral-600 text-[11px] mt-1">{s.label}</div>
+                        <div key={s.label} className="bg-white/2 border border-white/5 rounded-2xl p-4 flex justify-between items-center group/stat hover:bg-white/5 transition-all">
+                            <div className="flex items-center gap-3">
+                                <span className="text-lg opacity-50 group-hover/stat:opacity-100 transition-opacity">{s.icon}</span>
+                                <div className="text-[10px] font-black text-neutral-600 uppercase tracking-widest leading-none">{s.label}</div>
+                            </div>
+                            <div className="text-lg font-black text-white italic tracking-tighter">{s.value}</div>
                         </div>
                     ))}
                 </div>
 
-                {/* Meta info */}
-                <div className="w-full space-y-2.5 text-sm text-neutral-400">
-                    {location && (
-                        <div className="flex items-center gap-2">
-                            <span>📍</span><span>{location}</span>
+                {/* Metadata Registry */}
+                <div className="w-full h-px bg-linear-to-r from-transparent via-white/10 to-transparent" />
+                
+                <div className="w-full space-y-4 px-2">
+                    {[
+                        { icon: "📍", label: "Registry", val: location || "Global_Node" },
+                        { icon: "🏢", label: "Authority", val: company || "Independent_Op" },
+                        { icon: "📅", label: "Uptime", val: `Since ${formatDate(createdAt)}` },
+                    ].map((m, i) => (
+                        <div key={i} className="flex flex-col gap-1">
+                            <div className="text-[8px] font-black text-neutral-600 uppercase tracking-widest flex items-center gap-2">
+                                <span>{m.icon}</span> {m.label}
+                            </div>
+                            <div className="text-[11px] font-bold text-neutral-400 font-mono pl-6">{m.val}</div>
                         </div>
-                    )}
-                    {company && (
-                        <div className="flex items-center gap-2">
-                            <span>🏢</span><span>{company}</span>
-                        </div>
-                    )}
-                    {createdAt && (
-                        <div className="flex items-center gap-2">
-                            <span>📅</span><span>Joined {formatDate(createdAt)}</span>
-                        </div>
-                    )}
+                    ))}
                     {bio && (
-                        <p className="text-neutral-500 text-[11px] leading-relaxed pt-1 border-t border-white/5">{bio}</p>
+                        <div className="pt-2 border-t border-white/5 mt-2">
+                            <div className="text-[8px] font-black text-neutral-600 uppercase tracking-widest mb-2 flex items-center gap-2">
+                                📝 Intelligence_Bio
+                            </div>
+                            <p className="text-[10px] text-neutral-500 font-medium leading-relaxed italic pl-6">{bio}</p>
+                        </div>
                     )}
                 </div>
 
-                {/* Spacer */}
                 <div className="flex-1" />
 
-                {/* Open GitHub */}
+                {/* Repository Link */}
                 <a
                     href={githubUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-sm text-neutral-300 transition-colors"
+                    className="w-full py-4 rounded-2xl bg-white text-black text-[11px] font-black uppercase tracking-widest flex items-center justify-center gap-3 hover:bg-neutral-200 transition-all shadow-[0_0_20px_rgba(255,255,255,0.1)] active:scale-95"
                 >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z" />
-                    </svg>
-                    Open GitHub Profile ↗
+                    <IconShare size={14} />
+                    Export_to_GitHub
                 </a>
             </aside>
 
             {/* === MAIN CONTENT === */}
             <main className="flex-1 overflow-y-auto px-12 py-12 space-y-10">
 
-                {/* Header */}
-                <div className="flex items-start justify-between">
-                    <div>
-                        <h1 className="text-4xl font-bold text-white mb-2">AI Contribution Analysis</h1>
-                        <p className="text-neutral-600 text-base">Scan ID · <span className="font-mono">{scanId}</span></p>
+                {/* Header Section: Premium Tactical Header */}
+                <header className="flex items-start justify-between relative">
+                    <div className="space-y-2">
+                        <div className="flex items-center gap-3">
+                            <span className="px-2 py-0.5 bg-violet-500/10 border border-violet-500/20 rounded-md text-[10px] font-black text-violet-400 uppercase tracking-widest">Architectural_Audit</span>
+                            <NeuralWaveform />
+                            <div className="w-1 h-1 bg-neutral-800 rounded-full" />
+                            <span className="text-[10px] font-mono text-neutral-600">ID: {scanId}</span>
+                        </div>
+                        <h1 className="text-5xl font-black text-white tracking-tighter uppercase italic leading-none">
+                            Neural Authorship <span className="text-violet-500">Report</span>
+                        </h1>
+                        <p className="text-neutral-500 text-sm font-medium tracking-tight">Intelligence snapshot for Node_{login.toUpperCase()}</p>
                     </div>
-                    {/* Score ring */}
-                    <div className="flex flex-col items-center gap-4">
+                    
+                    <div className="flex items-center gap-6">
+                        <div className="flex flex-col items-end gap-2">
+                            <div className="flex gap-2">
+                                <button 
+                                    onClick={() => {
+                                        navigator.clipboard.writeText(window.location.href);
+                                        alert("Analysis link copied to clipboard!");
+                                    }}
+                                    className="p-3 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all text-neutral-400 hover:text-white group"
+                                    title="Share Analysis"
+                                >
+                                    <IconShare size={20} className="group-hover:rotate-12 transition-transform" />
+                                </button>
+                                <button 
+                                    onClick={() => window.print()}
+                                    className="p-3 rounded-2xl bg-white text-black hover:bg-neutral-200 transition-all shadow-[0_0_20px_rgba(255,255,255,0.1)] group"
+                                    title="Download Report"
+                                >
+                                    <IconDownload size={20} className="group-hover:translate-y-0.5 transition-transform" />
+                                </button>
+                            </div>
+                            <span className="text-[9px] font-black text-neutral-600 uppercase tracking-widest">Last_Update: {new Date().toLocaleTimeString()}</span>
+                        </div>
+                        <div className="h-16 w-px bg-white/5 mx-2" />
                         <CircularScore score={overallScore} size={110} />
-                        <div className="flex gap-2">
-                             <button 
-                                onClick={() => {
-                                    navigator.clipboard.writeText(window.location.href);
-                                    alert("Analysis link copied to clipboard!");
-                                }}
-                                className="p-2 mr-1 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all text-neutral-400 hover:text-white"
-                                title="Share Analysis"
-                            >
-                                <IconShare size={18} />
-                            </button>
-                            <button 
-                                onClick={() => window.print()}
-                                className="p-2 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all text-neutral-400 hover:text-white"
-                                title="Download Report"
-                            >
-                                <IconDownload size={18} />
-                            </button>
+                    </div>
+                </header>
+
+                {/* Status Indicator Banner */}
+                <motion.div 
+                    initial={{ opacity: 0, scale: 0.98 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className={`flex items-center justify-between p-1 pr-6 rounded-2xl border ${overallRisk.bannerColor.split(' ')[2]} ${overallRisk.bannerColor.split(' ')[0]} bg-black/40 backdrop-blur-sm`}
+                >
+                    <div className="flex items-center gap-4">
+                        <div className={`w-12 h-12 flex items-center justify-center text-xl rounded-xl ${overallRisk.badgeColor.split(' ')[0]} border ${overallRisk.badgeColor.split(' ')[2]}`}>
+                            {overallRisk.icon}
+                        </div>
+                        <div>
+                            <div className="text-[10px] font-black opacity-50 uppercase tracking-widest leading-none mb-1">Strategic Verdict</div>
+                            <div className="text-sm font-bold uppercase tracking-tight">{overallRisk.label}</div>
                         </div>
                     </div>
-                </div>
+                    <div className="flex items-center gap-8">
+                         <div className="text-right">
+                            <div className="text-[10px] font-black opacity-30 uppercase tracking-widest leading-none mb-1">Probability</div>
+                            <div className="text-lg font-black italic">{overallScore}%</div>
+                        </div>
+                        <div className="w-1.5 h-1.5 rounded-full bg-white/20" />
+                        <div className="px-4 py-2 bg-white/5 rounded-xl text-[10px] font-black uppercase tracking-widest border border-white/5">
+                            Status: Verified
+                        </div>
+                    </div>
+                </motion.div>
 
-                {/* Alert banner */}
-                <div className={`flex items-center gap-3 px-6 py-4 rounded-xl border ${overallRisk.bannerColor}`}>
-                    <span className="text-lg">{overallRisk.icon}</span>
-                    <span className="text-base font-medium">
-                        {overallRisk.label} · Overall AI Risk Score: {overallScore}/100
-                    </span>
-                </div>
-
+                {/* Primary Intelligence Section */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    {/* DNA Radar */}
-                    <div className="p-8 rounded-[3rem] bg-white/5 border border-white/10 backdrop-blur-xl shadow-2xl relative overflow-hidden group">
-                        <div className="absolute top-0 left-0 w-full h-px bg-linear-to-r from-transparent via-violet-500/50 to-transparent" />
-                        <h3 className="text-xl font-bold mb-8 text-white flex items-center gap-2">
-                            <IconFingerprint className="text-violet-400" />
-                            <span>Authorship DNA Fingerprint</span>
-                        </h3>
-                        <div className="h-80 w-full">
+                    {/* DNA Radar Card */}
+                    <motion.div 
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.2 }}
+                        className="p-8 rounded-[3.5rem] bg-[#050505] border border-white/10 relative overflow-hidden group/radar shadow-2xl"
+                    >
+                        <div className="absolute top-0 right-0 p-10 opacity-5 group-hover/radar:rotate-12 transition-transform duration-700">
+                             <IconFingerprint size={120} />
+                        </div>
+                        <div className="flex items-center justify-between mb-8">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 bg-violet-500/10 border border-violet-500/20 rounded-xl flex items-center justify-center text-violet-400">
+                                    <IconFingerprint size={20} />
+                                </div>
+                                <h3 className="text-lg font-black text-white uppercase tracking-tighter italic">Authorship DNA</h3>
+                            </div>
+                            <div className="text-[9px] font-mono text-neutral-600 animate-pulse uppercase tracking-widest">Sequencing_Neural_Vector...</div>
+                        </div>
+                        
+                        <div className="h-80 w-full relative">
+                            <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none">
+                                <div className="w-[80%] h-[80%] border border-white/10 rounded-full" />
+                                <div className="absolute w-[60%] h-[60%] border border-white/10 rounded-full" />
+                            </div>
                             <ResponsiveContainer width="100%" height="100%">
                                 <RadarChart cx="50%" cy="50%" outerRadius="80%" data={radarData}>
-                                    <PolarGrid stroke="#333" />
-                                    <PolarAngleAxis dataKey="subject" tick={{ fill: '#666', fontSize: 10 }} />
+                                    <PolarGrid stroke="rgba(255,255,255,0.05)" />
+                                    <PolarAngleAxis dataKey="subject" tick={{ fill: '#444', fontSize: 9, fontWeight: 'bold' }} />
                                     <Radar
                                         name="Developer"
                                         dataKey="A"
                                         stroke="#8b5cf6"
                                         fill="#8b5cf6"
                                         fillOpacity={0.6}
-                                        className="animate-pulse"
+                                        className="transition-all duration-700 hover:fill-opacity-80"
                                     />
                                 </RadarChart>
                             </ResponsiveContainer>
                         </div>
-                        <div className="mt-4 text-center">
-                            <p className="text-[10px] text-neutral-500 uppercase tracking-widest font-mono">
-                                Neural Vectorization Confidence: 94.2%
-                            </p>
+                        <div className="mt-6 flex items-center justify-between px-2">
+                             <div className="flex items-center gap-2">
+                                <span className="w-2 h-2 rounded-full bg-violet-500 animate-pulse" />
+                                <span className="text-[9px] font-black text-neutral-600 uppercase tracking-widest">Confidence: 94.2%</span>
+                             </div>
+                             <span className="text-[9px] font-mono text-neutral-700">TRACE_v2_DNA_LOG</span>
                         </div>
-                    </div>
+                    </motion.div>
 
-                    <div className="flex flex-col gap-5">
-                         <div className="p-6 rounded-2xl bg-violet-500/5 border border-violet-500/10 flex items-center gap-4">
-                            <div className="w-12 h-12 rounded-xl bg-violet-500/20 flex items-center justify-center text-violet-400">
-                                <IconBrain size={24} />
-                            </div>
-                            <div>
-                                <h4 className="font-bold text-white uppercase text-xs tracking-widest mb-1">Neural Profile</h4>
-                                <p className="text-neutral-500 text-[11px] leading-relaxed">
-                                    {overallScore < 40 ? "High original authorship preservation. Low external linguistic influence detected." : "Evidence of augmented workflow patterns. Moderate reliance on external neural aids."}
+                    {/* Secondary Metrics Column */}
+                    <div className="flex flex-col gap-6">
+                        <motion.div 
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: 0.3 }}
+                            className="flex-1 p-8 rounded-[3.5rem] bg-violet-500/5 border border-violet-500/10 flex flex-col justify-between group relative overflow-hidden"
+                        >
+                            <div className="absolute -bottom-10 -right-10 p-20 bg-violet-500/10 blur-[100px] rounded-full group-hover:bg-violet-500/20 transition-all duration-1000" />
+                            <div className="relative">
+                                <div className="flex items-center gap-4 mb-6">
+                                    <div className="w-12 h-12 rounded-2xl bg-violet-500/20 flex items-center justify-center text-violet-400">
+                                        <IconBrain size={24} />
+                                    </div>
+                                    <h4 className="font-black text-white uppercase text-sm tracking-widest italic leading-none">Intelligence Profile</h4>
+                                </div>
+                                <p className="text-neutral-500 text-sm font-medium leading-relaxed italic max-w-sm">
+                                    {overallScore < 40 ? "Node exhibits high original authorship preservation. External linguistic influence is minimal, suggesting proprietary stylistic integrity." : "Evidence of augmented workflow patterns detected. Observations indicate frequent reliance on neural translation and architectural drafting aids."}
                                 </p>
                             </div>
-                        </div>
-                        
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="p-5 rounded-2xl bg-white/5 border border-white/10">
-                                <p className="text-[9px] text-neutral-600 font-black uppercase tracking-widest mb-2">Unique Primitives</p>
-                                <p className="text-2xl font-black text-white">{hashScore(login + "up", 120, 450)}</p>
+                            
+                            <div className="grid grid-cols-2 gap-4 mt-12 relative z-10">
+                                <div className="p-6 rounded-3xl bg-black/40 border border-white/5 hover:border-violet-500/30 transition-all">
+                                    <p className="text-[9px] text-neutral-600 font-black uppercase tracking-widest mb-2">Unique Primitives</p>
+                                    <div className="flex items-baseline gap-1">
+                                        <span className="text-3xl font-black text-white italic tracking-tighter">{hashScore(login + "up", 120, 450)}</span>
+                                        <span className="text-[10px] font-mono text-neutral-700">Δ</span>
+                                    </div>
+                                </div>
+                                <div className="p-6 rounded-3xl bg-black/40 border border-white/5 hover:border-violet-500/30 transition-all">
+                                    <p className="text-[9px] text-neutral-600 font-black uppercase tracking-widest mb-2">Style Persistence</p>
+                                    <div className="flex items-baseline gap-1">
+                                        <span className="text-3xl font-black text-white italic tracking-tighter">{hashScore(login + "sp", 60, 98)}</span>
+                                        <span className="text-[10px] font-mono text-neutral-700">%</span>
+                                    </div>
+                                </div>
                             </div>
-                            <div className="p-5 rounded-2xl bg-white/5 border border-white/10">
-                                <p className="text-[9px] text-neutral-600 font-black uppercase tracking-widest mb-2">Style Persistence</p>
-                                <p className="text-2xl font-black text-white">{hashScore(login + "sp", 60, 98)}%</p>
-                            </div>
-                        </div>
+                        </motion.div>
                     </div>
                 </div>
 
-                {/* Metric cards grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <MetricCard
-                        icon={<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>}
-                        iconBg="bg-amber-500/15"
-                        cardBgClass="bg-amber-500/5 border-amber-500/20"
-                        title="AI Likelihood Score"
-                        score={aiScore}
-                        description="Measures how closely commit patterns, naming conventions and code entropy match known AI code generation signatures."
-                    />
-                    <MetricCard
-                        icon={<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="12" width="4" height="9" /><rect x="10" y="7" width="4" height="14" /><rect x="17" y="2" width="4" height="19" /></svg>}
-                        iconBg="bg-violet-500/15"
-                        cardBgClass="bg-violet-500/5 border-violet-500/20"
-                        title="Style Drift Indicator"
-                        score={styleDrift}
-                        description="Detects sudden shifts in coding style, indentation, and naming patterns that often coincide with LLM adoption."
-                    />
-                    <MetricCard
-                        icon={<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="18" r="3" /><circle cx="6" cy="6" r="3" /><path d="M6 21V9a9 9 0 0 0 9 9" /></svg>}
-                        iconBg="bg-cyan-500/15"
-                        cardBgClass="bg-cyan-500/5 border-cyan-500/20"
-                        title="Post-Merge Stability"
-                        score={postMerge}
-                        description="Tracks hotfixes and reverts within 72 hours of a PR merge — a key signal of low-confidence, AI-drafted code."
-                    />
-                    <MetricCard
-                        icon={<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>}
-                        iconBg="bg-emerald-500/15"
-                        cardBgClass="bg-emerald-500/5 border-emerald-500/20"
-                        title="Ownership Confidence"
-                        score={ownership}
-                        description="Analyzes PR review quality, issue resolution and discussion depth to gauge true authorship understanding."
-                    />
+                {/* Tactical Metrics Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {[
+                        { 
+                            icon: <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />, 
+                            color: "text-amber-400", bg: "bg-amber-500/15", border: "border-amber-500/20", 
+                            title: "AI Likelihood", score: aiScore, 
+                            desc: "Commit patterns and code entropy match known generation signatures."
+                        },
+                        { 
+                            icon: <rect x="3" y="12" width="4" height="9" />, 
+                            color: "text-violet-400", bg: "bg-violet-500/15", border: "border-violet-500/20", 
+                            title: "Style Drift", score: styleDrift, 
+                            desc: "Detects sudden shifts in coding patterns coinciding with neural adoption."
+                        },
+                        { 
+                            icon: <circle cx="18" cy="18" r="3" />, 
+                            color: "text-cyan-400", bg: "bg-cyan-500/15", border: "border-cyan-500/20", 
+                            title: "Merge Stability", score: postMerge, 
+                            desc: "Tracks hotfixes and reverts within 72 hours of integration sequences."
+                        },
+                        { 
+                            icon: <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />, 
+                            color: "text-emerald-400", bg: "bg-emerald-500/15", border: "border-emerald-500/20", 
+                            title: "Ownership Index", score: ownership, 
+                            desc: "GAUGE true authorship through PR review quality and discussion depth."
+                        }
+                    ].map((m, i) => (
+                        <motion.div 
+                            key={i}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.4 + (i * 0.1) }}
+                        >
+                            <MetricCard
+                                icon={<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={m.color}>{m.icon}</svg>}
+                                iconBg={m.bg}
+                                cardBgClass={m.bg.replace('/15', '/5') + ' ' + m.border}
+                                title={m.title}
+                                score={m.score}
+                                description={m.desc}
+                            />
+                        </motion.div>
+                    ))}
                 </div>
 
                 {/* Full-width card */}
@@ -587,14 +874,48 @@ export default function ProfileResults({ data, onBack }: ProfileResultsProps) {
                     description="Monitors commit frequency, burst patterns and off-hours activity for increasing AI assistance over time."
                 />
 
+                <div className="my-8">
+                    <NeuralGraph login={login} />
+                </div>
+
                 <div className="grid grid-cols-1 gap-8">
                     <LanguageBreakdown data={data} />
                 </div>
 
-                <GitHubContributions username={login} />
+                <div className="pt-8 border-t border-white/10">
+                    <div className="bg-white/2 border border-white/5 rounded-[3rem] p-8">
+                        <div className="flex items-center gap-3 mb-8">
+                            <div className="w-10 h-10 bg-emerald-500/10 border border-emerald-500/20 rounded-xl flex items-center justify-center text-emerald-400">
+                                <IconFingerprint size={20} />
+                            </div>
+                            <h3 className="text-xl font-black text-white uppercase tracking-tighter italic">Contribution Temporal Map</h3>
+                        </div>
+                        <GitHubContributions username={login} />
+                    </div>
+                </div>
+
+                {/* New Feature: Neural Coding Habits */}
+                <div className="pt-8 border-t border-white/10">
+                    <div className="flex items-center justify-between mb-8">
+                        <div>
+                            <h3 className="text-2xl font-black text-white uppercase tracking-tighter italic">Neural Coding Habits</h3>
+                            <p className="text-neutral-500 text-sm font-medium italic">Deconstructing the developer's temporal and linguistic fingerprints.</p>
+                        </div>
+                        <div className="px-3 py-1 bg-violet-500/10 border border-violet-500/20 rounded-md">
+                            <span className="text-[10px] font-mono text-violet-400 font-bold uppercase tracking-widest leading-none animate-pulse">Live_Auth_Feed</span>
+                        </div>
+                    </div>
+                    <CodingHabits login={login} />
+                </div>
 
                 {/* All Repositories Section */}
                 <div className="pt-8 border-t border-white/10 mt-8">
+                    <div className="flex items-center gap-3 mb-8">
+                        <div className="w-10 h-10 bg-white/5 border border-white/10 rounded-xl flex items-center justify-center text-neutral-400">
+                            <IconShare size={20} />
+                        </div>
+                        <h3 className="text-2xl font-black text-white uppercase tracking-tighter italic">Repository Registry</h3>
+                    </div>
                     <AllRepos data={data} username={login} />
                 </div>
 

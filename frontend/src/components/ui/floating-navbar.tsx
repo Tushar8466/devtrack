@@ -76,14 +76,6 @@ export const FloatingNav: React.FC<FloatingNavProps> = ({
         <div className="h-5 w-px bg-neutral-300 dark:bg-white/10" />
 
         <div className="flex items-center gap-2">
-          <Link
-            href="/inbox"
-            className="p-2 rounded-full text-neutral-500 hover:text-violet-500 hover:bg-violet-500/10 transition-all border border-transparent hover:border-violet-500/20 group"
-            title="Feedback Inbox"
-          >
-            <Inbox size={20} className="group-hover:scale-110 transition-transform" />
-          </Link>
-
           {/* Auth Buttons */}
           {session ? (
             <div className="flex items-center gap-3">

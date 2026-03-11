@@ -137,15 +137,7 @@ export function FeedbackForm() {
                 </div>
             </form>
 
-            <div className="mt-20 flex flex-col items-center gap-4">
-                <p className="text-neutral-600 text-xs uppercase tracking-[0.4em] font-mono">// VIEW COLLECTIVE INTELLIGENCE //</p>
-                <Link
-                    href="/inbox"
-                    className="p-4 rounded-full border border-white/5 hover:border-violet-500/30 hover:bg-violet-500/5 transition-all text-neutral-500 hover:text-white group"
-                >
-                    <Inbox size={24} className="group-hover:scale-110 transition-transform" />
-                </Link>
-            </div>
+            {/* Removed Collective Intelligence / Inbox link as per tactical refinement */}
         </div>
     );
 }
