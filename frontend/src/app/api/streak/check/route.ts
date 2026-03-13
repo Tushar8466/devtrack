@@ -68,10 +68,14 @@ export async function GET(req: NextRequest) {
       }
     }
 
+    // Also compute total active contribution days in the past year as a commit proxy
+    const totalActiveDays = datesWithActivity.size;
+
     return NextResponse.json({ 
       hasCommittedToday, 
       hasCommittedYesterday,
-      currentStreak 
+      currentStreak,
+      totalActiveDays,
     });
   } catch (error) {
     return NextResponse.json(

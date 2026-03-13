@@ -15,6 +15,9 @@ import { MultiStepLoader } from "@/components/ui/multi-step-loader";
 import { motion } from "motion/react";
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer } from 'recharts';
 import Link from "next/link";
+import { BadgeShelf } from "@/components/ui/badge-shelf";
+import { BadgeNotificationProvider } from "@/components/ui/badge-unlock";
+import { Badge } from "@/lib/badges/schema";
 
 interface GitHubUser {
   login: string;
@@ -70,6 +73,7 @@ export default function DashboardPage() {
   const [profileError, setProfileError] = useState<string | null>(null);
   const [currentStreak, setCurrentStreak] = useState(0);
   const [timeLeft, setTimeLeft] = useState("");
+  const [newBadges, setNewBadges] = useState<Badge[]>([]);
   const [threatLevel, setThreatLevel] = useState<{
     color: string;
     label: string;
@@ -162,6 +166,30 @@ export default function DashboardPage() {
         if (res.ok) {
           setGithubData(data.userData);
           if (Array.isArray(data.reposData)) setRepos(data.reposData);
+
+          // Second-pass badge evaluation with GitHub profile data
+          try {
+            const repoList = Array.isArray(data.reposData) ? data.reposData : [];
+            const totalStars = repoList.reduce((sum: number, r: any) => sum + (r.stargazers_count || 0), 0);
+            const languages = [...new Set(repoList.map((r: any) => r.language).filter(Boolean))] as string[];
+
+            await fetch(`/api/badges/${encodeURIComponent(effectiveUsername)}`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                streak: 0,   // already evaluated in streak check
+                commits: 0,  // already evaluated in streak check
+                repos: data.userData?.public_repos || repoList.length,
+                prs: 0,
+                issues: 0,
+                stars: totalStars,
+                languages,
+              })
+            });
+            // Note: we don't overwrite newBadges here to avoid double-notifying streak ones
+          } catch (e) {
+            console.error("Profile badge evaluation failed", e);
+          }
         } else {
           setProfileError(data.message || data.error || "Failed to fetch profile");
           setGithubData(null);
@@ -193,7 +221,8 @@ export default function DashboardPage() {
         const data = (await res.json()) as { 
           hasCommittedToday?: boolean; 
           hasCommittedYesterday?: boolean;
-          currentStreak?: number 
+          currentStreak?: number;
+          totalActiveDays?: number;
         };
         if (!cancelled) {
           const pushed = data.hasCommittedToday === true;
@@ -204,6 +233,37 @@ export default function DashboardPage() {
           setStreakAtRisk(!pushed && pushedYesterday);
           setCurrentStreak(data.currentStreak || 0);
           setStreakChecked(true);
+
+          // Trigger badge evaluation with rich real data
+          try {
+            const streakVal = data.currentStreak || 0;
+            const totalCommits = data.totalActiveDays || 0; // best commit proxy from HTML scrape
+
+            // Try to pull language list from the repos we already loaded in state
+            // githubData isn't reliably loaded yet, so we use what we have
+            const badgeRes = await fetch(`/api/badges/${encodeURIComponent(effectiveUsername)}`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                streak:  streakVal,
+                commits: totalCommits,
+                // These come from githubData loaded in parallel — may already be set
+                repos:   0,   // will be a real value once githubData loads
+                prs:     0,
+                issues:  0,
+                stars:   0,
+                languages: [],
+              })
+            });
+            if (badgeRes.ok) {
+              const badgeData = await badgeRes.json();
+              if (badgeData.newlyUnlocked?.length > 0) {
+                setNewBadges(badgeData.newlyUnlocked.map((nr: any) => nr.details).filter(Boolean));
+              }
+            }
+          } catch (e) {
+            console.error("Badge evaluation failed", e);
+          }
         }
       } catch {
         if (!cancelled) {
@@ -240,6 +300,8 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-[#030303] pt-28 pb-20 px-4 text-white font-sans selection:bg-violet-500/30">
+      <BadgeNotificationProvider newlyUnlocked={newBadges} />
+      
       <div className="max-w-[1400px] mx-auto space-y-12">
 
         {/* STREAK AT RISK BANNER */}
@@ -343,7 +405,7 @@ export default function DashboardPage() {
                       )}>{threatLevel.status}</span>
                     </div>
                     
-                    <h3 className="text-3xl md:text-5xl font-black text-white uppercase tracking-tighter italic flex flex-wrap justify-center md:justify-start gap-3 items-baseline relative z-10 drop-shadow-2xl">
+                    <h3 className="text-xl md:text-2xl font-black text-white uppercase tracking-tighter italic flex flex-wrap justify-center md:justify-start gap-2 items-baseline relative z-10 drop-shadow-2xl">
                       <span className={cn(
                         "transition-colors duration-1000 opacity-90",
                         threatLevel.color === "red" ? "text-red-50/90" : 
@@ -370,7 +432,7 @@ export default function DashboardPage() {
                     Time_Left_To_Sync
                   </span>
                   <span className={cn(
-                    "text-5xl md:text-6xl font-mono font-black tabular-nums transition-colors duration-1000 tracking-tighter drop-shadow-[0_0_20px_currentColor]",
+                    "text-3xl md:text-4xl font-mono font-black tabular-nums transition-colors duration-1000 tracking-tighter drop-shadow-[0_0_20px_currentColor]",
                      threatLevel.color === "red" ? "text-red-500" : 
                      threatLevel.color === "orange" ? "text-orange-500" : "text-amber-500"
                   )}>
@@ -615,6 +677,13 @@ export default function DashboardPage() {
                 </button>
               </div>
             </div>
+          </div>
+        )}
+
+        {/* BADGES & ACHIEVEMENTS SHELF */}
+        {effectiveUsername && (
+          <div className="mt-12">
+            <BadgeShelf username={effectiveUsername} />
           </div>
         )}
 
