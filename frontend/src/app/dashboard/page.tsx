@@ -10,7 +10,7 @@ import { Box, Users, GitFork, FileText, Camera } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { GlowingCard } from "@/components/ui/glowing-card";
 import { FileUpload } from "@/components/ui/file-upload";
-import { X, Fingerprint, Activity, Clock, Award, Terminal } from "lucide-react";
+import { X, Fingerprint, Activity, Clock, Award, Terminal, Flame, AlertCircle, ShieldCheck } from "lucide-react";
 import { MultiStepLoader } from "@/components/ui/multi-step-loader";
 import { motion } from "motion/react";
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer } from 'recharts';
@@ -67,7 +67,44 @@ export default function DashboardPage() {
   const [streakAtRisk, setStreakAtRisk] = useState(false);
   const [streakChecked, setStreakChecked] = useState(false);
   const [hasPushedToday, setHasPushedToday] = useState(false);
-  const [streakDismissedToday, setStreakDismissedToday] = useState(false);
+  const [profileError, setProfileError] = useState<string | null>(null);
+  const [currentStreak, setCurrentStreak] = useState(0);
+  const [timeLeft, setTimeLeft] = useState("");
+  const [threatLevel, setThreatLevel] = useState<{
+    color: string;
+    label: string;
+    status: string;
+    intensity: string;
+  }>({ color: "red", label: "Critical_Status_Check", status: "Streak_At_Risk", intensity: "500" });
+
+  useEffect(() => {
+    if (streakAtRisk && !hasPushedToday) {
+      const timer = setInterval(() => {
+        const now = new Date();
+        const tomorrow = new Date(now);
+        tomorrow.setHours(24, 0, 0, 0);
+        const diff = tomorrow.getTime() - now.getTime();
+        
+        const h = Math.floor(diff / (1000 * 60 * 60));
+        const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const s = Math.floor((diff % (1000 * 60)) / 1000);
+        
+        // Dynamic Threat Level Logic
+        if (h >= 12) {
+          setThreatLevel({ color: "amber", label: "Sequence_Pending", status: "Sync_Required", intensity: "500" });
+        } else if (h >= 6) {
+          setThreatLevel({ color: "orange", label: "Warning_Stability_Low", status: "Integrity_Degrading", intensity: "500" });
+        } else if (h >= 2) {
+          setThreatLevel({ color: "red", label: "Critical_Sequence_Risk", status: "Low_Integrity", intensity: "500" });
+        } else {
+          setThreatLevel({ color: "red", label: "Terminal_Expiry_Imminent", status: "Critical_Internal_Failure", intensity: "600" });
+        }
+
+        setTimeLeft(`${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`);
+      }, 1000);
+      return () => clearInterval(timer);
+    }
+  }, [streakAtRisk, hasPushedToday]);
 
   useEffect(() => {
     if (repos.length > 0) {
@@ -110,46 +147,31 @@ export default function DashboardPage() {
   const sessionUsername = (session?.user as SessionUser)?.username || "";
   const effectiveUsername = manualUsername || sessionUsername;
 
-  // Load streak dismissal state for today from localStorage
-  useEffect(() => {
-    if (!effectiveUsername) return;
-    const todayKey = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
-    const key = `devtrack_streak_dismissed_${effectiveUsername}_${todayKey}`;
-    if (typeof window !== "undefined" && window.localStorage.getItem(key) === "1") {
-      setStreakDismissedToday(true);
-    } else {
-      setStreakDismissedToday(false);
-    }
-  }, [effectiveUsername]);
-
   useEffect(() => {
     if (!effectiveUsername) return;
 
     Promise.resolve().then(() => {
       setLoading(true);
       setIsSearching(true);
+      setProfileError(null);
     });
 
-    Promise.all([
-      fetch(`https://api.github.com/users/${effectiveUsername}`).then((res) =>
-        res.ok ? res.json() : null
-      ),
-      fetch(
-        `https://api.github.com/users/${effectiveUsername}/repos?sort=updated&per_page=6`
-      ).then((res) => (res.ok ? res.json() : [])),
-    ])
-      .then(([userData, reposData]) => {
-        if (userData) {
-          setGithubData(userData);
-          if (Array.isArray(reposData)) setRepos(reposData);
+    fetch(`/api/github/profile?username=${effectiveUsername}`)
+      .then(async (res) => {
+        const data = await res.json();
+        if (res.ok) {
+          setGithubData(data.userData);
+          if (Array.isArray(data.reposData)) setRepos(data.reposData);
         } else {
+          setProfileError(data.message || data.error || "Failed to fetch profile");
           setGithubData(null);
           setRepos([]);
         }
         setLoading(false);
         setIsSearching(false);
       })
-      .catch(() => {
+      .catch((err) => {
+        setProfileError("Network error. Please try again.");
         setLoading(false);
         setIsSearching(false);
       });
@@ -162,15 +184,25 @@ export default function DashboardPage() {
     let cancelled = false;
     const checkStreak = async () => {
       try {
+        const localDate = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD
+        const offset = new Date().getTimezoneOffset();
         const res = await fetch(
-          `/api/streak/check?username=${encodeURIComponent(effectiveUsername)}`
+          `/api/streak/check?username=${encodeURIComponent(effectiveUsername)}&localDate=${localDate}&offset=${offset}`
         );
         if (!res.ok) return;
-        const data = (await res.json()) as { hasCommittedToday?: boolean };
+        const data = (await res.json()) as { 
+          hasCommittedToday?: boolean; 
+          hasCommittedYesterday?: boolean;
+          currentStreak?: number 
+        };
         if (!cancelled) {
           const pushed = data.hasCommittedToday === true;
+          const pushedYesterday = data.hasCommittedYesterday === true;
+          
           setHasPushedToday(pushed);
-          setStreakAtRisk(!pushed);
+          // Alert visibility: Only at risk if they pushed yesterday but not today
+          setStreakAtRisk(!pushed && pushedYesterday);
+          setCurrentStreak(data.currentStreak || 0);
           setStreakChecked(true);
         }
       } catch {
@@ -211,49 +243,187 @@ export default function DashboardPage() {
       <div className="max-w-[1400px] mx-auto space-y-12">
 
         {/* STREAK AT RISK BANNER */}
-        {streakChecked && streakAtRisk && !streakDismissedToday && (
-          <div className="flex flex-col md:flex-row items-center justify-between gap-3 px-6 py-4 rounded-2xl border border-amber-500/40 bg-amber-500/10 shadow-[0_0_30px_rgba(245,158,11,0.25)]">
-            <div className="flex items-center gap-3">
-              <div className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
-              <p className="text-sm md:text-base font-semibold text-amber-100">
-                Streak at risk — you haven&apos;t committed today!
-              </p>
+        {streakChecked && streakAtRisk && (
+          <motion.div 
+            initial={{ opacity: 0, y: -20, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            className="relative group "
+          >
+            {/* Ambient Base Glow */}
+            <div className={cn(
+              "absolute inset-0 blur-3xl opacity-30 group-hover:opacity-60 transition-all duration-2000",
+              threatLevel.color === "red" ? "bg-red-600/50" : 
+              threatLevel.color === "orange" ? "bg-orange-500/50" : "bg-amber-500/50"
+            )} />
+
+            <div className={cn(
+              "relative flex items-center justify-between px-6 md:px-12 py-8 rounded-4xl border backdrop-blur-3xl transition-all duration-2000 overflow-hidden shadow-2xl z-10",
+              threatLevel.color === "red" ? "border-red-500/40 shadow-red-500/20" : 
+              threatLevel.color === "orange" ? "border-orange-500/40 shadow-orange-500/20" : 
+              "border-amber-500/40 shadow-amber-500/20",
+              "bg-[#050505]/95" // Deep dark background
+            )}>
+              {/* Tactical Warning Stripes */}
+              <div className={cn(
+                "absolute inset-0 opacity-[0.03] transition-colors duration-1000 pointer-events-none mix-blend-plus-lighter",
+                "bg-[repeating-linear-gradient(-45deg,currentColor,currentColor_15px,transparent_15px,transparent_30px)]",
+                threatLevel.color === "red" ? "text-red-500" : 
+                threatLevel.color === "orange" ? "text-orange-500" : "text-amber-500"
+              )} />
+              
+              {/* Moving Laser Sweep */}
+              <motion.div
+                animate={{ x: ["-100%", "200%"] }}
+                transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+                className={cn(
+                  "absolute top-0 bottom-0 w-[50%] opacity-[0.05] pointer-events-none skew-x-[-20deg]",
+                  "bg-linear-to-r from-transparent via-current to-transparent",
+                  threatLevel.color === "red" ? "text-red-500" : 
+                  threatLevel.color === "orange" ? "text-orange-500" : "text-amber-500"
+                )}
+              />
+
+              {/* Grid Overlay */}
+              <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-size-[40px_40px] pointer-events-none mask-[linear-gradient(to_bottom,black,transparent)] opacity-20" />
+
+              <div className="relative flex flex-col md:flex-row items-center justify-between w-full gap-8 z-10">
+                <div className="flex flex-col md:flex-row items-center gap-8 w-full md:w-auto text-center md:text-left">
+                  
+                  {/* Central Icon Container */}
+                  <div className="relative shrink-0">
+                    <div className="absolute inset-0 bg-black rounded-3xl blur-[10px]" />
+                    <div className={cn(
+                      "w-20 h-20 rounded-3xl border-2 flex items-center justify-center transition-colors duration-1000 relative z-10 bg-black overflow-hidden shadow-inner group-hover:scale-110",
+                      threatLevel.color === "red" ? "border-red-500/50 shadow-red-500/20" : 
+                      threatLevel.color === "orange" ? "border-orange-500/50 shadow-orange-500/20" : 
+                      "border-amber-500/50 shadow-amber-500/20"
+                    )}>
+                      <div className={cn(
+                        "absolute inset-0 opacity-20",
+                        threatLevel.color === "red" ? "bg-red-500" : 
+                        threatLevel.color === "orange" ? "bg-orange-500" : "bg-amber-500"
+                      )} />
+                      <Activity className={cn(
+                        "w-10 h-10 transition-colors duration-1000 animate-pulse",
+                        threatLevel.color === "red" ? "text-red-500" : 
+                        threatLevel.color === "orange" ? "text-orange-500" : "text-amber-500"
+                      )} />
+                    </div>
+                    {/* Floating Orbs */}
+                    <motion.div 
+                      animate={{ scale: [1, 1.5, 1], opacity: [0.5, 1, 0.5] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                      className={cn(
+                        "absolute -top-2 -right-2 w-4 h-4 rounded-full transition-colors duration-1000 z-20 blur-[2px]",
+                        threatLevel.color === "red" ? "bg-red-500" : threatLevel.color === "orange" ? "bg-orange-500" : "bg-amber-500"
+                      )} 
+                    />
+                    <div className={cn(
+                      "absolute -bottom-1 -left-1 w-2 h-2 rounded-full animate-ping transition-colors duration-1000 z-20",
+                      threatLevel.color === "red" ? "bg-red-500" : threatLevel.color === "orange" ? "bg-orange-500" : "bg-amber-500"
+                    )} />
+                  </div>
+                  
+                  {/* Typography Block */}
+                  <div>
+                    <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 mb-3">
+                      <span className={cn(
+                        "flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.4em] transition-colors duration-1000",
+                        threatLevel.color === "red" ? "text-red-500" : 
+                        threatLevel.color === "orange" ? "text-orange-500" : "text-amber-500"
+                      )}>
+                        <div className="w-1.5 h-1.5 rounded-full bg-current animate-pulse shadow-[0_0_10px_currentColor]" />
+                        {threatLevel.label}
+                      </span>
+                      <span className={cn(
+                        "px-3 py-1 border rounded-md bg-black text-[10px] font-black uppercase tracking-widest transition-all duration-1000",
+                        threatLevel.color === "red" ? "border-red-500/80 text-red-500 shadow-[0_0_15px_rgba(239,68,68,0.4)]" : 
+                        threatLevel.color === "orange" ? "border-orange-500/80 text-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.4)]" : 
+                        "border-amber-500/80 text-amber-500 shadow-[0_0_15px_rgba(245,158,11,0.4)]"
+                      )}>{threatLevel.status}</span>
+                    </div>
+                    
+                    <h3 className="text-3xl md:text-5xl font-black text-white uppercase tracking-tighter italic flex flex-wrap justify-center md:justify-start gap-3 items-baseline relative z-10 drop-shadow-2xl">
+                      <span className={cn(
+                        "transition-colors duration-1000 opacity-90",
+                        threatLevel.color === "red" ? "text-red-50/90" : 
+                        threatLevel.color === "orange" ? "text-orange-50/90" : "text-amber-50/90"
+                      )}>NEURAL LINK EXPIRING:</span>
+                      <span className={cn(
+                        "transition-all duration-1000 drop-shadow-xl animate-pulse",
+                        threatLevel.color === "red" ? "text-red-500" : 
+                        threatLevel.color === "orange" ? "text-orange-500" : "text-amber-500"
+                      )}>{currentStreak || 0} DAY STREAK</span>
+                    </h3>
+                    
+                    <p className="text-xs text-neutral-400 font-medium italic mt-4 flex items-center justify-center md:justify-start gap-2 max-w-lg">
+                      <ShieldCheck size={16} className="opacity-50 shrink-0" />
+                      Synchronize your work today to maintain sequence integrity and prevent neural degradation.
+                    </p>
+                  </div>
+                </div>
+                
+                {/* Clock Display */}
+                <div className="relative z-10 flex flex-col items-center md:items-end shrink-0 md:pl-10 md:border-l border-white/10 md:h-full justify-center mt-6 md:mt-0">
+                  <span className="text-[10px] font-mono text-neutral-500 uppercase tracking-[0.4em] mb-2 flex items-center gap-2">
+                    <Clock size={12} className="opacity-50" />
+                    Time_Left_To_Sync
+                  </span>
+                  <span className={cn(
+                    "text-5xl md:text-6xl font-mono font-black tabular-nums transition-colors duration-1000 tracking-tighter drop-shadow-[0_0_20px_currentColor]",
+                     threatLevel.color === "red" ? "text-red-500" : 
+                     threatLevel.color === "orange" ? "text-orange-500" : "text-amber-500"
+                  )}>
+                    {timeLeft || "00:00:00"}
+                  </span>
+                </div>
+              </div>
+
+              {/* Base Progress Bar */}
+              <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-black/50">
+                <div className={cn(
+                  "h-full transition-all duration-1000 w-full animate-pulse",
+                  threatLevel.color === "red" ? "bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.8)]" : 
+                  threatLevel.color === "orange" ? "bg-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.8)]" : 
+                  "bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.8)]"
+                )} />
+              </div>
             </div>
-            <div className="flex flex-col md:flex-row items-center gap-3">
-              <p className="text-[11px] md:text-xs text-amber-200/80 font-mono uppercase tracking-widest">
-                Push at least once before midnight to keep your contribution streak alive.
-              </p>
-              <button
-                type="button"
-                onClick={() => {
-                  const todayKey = new Date().toISOString().slice(0, 10);
-                  const key = `devtrack_streak_dismissed_${effectiveUsername}_${todayKey}`;
-                  if (typeof window !== "undefined") {
-                    window.localStorage.setItem(key, "1");
-                  }
-                  setStreakDismissedToday(true);
-                }}
-                className="text-[10px] md:text-xs font-black uppercase tracking-[0.2em] px-3 py-1 rounded-full border border-amber-400/60 text-amber-100 hover:bg-amber-400/10 transition-colors"
-              >
-                Dismiss for today
-              </button>
-            </div>
-          </div>
+          </motion.div>
         )}
 
         {/* STREAK SUCCESS BANNER */}
-        {streakChecked && hasPushedToday && (
-          <div className="flex flex-col md:flex-row items-center justify-between gap-3 px-6 py-4 rounded-2xl border border-emerald-500/40 bg-emerald-500/10 shadow-[0_0_30px_rgba(16,185,129,0.25)]">
-            <div className="flex items-center gap-3">
-              <div className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-              <p className="text-sm md:text-base font-semibold text-emerald-100">
-                You&apos;re on fire — you&apos;ve already pushed today.
-              </p>
+        {streakChecked && hasPushedToday && currentStreak > 0 && (
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="relative group "
+          >
+            <div className="absolute inset-0 bg-emerald-500/10 blur-2xl opacity-50 group-hover:opacity-80 transition-opacity" />
+            <div className="relative flex flex-col md:flex-row items-center justify-between gap-6 px-8 py-5 rounded-4xl border border-emerald-500/40 bg-[#0a0a0a]/60 backdrop-blur-xl transition-all hover:border-emerald-500/60 shadow-[0_0_40px_rgba(16,185,129,0.1)]">
+              <div className="flex items-center gap-6">
+                <div className="w-12 h-12 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center">
+                  <Award className="w-6 h-6 text-emerald-400" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-[10px] font-black text-emerald-500 uppercase tracking-[0.4em]">Node_Synchronized</span>
+                    <span className="text-[9px] font-mono text-neutral-600 uppercase tracking-widest">Uptime_Guaranteed</span>
+                  </div>
+                  <h3 className="text-lg font-black text-white uppercase tracking-tighter italic mt-1">
+                    Sequence Stable: <span className="text-emerald-400">{currentStreak || 0} Day Synchronicity</span>
+                  </h3>
+                </div>
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="text-right">
+                  <p className="text-[9px] font-black text-emerald-500/60 uppercase tracking-widest">Integrity_Buffer</p>
+                  <p className="text-[10px] font-mono text-neutral-500 uppercase">Cycle Reserved For 24.0h</p>
+                </div>
+                <div className="w-1 h-8 bg-emerald-500/20 rounded-full" />
+              </div>
             </div>
-            <p className="text-[11px] md:text-xs text-emerald-200/80 font-mono uppercase tracking-widest">
-              Streak secured for this cycle. Keep shipping.
-            </p>
-          </div>
+          </motion.div>
         )}
 
         {/* TACTICAL STATUS BAR */}
@@ -326,16 +496,24 @@ export default function DashboardPage() {
                   }}
                   className="w-full max-w-md flex flex-col sm:flex-row gap-3"
                 >
-                  <input
-                    name="username"
-                    type="text"
-                    placeholder="Enter GitHub username (e.g. tushar8466)"
-                    className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all placeholder:text-neutral-600"
-                    required
-                  />
+                  <div className="flex-1 flex flex-col gap-2">
+                    <input
+                      name="username"
+                      type="text"
+                      placeholder="Enter GitHub username (e.g. tushar8466)"
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all placeholder:text-neutral-600"
+                      required
+                    />
+                    {profileError && (
+                      <div className="flex items-center gap-2 text-red-400 text-[10px] font-bold uppercase tracking-widest px-1">
+                        <AlertCircle className="w-3 h-3" />
+                        {profileError}
+                      </div>
+                    )}
+                  </div>
                   <button
                     type="submit"
-                    className="bg-white text-black font-semibold px-6 py-3 rounded-xl hover:bg-neutral-200 transition-colors"
+                    className="bg-white text-black font-semibold h-[50px] px-6 rounded-xl hover:bg-neutral-200 transition-colors whitespace-nowrap"
                   >
                     Fetch Profile
                   </button>
@@ -380,6 +558,12 @@ export default function DashboardPage() {
                 <div className="absolute -bottom-2 -right-2 bg-emerald-500 w-6 h-6 rounded-full border-4 border-black flex items-center justify-center">
                   <div className="w-2 h-2 bg-white rounded-full animate-ping" />
                 </div>
+                {currentStreak > 0 && (
+                  <div className="absolute -top-2 -right-2 bg-linear-to-br from-orange-500 to-red-600 px-2 py-1 rounded-lg border border-white/20 shadow-lg flex items-center gap-1.5 animate-bounce">
+                    <Flame className="w-3 h-3 text-white fill-white" />
+                    <span className="text-[10px] font-black text-white">{currentStreak}</span>
+                  </div>
+                )}
               </div>
 
               <div className="flex-1 text-center md:text-left space-y-4">

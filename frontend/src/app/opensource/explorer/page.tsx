@@ -38,12 +38,21 @@ import {
    PolarRadiusAxis,
 } from 'recharts';
 
+// Tactical Glitch Text Effect
+const GlitchText = ({ text, className }: { text: string, className?: string }) => (
+   <div className={cn("relative group inline-block", className)}>
+      <span className="relative z-10">{text}</span>
+      <span className="absolute top-0 left-0 -z-10 text-red-500 opacity-0 group-hover:opacity-70 group-hover:translate-x-[2px] transition-transform duration-100">{text}</span>
+      <span className="absolute top-0 left-0 -z-10 text-cyan-500 opacity-0 group-hover:opacity-70 group-hover:-translate-x-[2px] transition-transform duration-100">{text}</span>
+   </div>
+);
+
 // Mock data generator for repo intelligence
 const generatePulseData = () => {
-   return Array.from({ length: 20 }).map((_, i) => ({
+   return Array.from({ length: 24 }).map((_, i) => ({
       time: `${i}:00`,
-      frequency: 40 + Math.random() * 60,
-      intensity: 20 + Math.random() * 80,
+      frequency: 30 + Math.random() * 70,
+      intensity: 15 + Math.random() * 85,
    }));
 };
 
@@ -152,11 +161,12 @@ function OSExplorerContent() {
                         <span className="text-[10px] font-black text-cyan-400 uppercase tracking-widest">Active_Scan_Enabled</span>
                      </div>
                   </div>
-                  <h1 className="text-5xl md:text-7xl font-black tracking-tighter uppercase italic leading-none">
-                     Node <span className="bg-linear-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">Intelligence</span>
+                  <h1 className="text-5xl md:text-8xl font-black tracking-tighter uppercase italic leading-none">
+                     <GlitchText text="Node" />{" "}
+                     <span className="bg-linear-to-r from-cyan-400 via-blue-500 to-purple-600 bg-clip-text text-transparent">Intelligence</span>
                   </h1>
-                  <p className="text-neutral-500 font-medium text-lg italic max-w-xl">
-                     Deep-space tactical tracking for open source repositories. Map the neural pulse of the global software ecosystem.
+                  <p className="text-neutral-500 font-medium text-xl italic max-w-xl">
+                     Strategic asset tracking system for the Global Open Source Grid. Intercept neural patterns and structural integrity.
                   </p>
                </div>
 
@@ -488,29 +498,40 @@ function OSExplorerContent() {
                      </div>
 
                      {/* NEURAL HEALTH SCOUTER */}
-                     <div className="bg-white/2 border border-white/5 rounded-4xl p-10 backdrop-blur-3xl relative overflow-hidden group">
-                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(6,182,212,0.1),transparent)]" />
+                     <div className="bg-[#050505] border border-white/5 rounded-4xl p-10 backdrop-blur-3xl relative overflow-hidden group">
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(6,182,212,0.15),transparent)] opacity-50" />
                         <div className="relative z-10 flex flex-col items-center text-center space-y-6">
-                           <div className="relative w-32 h-32 flex items-center justify-center">
-                              <svg className="w-full h-full -rotate-90">
-                                 <circle cx="64" cy="64" r="60" fill="none" stroke="currentColor" strokeWidth="2" className="text-white/5" />
+                           <div className="relative w-40 h-40 flex items-center justify-center">
+                              {/* Background Rings */}
+                              <div className="absolute inset-0 border border-white/5 rounded-full" />
+                              <div className="absolute inset-4 border border-white/5 rounded-full border-dashed animate-spin-slow opacity-20" />
+                              
+                              <svg className="w-full h-full -rotate-90 drop-shadow-[0_0_15px_rgba(6,182,212,0.3)]">
+                                 <circle cx="80" cy="80" r="74" fill="none" stroke="currentColor" strokeWidth="1" className="text-white/5" />
                                  <motion.circle
-                                    cx="64" cy="64" r="60" fill="none" stroke="currentColor" strokeWidth="4"
+                                    cx="80" cy="80" r="74" fill="none" stroke="currentColor" strokeWidth="6"
                                     className="text-cyan-500"
-                                    strokeDasharray="377"
-                                    initial={{ strokeDashoffset: 377 }}
-                                    animate={{ strokeDashoffset: 377 - (377 * (healthScore / 100)) }}
-                                    transition={{ duration: 2, ease: "easeOut" }}
+                                    strokeDasharray="465"
+                                    initial={{ strokeDashoffset: 465 }}
+                                    animate={{ strokeDashoffset: 465 - (465 * (healthScore / 100)) }}
+                                    transition={{ duration: 2.5, ease: "easeOut" }}
+                                    strokeLinecap="round"
                                  />
                               </svg>
                               <div className="absolute flex flex-col items-center">
-                                 <span className="text-2xl font-black text-white italic leading-none">{healthScore.toFixed(0)}</span>
-                                 <span className="text-[8px] font-black text-neutral-500 uppercase">Health</span>
+                                 <motion.span 
+                                    initial={{ opacity: 0, scale: 0.5 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    className="text-4xl font-black text-white italic leading-none tracking-tighter"
+                                 >
+                                    {healthScore.toFixed(1)}
+                                 </motion.span>
+                                 <span className="text-[10px] font-black text-cyan-500/60 uppercase tracking-widest mt-1">Integrity</span>
                               </div>
                            </div>
                            <div className="space-y-1">
-                              <h4 className="text-sm font-black text-white uppercase tracking-widest italic">Neural Integrity</h4>
-                              <p className="text-[9px] font-mono text-neutral-600 uppercase">Operational_Gravity_Stable</p>
+                              <h4 className="text-lg font-black text-white uppercase tracking-tighter italic">Structural Buffer</h4>
+                              <p className="text-[10px] font-mono text-neutral-600 uppercase tracking-widest">Efficiency_Index::{ (healthScore * 0.94).toFixed(2) }v</p>
                            </div>
                         </div>
                      </div>
@@ -620,28 +641,31 @@ function OSExplorerContent() {
 
                      {/* BIG FEATURE: NEURAL CONTRIBUTOR MATRIX */}
                      {repoContributors.length > 0 && (
-                        <div className="bg-black border border-white/5 rounded-4xl p-10 backdrop-blur-3xl space-y-8 relative overflow-hidden group">
+                        <div className="bg-[#050505] border border-white/5 rounded-4xl p-10 backdrop-blur-3xl space-y-8 relative overflow-hidden group">
                            <div className="flex items-center justify-between mb-8">
                               <div className="space-y-1">
                                  <h3 className="text-xl font-black text-white uppercase tracking-tighter italic">Architectural Elite</h3>
                                  <p className="text-[9px] font-mono text-neutral-500 uppercase tracking-widest">Primary_Neutral_Network_Architects</p>
                               </div>
-                              <Users size={20} className="text-emerald-500" />
+                              <Users size={20} className="text-emerald-500 animate-pulse" />
                            </div>
 
                            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                               {repoContributors.map((user, i) => (
-                                 <div key={user.id} className="p-4 bg-white/2 border border-white/5 rounded-3xl hover:border-emerald-500/30 transition-all group/user">
-                                    <div className="relative w-full aspect-square mb-4 rounded-2xl overflow-hidden border border-white/10">
-                                       <img src={user.avatar_url} alt={user.login} className="w-full h-full object-cover grayscale group-hover/user:grayscale-0 transition-all duration-500" />
-                                       <div className="absolute inset-0 bg-linear-to-t from-black/80 to-transparent" />
+                                 <div key={user.id} className="p-4 bg-white/2 border border-white/5 rounded-3xl hover:border-emerald-500/50 hover:bg-emerald-500/5 transition-all group/user relative overflow-hidden">
+                                    <div className="absolute top-0 right-0 p-3 opacity-0 group-hover/user:opacity-100 transition-opacity">
+                                       <Activity size={12} className="text-emerald-500 animate-pulse" />
+                                    </div>
+                                    <div className="relative w-full aspect-square mb-4 rounded-2xl overflow-hidden border border-white/10 group-hover/user:border-emerald-500/30 transition-colors">
+                                       <img src={user.avatar_url} alt={user.login} className="w-full h-full object-cover grayscale group-hover/user:grayscale-0 scale-100 group-hover/user:scale-110 transition-all duration-700" />
+                                       <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent" />
                                        <div className="absolute bottom-2 left-2 right-2 flex justify-between items-end">
                                           <span className="text-[8px] font-black text-emerald-400">IMPACT_0{i + 1}</span>
                                           <TrendingUp size={10} className="text-emerald-500" />
                                        </div>
                                     </div>
                                     <h4 className="text-[10px] font-black text-white uppercase truncate">{user.login}</h4>
-                                    <p className="text-[8px] font-mono text-neutral-600 uppercase mt-1">{user.contributions} NODES</p>
+                                    <p className="text-[8px] font-mono text-neutral-600 uppercase mt-1 group-hover/user:text-emerald-500/70 transition-colors">{user.contributions} NODES</p>
                                  </div>
                               ))}
                            </div>
@@ -649,7 +673,7 @@ function OSExplorerContent() {
                      )}
 
                      {/* BIG FEATURE: ARCHITECTURAL IMPULSE MAP (HEATMAP) */}
-                     <div className="bg-black border border-white/5 rounded-4xl p-10 backdrop-blur-3xl space-y-8 relative overflow-hidden group">
+                     <div className="bg-[#050505] border border-white/5 rounded-4xl p-10 backdrop-blur-3xl space-y-8 relative overflow-hidden group">
                         <div className="flex items-center justify-between mb-8">
                            <div className="space-y-1">
                               <h3 className="text-xl font-black text-white uppercase tracking-tighter italic">Architectural Impulse Map</h3>
@@ -668,12 +692,14 @@ function OSExplorerContent() {
                                     animate={{ scale: 1, opacity: 1 }}
                                     transition={{ delay: i * 0.02 }}
                                     className={cn(
-                                       "aspect-square rounded-md border border-white/5",
-                                       intensity > 0.8 ? "bg-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.5)]" :
+                                       "aspect-square rounded-md border border-white/5 relative group/cell",
+                                       intensity > 0.8 ? "bg-cyan-500 shadow-[0_0_15px_rgba(6,182,212,0.4)]" :
                                           intensity > 0.5 ? "bg-cyan-500/40" :
                                              intensity > 0.2 ? "bg-cyan-500/10" : "bg-white/2"
                                     )}
-                                 />
+                                 >
+                                    <div className="absolute inset-0 border border-cyan-500/0 group-hover/cell:border-cyan-500/50 rounded-md transition-colors" />
+                                 </motion.div>
                               );
                            })}
                         </div>
@@ -693,8 +719,8 @@ function OSExplorerContent() {
                      </div>
 
                      {/* BIG FEATURE: GLOBAL GEO-TELEMETRY */}
-                     <div className="bg-black border border-white/10 rounded-4xl p-10 backdrop-blur-3xl overflow-hidden relative group h-[400px]">
-                        <div className="absolute top-0 right-0 p-10 opacity-5">
+                     <div className="bg-[#050505] border border-white/10 rounded-4xl p-10 backdrop-blur-3xl overflow-hidden relative group h-[400px]">
+                        <div className="absolute top-0 right-0 p-10 opacity-5 group-hover:scale-110 transition-transform duration-1000 group-hover:opacity-10">
                            <Globe size={300} />
                         </div>
                         <div className="relative z-10 space-y-2 mb-8">
@@ -720,7 +746,7 @@ function OSExplorerContent() {
                                  </motion.div>
                               ))}
                               <svg className="w-full h-full">
-                                 <path d="M 100 100 L 200 300 L 400 150 L 500 400" fill="none" stroke="rgba(6,182,212,0.1)" strokeWidth="1" strokeDasharray="4 4" />
+                                 <path d="M 100 100 L 200 300 L 400 150 L 500 400" fill="none" stroke="rgba(6,182,212,0.2)" strokeWidth="1" strokeDasharray="2 4" className="animate-[dash_20s_linear_infinite]" />
                               </svg>
                            </div>
                         </div>
@@ -739,7 +765,7 @@ function OSExplorerContent() {
 
                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         {/* COLLABORATOR DENSITY */}
-                        <div className="bg-black border border-white/5 rounded-4xl p-8 backdrop-blur-3xl space-y-6">
+                        <div className="bg-[#050505] border border-white/5 rounded-4xl p-8 backdrop-blur-3xl space-y-6">
                            <div className="flex items-center gap-3">
                               <Users size={18} className="text-violet-400" />
                               <h4 className="text-sm font-black text-white uppercase tracking-[0.2em]">Node Collaboration</h4>
@@ -771,8 +797,8 @@ function OSExplorerContent() {
                         </div>
 
                         {/* RISK ASSESSMENT */}
-                        <div className="bg-black border border-white/5 rounded-4xl p-8 backdrop-blur-3xl space-y-6 relative overflow-hidden group">
-                           <div className="absolute top-2 right-2 p-2 opacity-20">
+                        <div className="bg-[#050505] border border-white/5 rounded-4xl p-8 backdrop-blur-3xl space-y-6 relative overflow-hidden group">
+                           <div className="absolute top-2 right-2 p-2 opacity-20 group-hover:scale-110 transition-transform">
                               <AlertTriangle size={40} className="text-amber-500" />
                            </div>
                            <div className="flex items-center gap-3">
@@ -782,19 +808,19 @@ function OSExplorerContent() {
                            <div className="space-y-2">
                               <div className="flex items-center justify-between text-[10px] font-black uppercase text-neutral-500">
                                  <span>Deprecation_Risk</span>
-                                 <span className="text-emerald-500">LOW</span>
+                                 <span className="text-emerald-500 px-2 py-0.5 bg-emerald-500/10 rounded">LOW</span>
                               </div>
                               <div className="flex items-center justify-between text-[10px] font-black uppercase text-neutral-500">
                                  <span>Maintainer_S_Level</span>
-                                 <span className="text-amber-500">OPTIMAL</span>
+                                 <span className="text-amber-500 px-2 py-0.5 bg-amber-500/10 rounded">OPTIMAL</span>
                               </div>
                               <div className="flex items-center justify-between text-[10px] font-black uppercase text-neutral-500">
                                  <span>Security_Patch_V</span>
-                                 <span className="text-cyan-400">HIGH</span>
+                                 <span className="text-cyan-400 px-2 py-0.5 bg-cyan-400/10 rounded">HIGH</span>
                               </div>
                            </div>
                            <div className="pt-4 border-t border-white/5">
-                              <p className="text-[9px] text-neutral-600 leading-relaxed font-mono uppercase italic">
+                              <p className="text-[9px] text-neutral-600 leading-relaxed font-mono uppercase italic group-hover:text-neutral-400 transition-colors">
                                  Analysis indicates stable architectural patterns. No critical vulnerabilities detected in top-level metadata.
                               </p>
                            </div>
@@ -812,40 +838,51 @@ function OSExplorerContent() {
                            <h3 className="text-xl font-black text-white uppercase tracking-tighter italic">Orbital Frequency Intercept</h3>
                            <p className="text-[9px] font-mono text-neutral-500 uppercase tracking-widest">Global_Event_Stream_Sync</p>
                         </div>
-
-                        <div className="space-y-4 max-h-[400px] overflow-y-auto pr-4 scrollbar-hide font-mono">
+                        <div className="space-y-4 max-h-[450px] overflow-y-auto pr-4 scrollbar-hide font-mono group/feed">
                            {repoEvents.length > 0 ? repoEvents.map((event, i) => (
                               <motion.div
                                  key={i}
                                  initial={{ x: -20, opacity: 0 }}
                                  animate={{ x: 0, opacity: 1 }}
-                                 transition={{ delay: i * 0.1 }}
-                                 className="p-4 bg-white/2 border border-white/5 rounded-2xl hover:bg-white/5 transition-all space-y-2 group/event"
+                                 transition={{ delay: i * 0.1, duration: 0.5 }}
+                                 className="relative p-5 bg-[#050505] border border-white/5 rounded-2xl hover:border-cyan-500/30 hover:bg-white/5 transition-all space-y-3"
                               >
                                  <div className="flex items-center justify-between">
-                                    <span className="text-[8px] font-black text-cyan-500 uppercase bg-cyan-500/10 px-2 py-0.5 rounded-full border border-cyan-500/20">
-                                       {event.type.replace('Event', '')}
-                                    </span>
-                                    <span className="text-[8px] text-neutral-700">{new Date(event.created_at).toLocaleTimeString()}</span>
+                                    <div className="flex items-center gap-2">
+                                       <div className="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse" />
+                                       <span className="text-[10px] font-black text-cyan-400 uppercase tracking-widest">
+                                          {event.type.replace('Event', '')}
+                                       </span>
+                                    </div>
+                                    <span className="text-[9px] font-mono text-neutral-700 font-bold">[{new Date(event.created_at).toLocaleTimeString()}]</span>
                                  </div>
-                                 <p className="text-[10px] text-neutral-400 flex items-center gap-2">
-                                    <span className="text-white font-bold">@{event.actor.display_login}</span>
-                                    <span className="text-[8px] opacity-40">triggered interception</span>
-                                 </p>
+                                 <div className="flex items-center gap-3">
+                                    <img src={event.actor.avatar_url} className="w-8 h-8 rounded-lg border border-white/10 grayscale group-hover:grayscale-0 transition-all opacity-60 group-hover:opacity-100" />
+                                    <p className="text-xs text-neutral-400 leading-none">
+                                       <span className="text-white font-black italic tracking-tight">{event.actor.display_login}</span>
+                                       <span className="block mt-1 text-[9px] font-mono text-neutral-600">ACTION_RELAY_SEQ::{(Math.random()*1000).toFixed(0)}</span>
+                                    </p>
+                                 </div>
                                  {event.payload.commits && (
-                                    <div className="mt-2 pl-4 border-l border-white/10 space-y-1">
-                                       {event.payload.commits.slice(0, 2).map((commit: any, ci: number) => (
-                                          <p key={ci} className="text-[9px] text-neutral-500 truncate italic">
-                                             {">"} {commit.message}
+                                    <div className="mt-3 pl-4 border-l-2 border-cyan-500/10 space-y-2">
+                                       {event.payload.commits.slice(0, 1).map((commit: any, ci: number) => (
+                                          <p key={ci} className="text-[10px] text-neutral-500 leading-relaxed italic group-hover:text-neutral-300 transition-colors">
+                                             <GlitchText text={`> ${commit.message}`} className="opacity-80" />
                                           </p>
                                        ))}
                                     </div>
                                  )}
+                                 <div className="absolute top-0 right-0 p-3 opacity-0 group-hover:opacity-10 transition-opacity">
+                                    <Terminal size={40} />
+                                 </div>
                               </motion.div>
                            )) : (
-                              <div className="py-20 text-center space-y-4">
-                                 <Terminal size={40} className="mx-auto text-neutral-800 animate-pulse" />
-                                 <p className="text-[10px] text-neutral-600 uppercase tracking-widest">Awaiting satellite triangulation...</p>
+                              <div className="py-24 text-center space-y-6">
+                                 <div className="relative inline-block">
+                                    <Terminal size={48} className="mx-auto text-neutral-800 animate-pulse" />
+                                    <div className="absolute inset-0 border-2 border-cyan-500/10 rounded-full scale-150 animate-ping" />
+                                 </div>
+                                 <p className="text-[11px] text-neutral-600 font-black uppercase tracking-[0.4em] animate-pulse">Scanning_Orbital_Sectors...</p>
                               </div>
                            )}
                         </div>
