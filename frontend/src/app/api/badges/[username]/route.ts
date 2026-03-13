@@ -2,18 +2,21 @@ import { NextResponse } from 'next/server';
 import { DEVTRACK_BADGES, UserBadge, BadgeWithStatus, calculateDeveloperLevel } from '@/lib/badges/schema';
 import { evaluateBadges, GitHubDataPayload } from '@/lib/badges/engine';
 
-// Mock database for UserBadges since no actual DB is hooked up for badges yet
+// Mock in-memory database for UserBadges (per-process, resets on cold start)
 const mockDatabase: Record<string, UserBadge[]> = {};
 
+// Next.js 15: params is a Promise
+type RouteContext = { params: Promise<{ username: string }> };
+
 export async function GET(
-  request: Request,
-  { params }: { params: { username: string } }
+  _request: Request,
+  context: RouteContext
 ) {
   try {
-    const { username } = await params;
+    const { username } = await context.params;
     const userBadges = mockDatabase[username] || [];
 
-    // Map unlocked badges to the full catalog
+    // Map unlocked badges against the full catalog
     const allBadges: BadgeWithStatus[] = DEVTRACK_BADGES.map((badge) => {
       const unlocked = userBadges.find((ub) => ub.badgeId === badge.id);
       return {
@@ -23,7 +26,7 @@ export async function GET(
       };
     });
 
-    // Calculate XP and level
+    // Calculate XP and developer level
     const totalXp = userBadges.reduce((acc, ub) => {
       const badgeConf = DEVTRACK_BADGES.find((b) => b.id === ub.badgeId);
       return acc + (badgeConf ? badgeConf.xpValue : 0);
@@ -43,38 +46,38 @@ export async function GET(
 
 export async function POST(
   request: Request,
-  { params }: { params: { username: string } }
+  context: RouteContext
 ) {
   try {
-    const { username } = await params;
-    
-    // Parse the payload (e.g. sent by dashboard upon login or stat fetch)
+    const { username } = await context.params;
+
     const body = await request.json();
     const githubData: GitHubDataPayload = {
-      commits: body.commits || 0,
-      streak: body.streak || 0,
-      prs: body.prs || 0,
-      issues: body.issues || 0,
-      repos: body.repos || 0,
-      stars: body.stars || 0,
+      commits:   body.commits   || 0,
+      streak:    body.streak    || 0,
+      prs:       body.prs       || 0,
+      issues:    body.issues    || 0,
+      repos:     body.repos     || 0,
+      stars:     body.stars     || 0,
       languages: body.languages || [],
+      isNewYear:         body.isNewYear         || false,
+      isHacktoberfest:   body.isHacktoberfest   || false,
     };
 
     const existingBadges = mockDatabase[username] || [];
-    
-    // Run Evaluation Engine
+
+    // Run evaluation engine
     const { newBadges, allUnlocked } = evaluateBadges(username, githubData, existingBadges);
-    
-    // Save to DB
+
+    // Persist
     mockDatabase[username] = allUnlocked;
 
-    // Output newly unlocked badges array so UI can show notifications
     return NextResponse.json({
       newlyUnlocked: newBadges.map((ub) => ({
         userBadge: ub,
         details: DEVTRACK_BADGES.find((b) => b.id === ub.badgeId),
       })),
-      totalUnlockedCount: allUnlocked.length
+      totalUnlockedCount: allUnlocked.length,
     });
   } catch (error) {
     console.error('[POST_EVALUATE_BADGES_ERROR]', error);
