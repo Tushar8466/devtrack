@@ -1,312 +1,267 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { cn } from "@/lib/utils";
-import { BadgeCategory, BadgeWithStatus, BADGE_CATEGORY_IMAGES } from "@/lib/badges/schema";
-import { Star, Lock, ChevronRight, Sparkles } from "lucide-react";
 import Image from "next/image";
+import { cn } from "@/lib/utils";
+import {
+  BadgeWithStatus,
+  BadgeTier,
+  BadgeCategory,
+  BADGE_CATEGORY_IMAGES,
+  calculateDeveloperLevel,
+} from "@/lib/badges/schema";
+import { Award, Lock, ChevronDown, ChevronUp, Zap } from "lucide-react";
 
-const TIER_GLOW: Record<string, string> = {
-  BRONZE:   "shadow-[0_0_30px_rgba(180,100,30,0.6)]",
-  SILVER:   "shadow-[0_0_30px_rgba(200,200,220,0.6)]",
-  GOLD:     "shadow-[0_0_30px_rgba(255,200,0,0.7)]",
-  PLATINUM: "shadow-[0_0_40px_rgba(100,220,255,0.8)]",
+/* ─── Tier colour tokens ─────────────────────────────────────── */
+const TIER_STYLES: Record<
+  BadgeTier,
+  {
+    border: string;
+    glow: string;
+    text: string;
+    badge: string;
+    ring: string;
+  }
+> = {
+  BRONZE:   { border: "border-amber-700/60",   glow: "shadow-[0_0_20px_rgba(180,83,9,0.35)]",    text: "text-amber-600",   badge: "bg-amber-900/20",   ring: "ring-amber-700/40" },
+  SILVER:   { border: "border-slate-400/60",   glow: "shadow-[0_0_20px_rgba(148,163,184,0.3)]",  text: "text-slate-300",   badge: "bg-slate-700/20",   ring: "ring-slate-400/30" },
+  GOLD:     { border: "border-yellow-400/60",  glow: "shadow-[0_0_25px_rgba(250,204,21,0.3)]",   text: "text-yellow-400",  badge: "bg-yellow-500/10",  ring: "ring-yellow-400/40" },
+  PLATINUM: { border: "border-violet-400/70",  glow: "shadow-[0_0_30px_rgba(167,139,250,0.4)]",  text: "text-violet-300",  badge: "bg-violet-500/15",  ring: "ring-violet-400/50" },
 };
 
-const TIER_RING: Record<string, string> = {
-  BRONZE:   "ring-2 ring-amber-700/60",
-  SILVER:   "ring-2 ring-neutral-300/50",
-  GOLD:     "ring-2 ring-yellow-400/70",
-  PLATINUM: "ring-2 ring-cyan-400/80",
+const CATEGORY_LABELS: Record<BadgeCategory, string> = {
+  STREAK:      "Streak",
+  COMMIT:      "Commit",
+  OPEN_SOURCE: "Open Source",
+  LANGUAGE:    "Language",
+  SOCIAL:      "Social",
+  SPECIAL:     "Special",
 };
 
-const TIER_BADGE_COLOR: Record<string, string> = {
-  BRONZE:   "bg-amber-900/80 text-amber-400 border-amber-700/50",
-  SILVER:   "bg-neutral-800/80 text-neutral-300 border-neutral-500/50",
-  GOLD:     "bg-yellow-900/80 text-yellow-400 border-yellow-600/50",
-  PLATINUM: "bg-cyan-950/80 text-cyan-400 border-cyan-500/50",
-};
+/* ─── Badge Card ─────────────────────────────────────────────── */
+function BadgeCard({ badge }: { badge: BadgeWithStatus }) {
+  const [hover, setHover] = useState(false);
+  const tier = TIER_STYLES[badge.tier];
+  const unlocked = badge.isUnlocked;
 
+  return (
+    <motion.div
+      onHoverStart={() => setHover(true)}
+      onHoverEnd={() => setHover(false)}
+      whileHover={{ y: -4, scale: 1.03 }}
+      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+      className={cn(
+        "relative flex flex-col items-center text-center gap-3 p-5 rounded-3xl border transition-all duration-700 overflow-hidden cursor-default group",
+        unlocked
+          ? `${tier.border} ${tier.glow} ${tier.badge}`
+          : "border-white/5 bg-white/2 opacity-30 grayscale"
+      )}
+    >
+      {/* Holographic shimmer on hover */}
+      {unlocked && (
+        <motion.div
+          animate={hover ? { left: "200%" } : { left: "-100%" }}
+          transition={{ duration: 0.6, ease: "easeInOut" }}
+          className="absolute top-0 bottom-0 w-12 bg-linear-to-r from-transparent via-white/15 to-transparent skew-x-[-20deg] pointer-events-none"
+        />
+      )}
+
+      {/* Category badge image */}
+      <div className={cn(
+        "relative w-14 h-14 rounded-2xl flex items-center justify-center border ring-2 overflow-hidden transition-all duration-500",
+        unlocked ? `${tier.border} ${tier.ring}` : "border-white/10 ring-white/5",
+      )}>
+        {unlocked ? (
+          <Image
+            src={BADGE_CATEGORY_IMAGES[badge.category]}
+            alt={badge.category}
+            fill
+            className="object-cover"
+            unoptimized
+          />
+        ) : (
+          <Lock className="w-5 h-5 text-neutral-600" />
+        )}
+      </div>
+
+      {/* Tier pill */}
+      <span className={cn(
+        "px-2 py-0.5 rounded border text-[8px] font-black uppercase tracking-[0.2em]",
+        unlocked ? `${tier.border} ${tier.text}` : "border-white/10 text-neutral-600"
+      )}>
+        {badge.tier}
+      </span>
+
+      {/* Name + description */}
+      <div className="space-y-0.5">
+        <h4 className={cn(
+          "text-[11px] font-black uppercase italic tracking-tight leading-tight",
+          unlocked ? "text-white" : "text-neutral-600"
+        )}>
+          {badge.name}
+        </h4>
+        <p className="text-[8px] font-mono text-neutral-600 uppercase tracking-widest line-clamp-2">
+          {badge.criteriaDescription}
+        </p>
+      </div>
+
+      {/* XP chip */}
+      {unlocked && (
+        <span className={cn(
+          "px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest flex items-center gap-1",
+          tier.text, tier.badge
+        )}>
+          <Zap className="w-2.5 h-2.5" />
+          +{badge.xpValue} XP
+        </span>
+      )}
+
+      {/* Active dot */}
+      {unlocked && (
+        <div className="absolute top-3 right-3 w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_#34d399]" />
+      )}
+
+      {/* Secret badge hint */}
+      {badge.isSecret && !unlocked && (
+        <span className="text-[7px] font-mono text-neutral-700 uppercase tracking-widest">Secret</span>
+      )}
+    </motion.div>
+  );
+}
+
+/* ─── Main BadgeShelf ─────────────────────────────────────────── */
 interface BadgeShelfProps {
   username: string;
 }
 
 export function BadgeShelf({ username }: BadgeShelfProps) {
   const [badges, setBadges] = useState<BadgeWithStatus[]>([]);
-  const [levelInfo, setLevelInfo] = useState({ level: 1, progress: 0, nextLevelXp: 100, totalXp: 0 });
-  const [selectedCategory, setSelectedCategory] = useState<BadgeCategory | "ALL">("ALL");
-  const [selectedBadge, setSelectedBadge] = useState<BadgeWithStatus | null>(null);
+  const [totalXp, setTotalXp] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [showAll, setShowAll] = useState(false);
 
   useEffect(() => {
-    async function fetchBadges() {
-      try {
-        const res = await fetch(`/api/badges/${username}`);
-        if (res.ok) {
-          const data = await res.json();
-          setBadges(data.badges);
-          setLevelInfo(data.levelStats);
-        }
-      } catch (e) {
-        console.error("Failed to load badges:", e);
-      }
-    }
-    fetchBadges();
+    if (!username) return;
+    setLoading(true);
+    setError(null);
+
+    fetch(`/api/badges/${encodeURIComponent(username)}`)
+      .then(async (res) => {
+        if (!res.ok) throw new Error("Failed to load badges");
+        const data = await res.json();
+        setBadges(data.badges ?? []);
+        setTotalXp(data.totalXp ?? 0);
+      })
+      .catch(() => setError("Could not load badges."))
+      .finally(() => setLoading(false));
   }, [username]);
 
-  const categories: (BadgeCategory | "ALL")[] = ["ALL", "STREAK", "COMMIT", "OPEN_SOURCE", "LANGUAGE", "SOCIAL", "SPECIAL"];
+  const unlockedBadges = badges.filter((b) => b.isUnlocked);
+  const lockedBadges = badges.filter((b) => !b.isUnlocked);
+  const levelInfo = calculateDeveloperLevel(totalXp);
 
-  const filteredBadges = badges.filter(
-    (b) => selectedCategory === "ALL" || b.category === selectedCategory
-  );
-
-  const unlockedCount = badges.filter(b => b.isUnlocked).length;
+  const displayedBadges = showAll ? badges : [...unlockedBadges, ...lockedBadges].slice(0, 8);
 
   return (
-    <div className="w-full space-y-8">
-      {/* Section Header */}
-      <div className="flex items-center gap-3">
-        <div className="w-1.5 h-6 bg-violet-500 rounded-full" />
-        <h2 className="text-2xl font-black text-white uppercase tracking-tighter italic flex items-center gap-3">
-          Neural Achievements
-          <span className="text-sm font-mono text-neutral-500 not-italic tracking-normal">
-            {unlockedCount}/{badges.length}
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div className="w-1.5 h-6 bg-amber-400 rounded-full" />
+          <h2 className="text-xl font-black text-white uppercase tracking-tighter italic">
+            Achievement Shelf
+          </h2>
+          <span className="px-2 py-0.5 rounded-md bg-amber-500/10 border border-amber-500/20 text-[9px] font-black uppercase tracking-widest text-amber-400">
+            {unlockedBadges.length}/{badges.length} Unlocked
           </span>
-        </h2>
-      </div>
-
-      <div className="bg-[#050505] border border-white/5 rounded-[2.5rem] p-8 md:p-10 w-full space-y-8 relative overflow-hidden group">
-        {/* Background Ambient */}
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-violet-600/5 rounded-full blur-[100px] pointer-events-none group-hover:bg-violet-600/8 transition-colors duration-1000" />
-
-        {/* XP Level Bar */}
-        <div className="flex flex-col md:flex-row gap-6 justify-between items-start md:items-center relative z-10">
-          <div className="flex items-center gap-5">
-            <div className="relative">
-              <div className="absolute inset-0 bg-violet-500/20 rounded-2xl blur-xl" />
-              <div className="relative w-16 h-16 rounded-2xl bg-black border border-violet-500/30 flex flex-col items-center justify-center">
-                <span className="text-2xl font-black italic text-white leading-none">{levelInfo.level}</span>
-                <span className="text-[8px] font-mono text-violet-400 uppercase tracking-widest">LVL</span>
-              </div>
-            </div>
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <Sparkles className="w-3 h-3 text-violet-400" />
-                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-violet-400">Developer Level</span>
-              </div>
-              <div className="w-48 h-2 bg-white/5 rounded-full overflow-hidden">
-                <motion.div
-                  initial={{ width: 0 }}
-                  animate={{ width: `${levelInfo.progress}%` }}
-                  transition={{ duration: 1.5, ease: "easeOut" }}
-                  className="h-full bg-linear-to-r from-violet-600 to-fuchsia-500 rounded-full"
-                />
-              </div>
-              <p className="text-[9px] font-mono text-neutral-600 uppercase tracking-widest">
-                {levelInfo.totalXp} / {levelInfo.totalXp + Math.round(levelInfo.nextLevelXp * (1 - levelInfo.progress / 100))} XP
-              </p>
-            </div>
-          </div>
-
-          <div className="flex flex-wrap gap-3">
-            {(["BRONZE", "SILVER", "GOLD", "PLATINUM"] as const).map(tier => {
-              const count = badges.filter(b => b.isUnlocked && b.tier === tier).length;
-              return (
-                <div key={tier} className={cn("px-3 py-1.5 rounded-lg border text-[9px] font-black uppercase tracking-widest", TIER_BADGE_COLOR[tier])}>
-                  {tier} · {count}
-                </div>
-              );
-            })}
-          </div>
         </div>
 
-        {/* Category Tabs */}
-        <div className="flex overflow-x-auto pb-1 scrollbar-hide gap-1 relative z-10">
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setSelectedCategory(cat)}
-              className={cn(
-                "px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest whitespace-nowrap transition-all",
-                selectedCategory === cat
-                  ? "bg-violet-500/20 text-violet-400 border border-violet-500/30"
-                  : "text-neutral-600 hover:text-neutral-400 border border-transparent"
-              )}
-            >
-              {cat.replace("_", " ")}
-            </button>
-          ))}
-        </div>
-
-        {/* Badge Grid — Cards */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-5 relative z-10">
-          {filteredBadges.map((badge) => {
-            const imgSrc = BADGE_CATEGORY_IMAGES[badge.category];
-
-            return (
-              <motion.button
-                key={badge.id}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                whileHover={{ scale: badge.isUnlocked ? 1.08 : 1.02 }}
-                onClick={() => setSelectedBadge(badge)}
-                className={cn(
-                  "relative flex flex-col items-center gap-3 p-4 rounded-3xl border transition-all duration-300 group/badge text-center cursor-pointer",
-                  badge.isUnlocked
-                    ? cn("bg-black/40 border-white/10 hover:border-white/20", TIER_GLOW[badge.tier])
-                    : "bg-white/2 border-white/5"
-                )}
-              >
-                {/* Badge Image */}
-                <div className={cn(
-                  "relative w-20 h-20 rounded-2xl overflow-hidden transition-all duration-500",
-                  badge.isUnlocked
-                    ? cn("group-hover/badge:scale-110", TIER_RING[badge.tier])
-                    : "grayscale opacity-30 ring-2 ring-white/5"
-                )}>
-                  <Image
-                    src={imgSrc}
-                    alt={badge.name}
-                    fill
-                    className="object-cover"
-                    sizes="80px"
-                  />
-                  {/* Shiny overlay for unlocked */}
-                  {badge.isUnlocked && (
-                    <div className="absolute inset-0 bg-linear-to-br from-white/20 via-transparent to-transparent opacity-0 group-hover/badge:opacity-100 transition-opacity duration-300" />
-                  )}
-                </div>
-
-                {/* Lock icon overlay for locked */}
-                {!badge.isUnlocked && (
-                  <div className="absolute top-4 left-1/2 -translate-x-1/2 w-20 h-20 flex items-center justify-center">
-                    <div className="w-8 h-8 rounded-full bg-black/60 backdrop-blur-sm border border-white/10 flex items-center justify-center">
-                      <Lock className="w-3.5 h-3.5 text-neutral-500" />
-                    </div>
-                  </div>
-                )}
-
-                {/* Tier pill */}
-                {badge.isUnlocked && (
-                  <span className={cn("px-2 py-0.5 rounded-md text-[7px] font-black uppercase tracking-widest border", TIER_BADGE_COLOR[badge.tier])}>
-                    {badge.tier}
-                  </span>
-                )}
-
-                {/* Name */}
-                <p className={cn(
-                  "text-[10px] font-black uppercase leading-tight tracking-wide w-full truncate",
-                  badge.isUnlocked ? "text-white" : "text-neutral-600"
-                )}>
-                  {!badge.isUnlocked && badge.isSecret ? "???" : badge.name}
-                </p>
-
-                {/* XP pill on unlock */}
-                {badge.isUnlocked && (
-                  <span className="text-[8px] font-mono text-violet-400 uppercase tracking-widest">
-                    +{badge.xpValue} XP
-                  </span>
-                )}
-              </motion.button>
-            );
-          })}
+        {/* XP + Level */}
+        <div className="flex items-center gap-4 px-5 py-2 rounded-2xl border border-white/5 bg-black/30 backdrop-blur-xl">
+          <div className="flex flex-col items-end">
+            <span className="text-[8px] font-mono text-neutral-600 uppercase tracking-widest">Developer Level</span>
+            <span className="text-lg font-black text-white italic">Lvl {levelInfo.level}</span>
+          </div>
+          <div className="w-px h-8 bg-white/5" />
+          <div className="flex flex-col items-end min-w-[80px]">
+            <span className="text-[8px] font-mono text-neutral-600 uppercase tracking-widest">Total XP</span>
+            <span className="text-sm font-black text-amber-400">{totalXp.toLocaleString()} XP</span>
+          </div>
+          {/* XP progress bar */}
+          <div className="flex flex-col gap-1 min-w-[80px]">
+            <div className="flex justify-between">
+              <span className="text-[7px] font-mono text-neutral-700">Next Lvl</span>
+              <span className="text-[7px] font-mono text-neutral-700">{Math.round(levelInfo.progress)}%</span>
+            </div>
+            <div className="h-1 w-20 bg-white/5 rounded-full overflow-hidden">
+              <motion.div
+                initial={{ width: 0 }}
+                animate={{ width: `${levelInfo.progress}%` }}
+                transition={{ duration: 1.2, ease: "easeOut" }}
+                className="h-full bg-amber-400 rounded-full shadow-[0_0_6px_rgba(251,191,36,0.6)]"
+              />
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Badge Detail Modal */}
-      <AnimatePresence>
-        {selectedBadge && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/70 backdrop-blur-md"
-            onClick={() => setSelectedBadge(null)}
-          >
+      {/* Body */}
+      {loading ? (
+        <div className="flex items-center justify-center h-40 rounded-3xl border border-white/5 bg-black/30">
+          <div className="flex flex-col items-center gap-3 opacity-40">
+            <Award className="w-8 h-8 text-amber-400 animate-pulse" />
+            <p className="text-[10px] font-mono uppercase tracking-widest text-neutral-500">Loading badges…</p>
+          </div>
+        </div>
+      ) : error ? (
+        <div className="flex items-center justify-center h-32 rounded-3xl border border-red-500/20 bg-red-500/5">
+          <p className="text-[10px] font-mono text-red-500 uppercase tracking-widest">{error}</p>
+        </div>
+      ) : badges.length === 0 ? (
+        <div className="flex items-center justify-center h-40 rounded-3xl border border-white/5 bg-black/30">
+          <div className="flex flex-col items-center gap-3 opacity-30">
+            <Award className="w-8 h-8 text-neutral-500" />
+            <p className="text-[10px] font-mono uppercase tracking-widest text-neutral-600">No badges found</p>
+          </div>
+        </div>
+      ) : (
+        <>
+          <AnimatePresence>
             <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              onClick={e => e.stopPropagation()}
-              className="relative w-full max-w-sm bg-[#050505] border border-white/10 rounded-4xl overflow-hidden shadow-2xl"
+              layout
+              className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8 gap-3"
             >
-              {/* Ambient glow */}
-              <div className={cn(
-                "absolute top-0 left-0 right-0 h-40 opacity-20 blur-2xl pointer-events-none",
-                selectedBadge.tier === "PLATINUM" ? "bg-cyan-400" :
-                selectedBadge.tier === "GOLD" ? "bg-yellow-400" :
-                selectedBadge.tier === "SILVER" ? "bg-neutral-400" : "bg-amber-700"
-              )} />
-
-              <div className="relative p-8 flex flex-col items-center gap-6">
-                {/* Big badge image */}
-                <div className={cn(
-                  "relative w-40 h-40 rounded-3xl overflow-hidden",
-                  selectedBadge.isUnlocked ? TIER_RING[selectedBadge.tier] : "grayscale opacity-40 ring-2 ring-white/5",
-                  selectedBadge.isUnlocked ? TIER_GLOW[selectedBadge.tier] : ""
-                )}>
-                  <Image
-                    src={BADGE_CATEGORY_IMAGES[selectedBadge.category]}
-                    alt={selectedBadge.name}
-                    fill
-                    className="object-cover"
-                    sizes="160px"
-                  />
-                </div>
-
-                {/* Tier pill */}
-                <div className={cn("px-3 py-1 rounded-lg border text-[9px] font-black uppercase tracking-widest", TIER_BADGE_COLOR[selectedBadge.tier])}>
-                  {selectedBadge.tier} · {selectedBadge.category.replace("_", " ")}
-                </div>
-
-                <div className="text-center space-y-2">
-                  <h3 className="text-2xl font-black text-white uppercase italic tracking-tighter">
-                    {!selectedBadge.isUnlocked && selectedBadge.isSecret ? "CLASSIFIED" : selectedBadge.name}
-                  </h3>
-                  <p className="text-xs text-neutral-400 font-mono leading-relaxed">
-                    {!selectedBadge.isUnlocked && selectedBadge.isSecret
-                      ? "This badge is hidden. Keep exploring to discover it."
-                      : selectedBadge.description}
-                  </p>
-                </div>
-
-                <div className="w-full grid grid-cols-2 gap-3">
-                  <div className="bg-white/3 rounded-2xl p-3 text-center border border-white/5">
-                    <p className="text-[8px] font-mono text-neutral-600 uppercase tracking-widest mb-1">Criteria</p>
-                    <p className="text-[10px] font-black text-neutral-300 uppercase">
-                      {!selectedBadge.isUnlocked && selectedBadge.isSecret ? "???" : selectedBadge.criteriaDescription}
-                    </p>
-                  </div>
-                  <div className="bg-white/3 rounded-2xl p-3 text-center border border-white/5">
-                    <p className="text-[8px] font-mono text-neutral-600 uppercase tracking-widest mb-1">Reward</p>
-                    <p className="text-[10px] font-black text-violet-400 uppercase">+{selectedBadge.xpValue} XP</p>
-                  </div>
-                </div>
-
-                {selectedBadge.isUnlocked && selectedBadge.unlockedAt && (
-                  <p className="text-[9px] font-mono text-neutral-700 uppercase tracking-widest">
-                    Unlocked · {new Date(selectedBadge.unlockedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
-                  </p>
-                )}
-
-                {!selectedBadge.isUnlocked && (
-                  <div className="flex items-center gap-2 text-[9px] font-mono text-neutral-600 uppercase tracking-widest">
-                    <Lock className="w-3 h-3" />
-                    Not yet unlocked
-                  </div>
-                )}
-
-                <button
-                  onClick={() => setSelectedBadge(null)}
-                  className="w-full py-3 rounded-2xl border border-white/10 text-[10px] font-black text-neutral-500 uppercase tracking-widest hover:bg-white/5 hover:text-white transition-all"
+              {displayedBadges.map((badge, i) => (
+                <motion.div
+                  key={badge.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.04 }}
                 >
-                  Close
-                </button>
-              </div>
+                  <BadgeCard badge={badge} />
+                </motion.div>
+              ))}
             </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          </AnimatePresence>
+
+          {badges.length > 8 && (
+            <div className="flex justify-center pt-2">
+              <button
+                onClick={() => setShowAll((v) => !v)}
+                className="flex items-center gap-2 px-5 py-2 rounded-xl border border-white/10 bg-white/5 text-[10px] font-black uppercase tracking-widest text-neutral-400 hover:text-white hover:border-white/20 hover:bg-white/10 transition-all"
+              >
+                {showAll ? (
+                  <><ChevronUp className="w-3 h-3" /> Show Less</>
+                ) : (
+                  <><ChevronDown className="w-3 h-3" /> Show All {badges.length} Badges</>
+                )}
+              </button>
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 }
