@@ -31,8 +31,8 @@ export async function GET(req: NextRequest) {
         }
         const userData = await userRes.json();
 
-        // Fetch Recent Repos
-        const reposRes = await fetch(`https://api.github.com/users/${username}/repos?sort=updated&per_page=6`, { headers });
+        // Fetch Recent Repos (updated sort, more items for leaderboard)
+        const reposRes = await fetch(`https://api.github.com/users/${username}/repos?sort=updated&per_page=30`, { headers });
         const reposData = reposRes.ok ? await reposRes.json() : [];
 
         return NextResponse.json({

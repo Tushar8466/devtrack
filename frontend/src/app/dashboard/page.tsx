@@ -17,6 +17,11 @@ import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Responsi
 import Link from "next/link";
 import { BadgeShelf } from "@/components/ui/badge-shelf";
 import { BadgeNotificationProvider } from "@/components/ui/badge-unlock";
+import { DevScoreCard } from "@/components/ui/dev-score-card";
+import { TopReposLeaderboard } from "@/components/ui/top-repos-leaderboard";
+import { GoalTracker } from "@/components/ui/goal-tracker";
+import { CommitActivityChart } from "@/components/ui/commit-activity-chart";
+import { LanguageProficiency } from "@/components/ui/language-proficiency";
 import { Badge } from "@/lib/badges/schema";
 
 interface GitHubUser {
@@ -41,6 +46,7 @@ interface GitHubRepo {
   description: string | null;
   html_url: string;
   stargazers_count: number;
+  forks_count: number;
   language: string | null;
   updated_at: string;
 }
@@ -685,6 +691,41 @@ export default function DashboardPage() {
           <div className="mt-12">
             <BadgeShelf username={effectiveUsername} />
           </div>
+        )}
+
+        {/* DEVELOPER SCORE CARD + STAR LEADERBOARD */}
+        {githubData && repos.length > 0 && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <DevScoreCard
+              repos={githubData.public_repos}
+              followers={githubData.followers}
+              stars={repos.reduce((s, r) => s + (r.stargazers_count || 0), 0)}
+              streak={currentStreak}
+              languages={langData.length}
+              commits={repos.length}
+            />
+            <TopReposLeaderboard repos={repos} />
+          </div>
+        )}
+
+        {/* MONTHLY ACTIVITY CHART */}
+        {effectiveUsername && (
+          <CommitActivityChart username={effectiveUsername} />
+        )}
+
+        {/* LANGUAGE PROFICIENCY */}
+        {repos.length > 0 && (
+          <LanguageProficiency repos={repos} />
+        )}
+
+        {/* GOAL TRACKER */}
+        {githubData && (
+          <GoalTracker
+            streak={currentStreak}
+            commits={repos.length}
+            stars={repos.reduce((s, r) => s + (r.stargazers_count || 0), 0)}
+            repos={githubData.public_repos}
+          />
         )}
 
         {/* GLOWING STATS */}
