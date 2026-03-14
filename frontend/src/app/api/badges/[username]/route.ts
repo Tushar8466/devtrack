@@ -36,6 +36,7 @@ export async function GET(
 
     return NextResponse.json({
       badges: allBadges,
+      totalXp,                              // top-level for BadgeShelf
       levelStats: { ...levelStats, totalXp },
     });
   } catch (error) {

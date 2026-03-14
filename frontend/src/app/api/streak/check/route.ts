@@ -11,34 +11,51 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    // We use the scraping method because it IS NOT rate limited like the REST API
-    const res = await fetch(`https://github.com/users/${username}/contributions`, {
-        headers: { "Accept": "text/html" },
-        next: { revalidate: 60 }
-    });
+    // GitHub's contribution page only returns ~1 year of data by default.
+    // To support long streaks that span multiple years, we fetch the current year
+    // AND the previous year, then merge all active dates together.
+    const currentYear = new Date().getFullYear();
+    const yearsToFetch = [currentYear, currentYear - 1];
 
-    if (!res.ok) {
-        return NextResponse.json({ error: "Failed to fetch contribution page" }, { status: 502 });
-    }
-
-    const html = await res.text();
     const datesWithActivity = new Set<string>();
-    
-    // Each contribution cell: <td ... data-date="2024-03-10" data-level="2" ...>
-    // Only levels > 0 count as activity
-    const cellRegex = /data-date="(\d{4}-\d{2}-\d{2})"[^>]*data-level="([1-4])"/g;
-    let match;
-    while ((match = cellRegex.exec(html)) !== null) {
-        datesWithActivity.add(match[1]);
+
+    await Promise.all(
+      yearsToFetch.map(async (year) => {
+        // Passing `from` and `to` forces GitHub to return a specific yearly range
+        const from = `${year}-01-01`;
+        const to   = year === currentYear
+          ? new Date().toISOString().split("T")[0]   // today for current year
+          : `${year}-12-31`;
+
+        const res = await fetch(
+          `https://github.com/users/${username}/contributions?from=${from}&to=${to}`,
+          { headers: { Accept: "text/html" }, next: { revalidate: 60 } }
+        );
+        if (!res.ok) return; // skip years that fail gracefully
+
+        const html = await res.text();
+        // Each contribution cell: <td ... data-date="2024-03-10" data-level="2" ...>
+        // Only levels > 0 count as activity
+        const cellRegex = /data-date="(\d{4}-\d{2}-\d{2})"[^>]*data-level="([1-4])"/g;
+        let match;
+        while ((match = cellRegex.exec(html)) !== null) {
+          datesWithActivity.add(match[1]);
+        }
+      })
+    );
+
+    if (datesWithActivity.size === 0) {
+      return NextResponse.json({ error: "Failed to fetch contribution data" }, { status: 502 });
     }
 
     // Determine Today/Yesterday in the user's local context
     // localDateStr is our source of truth for "Today"
-    const todayStr = localDateStr || new Date(new Date().getTime() - (offset * 60000)).toISOString().split("T")[0];
-    
+    const todayStr =
+      localDateStr ||
+      new Date(new Date().getTime() - offset * 60000).toISOString().split("T")[0];
+
     const getYesterday = (dateS: string) => {
       const d = new Date(dateS);
-      // Ensure we are working with the date part safely
       d.setMinutes(d.getMinutes() + d.getTimezoneOffset()); // Normalize to pure date
       d.setDate(d.getDate() - 1);
       return d.toISOString().split("T")[0];
@@ -46,17 +63,18 @@ export async function GET(req: NextRequest) {
 
     const yesterdayStr = getYesterday(todayStr);
 
-    const hasCommittedToday = datesWithActivity.has(todayStr);
+    const hasCommittedToday     = datesWithActivity.has(todayStr);
     const hasCommittedYesterday = datesWithActivity.has(yesterdayStr);
-    
-    // Calculate streak by counting backwards from the last active day
+
+    // Calculate streak by counting backwards from the last active day.
+    // We allow up to 800 iterations (~2+ years) to handle very long streaks.
     let currentStreak = 0;
     if (hasCommittedToday || hasCommittedYesterday) {
       let checkDate = new Date(hasCommittedToday ? todayStr : yesterdayStr);
       checkDate.setMinutes(checkDate.getMinutes() + checkDate.getTimezoneOffset());
-      
+
       let iterations = 0;
-      while (iterations < 365) {
+      while (iterations < 800) {
         const checkStr = checkDate.toISOString().split("T")[0];
         if (datesWithActivity.has(checkStr)) {
           currentStreak++;
@@ -68,11 +86,11 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    // Also compute total active contribution days in the past year as a commit proxy
+    // Total active contribution days across all fetched years
     const totalActiveDays = datesWithActivity.size;
 
-    return NextResponse.json({ 
-      hasCommittedToday, 
+    return NextResponse.json({
+      hasCommittedToday,
       hasCommittedYesterday,
       currentStreak,
       totalActiveDays,
