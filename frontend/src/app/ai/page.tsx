@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState, Suspense, useRef } from "react";
+import { useEffect, useState, Suspense } from "react";
 import AIVisual from "@/components/ai";
 import { motion, AnimatePresence } from "motion/react";
-import { Brain, Zap, Shield, Cpu, ArrowLeft, Activity, Terminal, Lock, Eye, Send, Sparkles, MessageSquare, Bot } from "lucide-react";
+import { Shield, Cpu, ArrowLeft, Terminal, Send, Sparkles } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 const INTERCEPT_MESSAGES = [
@@ -18,41 +19,6 @@ const INTERCEPT_MESSAGES = [
   "CALIBRATING_LOGIC_GATES"
 ];
 
-const DEV_TRACK_ANSWERS: Record<string, string> = {
-  "what is devtrack": "DevTrack is an advanced GitHub contribution tracker and impact analyzer. It uses Neural DNA mapping to visualize the real-world impact of your open-source contributions across the global repository network.",
-  "what is code dna": "Code DNA is our proprietary architectural analysis engine. It scans commit patterns to determine authorship signatures, genetic coding styles (e.g., Stable_Typed vs Low_Level), and AI-to-human authorship ratios.",
-  "how to scan": "You can initiate a scan from the Explore page or by asking me to analyze a specific GitHub node. I will then perform a high-dimensional topological analysis of the repository's health and contributor entropy.",
-  "who are you": "I am DevTrack AI, a high-dimensional neural intelligence core designed to decode the global open-source ecosystem. I monitor thousands of nodes and authorship signatures in real-time.",
-  "satellite": "The Satellite Interception Feed is a real-time tactical map of global system events, cache rebuilds, and node synchronizations happening across the OSS landscape.",
-  "default": "Command recognized. I am currently scanning the DevTrack database for relevant signals. Initial results indicate high architectural integrity in the requested sector."
-};
-
-const ChatMessage = ({ msg, isAi }: { msg: string, isAi: boolean }) => (
-  <motion.div
-    initial={{ opacity: 0, y: 10, scale: 0.95 }}
-    animate={{ opacity: 1, y: 0, scale: 1 }}
-    className={cn(
-      "flex gap-4 max-w-[85%] mb-6",
-      isAi ? "mr-auto" : "ml-auto flex-row-reverse"
-    )}
-  >
-    <div className={cn(
-      "w-8 h-8 rounded-full shrink-0 flex items-center justify-center border",
-      isAi ? "bg-violet-600/20 border-violet-500/30 text-violet-400" : "bg-white/10 border-white/20 text-white"
-    )}>
-      {isAi ? <Bot size={14} /> : <div className="text-[10px] font-black">U</div>}
-    </div>
-    <div className={cn(
-      "p-4 rounded-2xl text-[11px] leading-relaxed font-medium italic backdrop-blur-3xl",
-      isAi 
-        ? "bg-violet-600/5 border border-violet-500/20 text-violet-100 rounded-tl-none" 
-        : "bg-white/5 border border-white/10 text-white rounded-tr-none"
-    )}>
-      {msg}
-    </div>
-  </motion.div>
-);
-
 const DiagnosticBar = ({ value, label, color }: { value: number, label: string, color: string }) => (
   <div className="space-y-1">
     <div className="flex justify-between text-[7px] font-black uppercase text-neutral-400">
@@ -60,11 +26,11 @@ const DiagnosticBar = ({ value, label, color }: { value: number, label: string, 
       <span>{value}%</span>
     </div>
     <div className="h-0.5 w-full bg-white/5 rounded-full overflow-hidden">
-      <motion.div 
+      <motion.div
         initial={{ width: 0 }}
         animate={{ width: `${value}%` }}
         transition={{ duration: 1.5, ease: "circOut" }}
-        className={cn("h-full", color)} 
+        className={cn("h-full", color)}
       />
     </div>
   </div>
@@ -74,11 +40,8 @@ export default function AIPage() {
   const [logs, setLogs] = useState<string[]>([]);
   const [isScanning, setIsScanning] = useState(false);
   const [pulseData, setPulseData] = useState<number[]>(Array(12).fill(20));
-  const [messages, setMessages] = useState<{msg: string, isAi: boolean}[]>([
-    { msg: "DevTrack AI core initialized. Ready for tactical inquiries. How can I assist your investigation?", isAi: true }
-  ]);
   const [input, setInput] = useState("");
-  const chatEndRef = useRef<HTMLDivElement>(null);
+  const [targetId, setTargetId] = useState("");
 
   useEffect(() => {
     const logInterval = setInterval(() => {
@@ -96,36 +59,45 @@ export default function AIPage() {
     };
   }, []);
 
-  useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!input.trim() || isScanning) return;
+    const trimmedInput = input.trim();
+    if (!trimmedInput || isScanning) return;
 
-    const userQuery = input.trim();
-    setInput("");
-    setMessages(prev => [...prev, { msg: userQuery, isAi: false }]);
-    
-    // Trigger Scanning Effect
-    setIsScanning(true);
-    
-    // Simulate AI thinking and "Scanning Website"
-    setTimeout(() => {
-      const lowerQuery = userQuery.toLowerCase();
-      let response = DEV_TRACK_ANSWERS["default"];
-      
-      for (const key in DEV_TRACK_ANSWERS) {
-        if (lowerQuery.includes(key)) {
-          response = DEV_TRACK_ANSWERS[key];
-          break;
-        }
+    // Intelligent Extraction
+    let extractedId = trimmedInput;
+    const words = trimmedInput.split(/\s+/);
+
+    if (words.length > 1) {
+      const fromIndex = words.findIndex((w: string) => w.toLowerCase() === 'from');
+      const analyzeIndex = words.findIndex((w: string) => w.toLowerCase() === 'analyze');
+      const atIndex = words.findIndex((w: string) => w.startsWith('@'));
+
+      if (fromIndex !== -1 && words[fromIndex + 1]) {
+        extractedId = words[fromIndex + 1];
+      } else if (analyzeIndex !== -1 && words[analyzeIndex + 1]) {
+        extractedId = words[analyzeIndex + 1];
+      } else if (atIndex !== -1) {
+        extractedId = words[atIndex].substring(1);
+      } else {
+        extractedId = words[words.length - 1];
       }
+    }
 
-      setMessages(prev => [...prev, { msg: response, isAi: true }]);
-      setIsScanning(false);
-    }, 2000);
+    // Clean extractedId
+    extractedId = extractedId.replace(/[?.!,]$/, "");
+    setTargetId(extractedId);
+    setIsScanning(true);
+
+    // Final check: if user actually typed a URL
+    if (extractedId.includes("github.com/")) {
+      const parts = extractedId.split("/");
+      extractedId = parts[parts.length - 1];
+    }
+
+    setTimeout(() => {
+      window.location.href = `/analyze/${extractedId}`;
+    }, 2500);
   };
 
   return (
@@ -137,7 +109,7 @@ export default function AIPage() {
       <div className="absolute inset-x-0 bottom-0 top-32 pointer-events-none z-30">
         {/* TOP LEFT: BRAND & NAV */}
         <div className="absolute top-0 left-8 space-y-6 pointer-events-auto">
-          <Link 
+          <Link
             href="/"
             className="flex items-center gap-2 text-[10px] font-black text-neutral-500 uppercase tracking-[0.3em] hover:text-white transition-colors group"
           >
@@ -171,7 +143,7 @@ export default function AIPage() {
               </div>
               <div className="text-[10px] font-mono text-emerald-500">STABLE</div>
             </div>
-            
+
             <div className="space-y-5">
               <DiagnosticBar label="Author DNA Correlation" value={98.4} color="bg-violet-500" />
               <DiagnosticBar label="Pattern Neutralization" value={14.2} color="bg-fuchsia-500" />
@@ -185,39 +157,39 @@ export default function AIPage() {
           </div>
         </div>
 
-        {/* CENTERED BOTTOM INPUT: BIG COMMAND TERMINAL (NEW) */}
+        {/* CENTERED BOTTOM INPUT: BIG COMMAND TERMINAL */}
         <div className="absolute bottom-12 left-1/2 -translate-x-1/2 w-full max-w-2xl px-8 pointer-events-auto">
-           <form onSubmit={handleSubmit} className="relative group">
-              <div className="absolute -inset-1 bg-linear-to-r from-violet-600 to-fuchsia-600 rounded-4xl blur opacity-25 group-focus-within:opacity-50 transition duration-1000 group-hover:duration-200"></div>
-              <div className="relative flex items-center bg-black/80 backdrop-blur-3xl border border-white/10 rounded-3xl p-2 pl-4">
-                 <div className="flex items-center gap-3 shrink-0">
-                    <Sparkles size={18} className="text-violet-500 animate-pulse" />
-                    <div className="h-4 w-px bg-white/10" />
-                 </div>
-                 <input 
-                   type="text"
-                   value={input}
-                   onChange={(e) => setInput(e.target.value)}
-                   placeholder="Enter tactical query to scan DevTrack network..."
-                   className="flex-1 bg-transparent border-none py-5 px-6 text-sm font-medium italic text-white placeholder-neutral-600 focus:outline-none focus:ring-0 transition-all selection:bg-violet-500/50"
-                 />
-                 <button 
-                   type="submit"
-                   disabled={!input.trim() || isScanning}
-                   className="bg-violet-600 hover:bg-violet-500 disabled:opacity-20 text-white p-4 rounded-2xl transition-all shadow-xl shadow-violet-500/20 active:scale-95 flex items-center gap-2 group/btn"
-                 >
-                    <span className="text-[10px] font-black uppercase tracking-widest hidden sm:block">Analyze_Node</span>
-                    <Send size={18} className="group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1 transition-transform duration-300" />
-                 </button>
+          <form onSubmit={handleSubmit} className="relative group">
+            <div className="absolute -inset-1 bg-linear-to-r from-violet-600 to-fuchsia-600 rounded-4xl blur opacity-25 group-focus-within:opacity-50 transition duration-1000 group-hover:duration-200"></div>
+            <div className="relative flex items-center bg-black/80 backdrop-blur-3xl border border-white/10 rounded-3xl p-2 pl-4">
+              <div className="flex items-center gap-3 shrink-0">
+                <Sparkles size={18} className="text-violet-500 animate-pulse" />
+                <div className="h-4 w-px bg-white/10" />
               </div>
-              <div className="flex justify-between items-center px-6 mt-3 text-[7px] font-black text-neutral-600 uppercase tracking-[0.3em]">
-                 <span>System_Ready: 0x8F</span>
-                 <span className="flex items-center gap-2">
-                    <div className="w-1 h-1 bg-emerald-500 rounded-full animate-ping" />
-                    Neural_Link_Stable
-                 </span>
-              </div>
-           </form>
+              <input
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder="Enter GitHub ID to analyze DNA fingerprints..."
+                className="flex-1 bg-transparent border-none py-5 px-6 text-sm font-medium italic text-white placeholder-neutral-600 focus:outline-none focus:ring-0 transition-all selection:bg-violet-500/50"
+              />
+              <button
+                type="submit"
+                disabled={!input.trim() || isScanning}
+                className="bg-violet-600 hover:bg-violet-500 disabled:opacity-20 text-white p-4 rounded-2xl transition-all shadow-xl shadow-violet-500/20 active:scale-95 flex items-center gap-2 group/btn"
+              >
+                <span className="text-[10px] font-black uppercase tracking-widest hidden sm:block">Analyze_ID</span>
+                <Send size={18} className="group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1 transition-transform duration-300" />
+              </button>
+            </div>
+            <div className="flex justify-between items-center px-6 mt-3 text-[7px] font-black text-neutral-600 uppercase tracking-[0.3em]">
+              <span>System_Ready: 0x8F</span>
+              <span className="flex items-center gap-2">
+                <div className="w-1 h-1 bg-emerald-500 rounded-full animate-ping" />
+                Neural_Link_Stable
+              </span>
+            </div>
+          </form>
         </div>
 
         {/* BOTTOM LEFT: INTERCEPT CONSOLE */}
@@ -250,10 +222,10 @@ export default function AIPage() {
         <div className="absolute bottom-8 right-8 space-y-6 text-right pointer-events-auto">
           <div className="flex items-end justify-end gap-1.5 h-12 px-4 border-r border-violet-500/30">
             {pulseData.map((h, i) => (
-              <motion.div 
+              <motion.div
                 key={i}
                 animate={{ height: `${h}%` }}
-                className="w-1 bg-linear-to-t from-violet-600 to-fuchsia-400 rounded-full opacity-60" 
+                className="w-1 bg-linear-to-t from-violet-600 to-fuchsia-400 rounded-full opacity-60"
               />
             ))}
           </div>
@@ -278,10 +250,10 @@ export default function AIPage() {
       <div className="absolute inset-x-0 bottom-0 top-32 z-10">
         <Suspense fallback={
           <div className="absolute inset-0 flex items-center justify-center">
-             <div className="flex flex-col items-center gap-4">
-                <div className="w-12 h-12 border-2 border-violet-500/20 border-t-violet-500 rounded-full animate-spin" />
-                <p className="text-[10px] font-black text-neutral-600 uppercase tracking-widest animate-pulse">Establishing_Neural_Sync...</p>
-             </div>
+            <div className="flex flex-col items-center gap-4">
+              <div className="w-12 h-12 border-2 border-violet-500/20 border-t-violet-500 rounded-full animate-spin" />
+              <p className="text-[10px] font-black text-neutral-600 uppercase tracking-widest animate-pulse">Establishing_Neural_Sync...</p>
+            </div>
           </div>
         }>
           <AIVisual />
@@ -291,21 +263,21 @@ export default function AIPage() {
       {/* SCANNING RIG (Overlay inside z-10/20) */}
       <AnimatePresence>
         {isScanning && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="absolute inset-0 z-40 pointer-events-none"
           >
-            <motion.div 
+            <motion.div
               animate={{ top: ["0%", "100%", "0%"] }}
               transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
               className="absolute left-0 right-0 h-px bg-violet-500 shadow-[0_0_50px_rgba(139,92,246,1)] flex items-center justify-center"
             >
-               <div className="bg-violet-500 text-white px-4 py-1 text-[9px] font-black uppercase tracking-tighter -mt-8 shadow-xl flex items-center gap-2">
-                  <Sparkles size={10} className="animate-pulse" />
-                  Analyzing_Database_Signals
-               </div>
+              <div className="bg-violet-500 text-white px-4 py-1 text-[9px] font-black uppercase tracking-tighter -mt-8 shadow-xl flex items-center gap-2">
+                <Sparkles size={10} className="animate-pulse" />
+                Analyzing_Target_GitHub_Identity
+              </div>
             </motion.div>
           </motion.div>
         )}
