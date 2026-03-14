@@ -14,6 +14,8 @@ import { FeedbackForm } from "@/components/FeedbackForm";
 import { BackgroundRippleEffect } from "@/components/ui/background-ripple-effect";
 import { SparklesCore } from "@/components/ui/sparkles";
 import { FeedbackWall } from "@/components/FeedbackWall";
+import { IntelligenceGrid } from "@/components/IntelligenceGrid";
+import { Vortex } from "@/components/ui/vortex";
 
 const Globe = dynamic(() => import("@/components/globe"), {
   ssr: false,
@@ -150,6 +152,22 @@ export default function Home() {
         />
       </div>
 
+      {/* Intelligence Grid Section */}
+      <section className="bg-black py-24 px-6 relative overflow-hidden">
+        <div className="max-w-[1400px] mx-auto">
+          <div className="mb-16">
+            <h2 className="text-3xl md:text-5xl font-black text-white uppercase tracking-tighter italic">
+              Neural <span className="text-violet-500">Core</span> Capabilities
+            </h2>
+            <p className="text-neutral-500 mt-4 max-w-xl font-medium">
+              DevTrack leverages high-dimensional vector analysis to authenticate the true source of engineering talent.
+            </p>
+          </div>
+          <IntelligenceGrid />
+        </div>
+      </section>
+
+
       {/* Features section */}
       <section className="bg-black py-24 px-6">
         <div className="relative z-20 w-full mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
@@ -194,46 +212,55 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Special Neural Section */}
-      <section className="bg-black py-24 px-6 relative overflow-hidden">
-        {/* Removed gradient accent line */}
 
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            <div className="space-y-8 animate-in fade-in slide-in-from-left-8 duration-1000">
-              <div>
-                <span className="px-3 py-1 rounded-full bg-transparent border border-white/10 text-cyan-400 text-[10px] font-bold uppercase tracking-[0.2em] mb-4 inline-block">
-                  Proprietary Neural Engine
-                </span>
-                <h2 className="text-4xl md:text-6xl font-black text-white tracking-tighter leading-none">
-                  DECONSTRUCTING <br />
-                  <span className="bg-linear-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">CODE GENETICS</span>
-                </h2>
+      {/* Special Neural Section with Vortex */}
+      <section className="bg-black relative overflow-hidden">
+        <Vortex
+          backgroundColor="black"
+          rangeY={800}
+          particleCount={500}
+          baseSpeed={0.5}
+          baseHue={280}
+          containerClassName="min-h-[800px] py-24 px-6"
+        >
+          <div className="max-w-7xl mx-auto relative z-10">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+              <div className="space-y-8 animate-in fade-in slide-in-from-left-8 duration-1000">
+                <div>
+                  <span className="px-3 py-1 rounded-full bg-transparent border border-white/10 text-cyan-400 text-[10px] font-bold uppercase tracking-[0.2em] mb-4 inline-block">
+                    Proprietary Neural Engine
+                  </span>
+                  <h2 className="text-4xl md:text-6xl font-black text-white tracking-tighter leading-none text-balance">
+                    DECONSTRUCTING <br />
+                    <span className="bg-linear-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent italic">CODE GENETICS</span>
+                  </h2>
+                </div>
+
+                <p className="text-neutral-400 text-lg leading-relaxed max-w-xl">
+                  Our core engine analyzes billions of code tokens to identify the unique fingerprints of human vs. synthetic authorship. Toggle the nodes to visualize the neural distribution.
+                </p>
+
+                <div className="flex flex-wrap gap-4">
+                  <div className="px-6 py-4 rounded-3xl bg-white/5 border border-white/10 group hover:border-cyan-500/30 transition-colors backdrop-blur-md">
+                    <div className="text-3xl font-black text-white">4.2M+</div>
+                    <div className="text-[10px] text-neutral-500 uppercase tracking-widest font-bold">Neural Weights</div>
+                  </div>
+                  <div className="px-6 py-4 rounded-3xl bg-white/5 border border-white/10 group hover:border-blue-500/30 transition-colors backdrop-blur-md">
+                    <div className="text-3xl font-black text-white">99.4%</div>
+                    <div className="text-[10px] text-neutral-500 uppercase tracking-widest font-bold">Signal Accuracy</div>
+                  </div>
+                </div>
               </div>
 
-              <p className="text-neutral-400 text-lg leading-relaxed max-w-xl">
-                Our core engine analyzes billions of code tokens to identify the unique fingerprints of human vs. synthetic authorship. Toggle the nodes to visualize the neural distribution.
-              </p>
-
-              <div className="flex flex-wrap gap-4">
-                <div className="px-6 py-4 rounded-3xl bg-white/5 border border-white/10 group hover:border-cyan-500/30 transition-colors">
-                  <div className="text-3xl font-black text-white">4.2M+</div>
-                  <div className="text-[10px] text-neutral-500 uppercase tracking-widest font-bold">Neural Weights</div>
-                </div>
-                <div className="px-6 py-4 rounded-3xl bg-white/5 border border-white/10 group hover:border-blue-500/30 transition-colors">
-                  <div className="text-3xl font-black text-white">99.4%</div>
-                  <div className="text-[10px] text-neutral-500 uppercase tracking-widest font-bold">Signal Accuracy</div>
-                </div>
+              <div className="h-[500px] md:h-[650px] w-full relative group">
+                <div className="absolute -inset-4 bg-transparent transition-opacity duration-1000" />
+                <SpecialEcosystem />
               </div>
-            </div>
-
-            <div className="h-[500px] md:h-[650px] w-full relative group">
-              <div className="absolute -inset-4 bg-transparent transition-opacity duration-1000" />
-              <SpecialEcosystem />
             </div>
           </div>
-        </div>
+        </Vortex>
       </section>
+
 
       {/* How it works section */}
       <section className="bg-black py-32 px-6 relative overflow-hidden group/steps">
