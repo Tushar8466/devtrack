@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 export const BoxesCore = ({ className, ...rest }: { className?: string }) => {
   const rows = new Array(150).fill(1);
   const cols = new Array(100).fill(1);
-  const colors = [
+  let colors = [
     "#93c5fd",
     "#f9a8d4",
     "#86efac",
@@ -18,7 +18,6 @@ export const BoxesCore = ({ className, ...rest }: { className?: string }) => {
     "#c4b5fd",
   ];
   const getRandomColor = () => {
-    // eslint-disable-next-line react-hooks/purity
     return colors[Math.floor(Math.random() * colors.length)];
   };
 
@@ -36,7 +35,7 @@ export const BoxesCore = ({ className, ...rest }: { className?: string }) => {
       {rows.map((_, i) => (
         <motion.div
           key={`row` + i}
-          className="relative h-8 w-16 border-l border-slate-700"
+          className="relative h-8 w-16 border-l border-white/10"
         >
           {cols.map((_, j) => (
             <motion.div
@@ -48,7 +47,7 @@ export const BoxesCore = ({ className, ...rest }: { className?: string }) => {
                 transition: { duration: 2 },
               }}
               key={`col` + j}
-              className="relative h-8 w-16 border-t border-r border-slate-700"
+              className="relative h-8 w-16 border-t border-r border-white/10"
             >
               {j % 2 === 0 && i % 2 === 0 ? (
                 <svg
@@ -57,7 +56,7 @@ export const BoxesCore = ({ className, ...rest }: { className?: string }) => {
                   viewBox="0 0 24 24"
                   strokeWidth="1.5"
                   stroke="currentColor"
-                  className="pointer-events-none absolute -top-[14px] -left-[22px] h-6 w-10 stroke-[1px] text-slate-700"
+                  className="pointer-events-none absolute -top-[14px] -left-[22px] h-6 w-10 stroke-[1px] text-white/10"
                 >
                   <path
                     strokeLinecap="round"

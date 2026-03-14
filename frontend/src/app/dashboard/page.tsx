@@ -4,6 +4,7 @@ import { useSession, signOut } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { BoxesCore } from "@/components/ui/background-boxes";
 import { GitHubCalendar } from "react-github-calendar";
 import { GlowingEffect } from "@/components/ui/glowing-effect";
 import { Box, Users, GitFork, FileText, Camera } from "lucide-react";
@@ -305,7 +306,15 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#030303] pt-28 pb-20 px-4 text-white font-sans selection:bg-violet-500/30">
+    <div className="relative min-h-screen bg-[#030303] pt-28 pb-20 px-4 text-white font-sans selection:bg-violet-500/30 overflow-hidden">
+      {/* Interactive Background Atmosphere */}
+      <div className="absolute inset-0 w-full h-full bg-black z-0">
+        <BoxesCore />
+        {/* Layered Technical Texture */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff03_1px,transparent_1px),linear-gradient(to_bottom,#ffffff03_1px,transparent_1px)] bg-size-[60px_60px] pointer-events-none opacity-20" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(3,3,3,0)_0%,rgba(3,3,3,1)_100%)] pointer-events-none" />
+        <div className="absolute inset-0 bg-black/60 backdrop-blur-[1px] pointer-events-none" />
+      </div>
       <BadgeNotificationProvider newlyUnlocked={newBadges} />
 
       <div className="max-w-[1400px] mx-auto space-y-12">

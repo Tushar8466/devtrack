@@ -142,7 +142,7 @@ export function ActivityFeed({ username }: ActivityFeedProps) {
                       )}
                       {event.type === "CreateEvent" && event.payload.refType && (
                         <p className="mt-2 text-[10px] font-mono text-blue-500/60 font-bold uppercase tracking-tight">
-                          >> New {event.payload.refType} {event.payload.ref} Initialized
+                          {">> "} New {event.payload.refType} {event.payload.ref} Initialized
                         </p>
                       )}
                     </div>
