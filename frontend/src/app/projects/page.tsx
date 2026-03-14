@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { 
-  Rocket, 
-  Star, 
-  GitFork, 
+import {
+  Rocket,
+  Star,
+  GitFork,
   ExternalLink,
   Search,
   Zap,
@@ -59,8 +59,8 @@ export default function ProjectsShowcase() {
   }, []);
 
   const filtered = projects.filter(p => {
-    const matchesSearch = p.full_name.toLowerCase().includes(search.toLowerCase()) || 
-                          p.description?.toLowerCase().includes(search.toLowerCase());
+    const matchesSearch = p.full_name.toLowerCase().includes(search.toLowerCase()) ||
+      p.description?.toLowerCase().includes(search.toLowerCase());
     const matchesLang = activeLang === "All" || p.language === activeLang;
     return matchesSearch && matchesLang;
   });
@@ -70,11 +70,11 @@ export default function ProjectsShowcase() {
   return (
     <div className="min-h-screen bg-black text-white selection:bg-emerald-500/30 pb-24 overflow-x-hidden">
       <BackgroundBeams className="opacity-20" />
-      
+
       <div className="max-w-7xl mx-auto px-6 pt-32 relative z-10">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-12 mb-20">
           <div className="space-y-4">
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               className="flex items-center gap-2 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full w-fit"
@@ -82,7 +82,7 @@ export default function ProjectsShowcase() {
               <Rocket className="w-3 h-3 text-emerald-400" />
               <span className="text-[10px] font-black text-emerald-400 uppercase tracking-widest">Discovery_Module_Engaged</span>
             </motion.div>
-            <motion.h1 
+            <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               className="text-6xl md:text-8xl font-black uppercase tracking-tighter italic leading-none"
@@ -97,7 +97,7 @@ export default function ProjectsShowcase() {
           <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
             <div className="relative flex-1 sm:w-80">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-600" />
-              <input 
+              <input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="SEARCH_REGISTRY..."
@@ -115,7 +115,7 @@ export default function ProjectsShowcase() {
               onClick={() => setActiveLang(lang)}
               className={cn(
                 "px-5 py-2 rounded-full border text-[10px] font-black uppercase tracking-widest transition-all",
-                activeLang === lang 
+                activeLang === lang
                   ? "bg-emerald-500 border-emerald-500 text-black shadow-[0_0_20px_rgba(16,185,129,0.3)]"
                   : "bg-white/5 border-white/5 text-neutral-500 hover:border-white/10 hover:text-white"
               )}
@@ -149,7 +149,7 @@ export default function ProjectsShowcase() {
                   <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity text-5xl">
                     <Terminal className="w-20 h-20" />
                   </div>
-                  
+
                   <div className="relative z-10 flex flex-col h-full">
                     <div className="flex items-start justify-between mb-8">
                       <div className="flex -space-x-3">
@@ -191,10 +191,10 @@ export default function ProjectsShowcase() {
 
                   {/* Intercept overlay */}
                   <div className="absolute inset-0 bg-linear-to-t from-emerald-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
-                     <div className="flex items-center gap-3 px-6 py-3 bg-black border border-white/20 rounded-full translate-y-4 group-hover:translate-y-0 transition-transform">
-                        <Zap className="w-4 h-4 text-emerald-400 fill-emerald-400" />
-                        <span className="text-[10px] font-black text-white uppercase tracking-[0.4em]">Intercept_Link</span>
-                     </div>
+                    <div className="flex items-center gap-3 px-6 py-3 bg-black border border-white/20 rounded-full translate-y-4 group-hover:translate-y-0 transition-transform">
+                      <Zap className="w-4 h-4 text-emerald-400 fill-emerald-400" />
+                      <span className="text-[10px] font-black text-white uppercase tracking-[0.4em]">Intercept_Link</span>
+                    </div>
                   </div>
                 </motion.div>
               ))}

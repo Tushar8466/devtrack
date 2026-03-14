@@ -35,7 +35,7 @@ export default function SignInPage() {
                                 transition={{ delay: 0.2, duration: 0.5 }}
                                 className="inline-flex items-center justify-center p-4 bg-violet-600/10 rounded-2xl mb-6 shadow-inner ring-1 ring-violet-500/20"
                             >
-                                <Fingerprint className="w-10 h-10 text-violet-400" strokeWidth={1.5} />
+                                <img src="/logo/devtrack-logo.png" alt="DevTrack Logo" className="w-12 h-12 hover:scale-110 transition-transform" />
                             </motion.div>
                             <h1 className="text-4xl font-bold text-white mb-2 tracking-tight">
                                 Access <span className="text-violet-400">DevTrack</span>

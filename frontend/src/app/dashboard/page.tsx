@@ -528,7 +528,7 @@ export default function DashboardPage() {
 
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2 px-3 py-1 bg-violet-500/10 border border-violet-500/20 rounded-full">
-              <div className="w-1.5 h-1.5 bg-violet-500 rounded-full animate-pulse" />
+              <img src="/logo/devtrack-logo.png" alt="Logo" className="w-3 h-3" />
               <span className="text-[9px] font-black text-violet-400 uppercase tracking-widest">Node_Encrypted</span>
             </div>
             <div className="text-[9px] font-mono text-neutral-700 uppercase tracking-widest group cursor-help">

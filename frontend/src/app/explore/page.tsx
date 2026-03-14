@@ -98,11 +98,11 @@ export default function ExplorePage() {
                 className="w-full max-w-lg text-center bg-black/40 backdrop-blur-xl border border-white/10 p-10 rounded-3xl"
             >
                 {/* Logo */}
-                <div className="flex items-center justify-center gap-3 mb-6">
-                    <div className="w-10 h-10 rounded-lg bg-linear-to-br from-violet-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-violet-500/20">
-                        <IconBrandGithub className="w-5 h-5 text-white" />
+                <div className="flex items-center justify-center gap-3 mb-8 group cursor-pointer" onClick={() => router.push("/")}>
+                    <div className="relative w-12 h-12">
+                        <img src="/logo/devtrack-logo.png" alt="DevTrack Logo" className="w-full h-full object-contain group-hover:scale-110 transition-transform" />
                     </div>
-                    <span className="text-white font-bold text-2xl tracking-tight">Devtrack</span>
+                    <span className="text-white font-black text-3xl tracking-tighter uppercase italic">Devtrack</span>
                 </div>
 
                 {/* Search Type Toggle */}

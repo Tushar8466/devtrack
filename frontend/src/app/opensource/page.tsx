@@ -14,7 +14,7 @@ function OpenSourceLandingPage() {
     <div className="flex flex-col min-h-screen bg-black text-white pb-20 selection:bg-cyan-500/30 overflow-x-hidden">
       {/* Neural Background Mesh */}
       <div className="fixed inset-0 z-0 pointer-events-none opacity-20">
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:40px_40px]" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-size-[40px_40px]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(6,182,212,0.1),transparent_70%)]" />
       </div>
 
@@ -41,7 +41,8 @@ function OpenSourceLandingPage() {
       <div className="flex flex-col overflow-hidden bg-black relative">
         <ContainerScroll
           titleComponent={
-            <h1 className="text-4xl font-semibold text-white text-center">
+            <h1 className="text-4xl font-semibold text-white text-center flex flex-col items-center gap-4">
+              <img src="/logo/devtrack-logo.png" alt="DevTrack Logo" className="w-16 h-16 animate-pulse" />
               DevTrack <br />
               <span className="text-4xl md:text-[6rem] font-bold mt-1 leading-none">
                 OpenSource Tracker
@@ -52,7 +53,7 @@ function OpenSourceLandingPage() {
           <img
             src="/opensource.png"
             alt="opensource"
-            className="mx-auto rounded-2xl object-cover h-full object-left-top"
+            className="mx-auto rounded-2xl object-cover h-full object-top-left"
             draggable={false}
           />
         </ContainerScroll>

@@ -50,7 +50,17 @@ export const FloatingNav: React.FC<FloatingNavProps> = ({
       )}
     >
       <div className="flex items-center gap-3 rounded-full border border-white/10 bg-white/80 px-4 py-2 shadow-xl backdrop-blur-md dark:bg-black/50">
-
+        {/* Brand Logo */}
+        <Link href="/" className="flex items-center gap-2 pr-2 border-r border-white/10">
+          <Image
+            src="/logo/devtrack-logo.png"
+            alt="DevTrack Logo"
+            width={28}
+            height={28}
+            className="hover:scale-110 transition-transform"
+          />
+        </Link>
+        
         {/* Navigation Links */}
         <div className="flex items-center gap-2">
           {navItems.map((item, index) => {

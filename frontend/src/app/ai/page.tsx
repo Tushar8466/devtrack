@@ -255,9 +255,9 @@ export default function AIPage() {
             <div className="absolute -inset-2 bg-linear-to-r from-violet-600/20 to-fuchsia-600/20 rounded-[40px] blur-xl opacity-0 group-focus-within/form:opacity-100 transition duration-1000"></div>
             <div className="relative flex items-center bg-black/40 backdrop-blur-3xl border border-white/10 rounded-[32px] p-3 pl-6 hover:border-violet-500/30 transition-all duration-500 shadow-2xl">
               <div className="flex items-center gap-4 shrink-0">
-                <div className="relative">
-                   <Sparkles size={22} className="text-violet-500 animate-pulse" />
-                   <motion.div animate={{ scale: [1, 1.5, 1], opacity: [0.5, 0, 0.5] }} transition={{ duration: 2, repeat: Infinity }} className="absolute inset-0 bg-violet-500 rounded-full blur-md" />
+                <div className="relative w-8 h-8 group-hover:scale-110 transition-transform">
+                   <img src="/logo/devtrack-logo.png" alt="Logo" className="w-full h-full object-contain" />
+                   <motion.div animate={{ scale: [1, 1.5, 1], opacity: [0.5, 0, 0.5] }} transition={{ duration: 2, repeat: Infinity }} className="absolute inset-0 bg-violet-500 rounded-full blur-md -z-10" />
                 </div>
                 <div className="h-6 w-px bg-white/10" />
               </div>

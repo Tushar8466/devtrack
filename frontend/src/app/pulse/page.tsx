@@ -78,7 +78,7 @@ export default function PulsePage() {
               animate={{ opacity: 1, x: 0 }}
               className="flex items-center gap-2 px-3 py-1 bg-cyan-500/10 border border-cyan-500/20 rounded-full w-fit"
             >
-              <Radio className="w-3 h-3 text-cyan-400 animate-pulse" />
+              <img src="/logo/devtrack-logo.png" alt="Logo" className="w-3 h-3" />
               <span className="text-[10px] font-black text-cyan-400 uppercase tracking-widest">Global_Frequency_Monitored</span>
             </motion.div>
             <motion.h1 

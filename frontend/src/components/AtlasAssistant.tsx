@@ -179,7 +179,7 @@ export function AtlasAssistant() {
       >
         <div className="absolute inset-0 bg-linear-to-br from-violet-600 to-fuchsia-600 animate-pulse" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.2),transparent)]" />
-        <Sparkles size={28} className="relative z-10 text-white transition-transform duration-500 group-hover:scale-110" />
+        <img src="/logo/devtrack-logo.png" alt="Logo" className="relative z-10 w-8 h-8 transition-transform duration-500 group-hover:scale-110" />
 
         {/* HUD Ring Effect */}
         <div className="absolute inset-2 border border-white/20 rounded-full animate-[spin_4s_linear_infinite]" />
@@ -206,8 +206,8 @@ export function AtlasAssistant() {
             <header className="p-6 border-b border-white/10 flex items-center justify-between bg-white/[0.02]">
               <div className="flex items-center gap-3">
                 <div className="relative">
-                  <div className="w-12 h-12 rounded-xl bg-black/50 overflow-hidden flex items-center justify-center shadow-[0_0_20px_rgba(139,92,246,0.5)] border border-white/10">
-                    <BotAgent />
+                  <div className="w-12 h-12 rounded-xl bg-black/50 overflow-hidden flex items-center justify-center shadow-[0_0_20px_rgba(139,92,246,0.5)] border border-white/10 group-hover:border-violet-500/50 transition-all">
+                    <img src="/logo/devtrack-logo.png" alt="Atlas Logo" className="w-8 h-8 object-contain" />
                   </div>
                   <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-emerald-500 rounded-full border-2 border-black animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
                 </div>
