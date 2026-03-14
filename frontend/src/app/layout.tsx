@@ -15,6 +15,7 @@ export default function RootLayout({
     { name: "Projects", link: "/projects" },
     { name: "OS Tracker", link: "/opensource" },
     { name: "Explore", link: "/explore" },
+    { name: "DevTrack AI", link: "/ai" },
     { name: "Compare", link: "/compare" },
   ];
 

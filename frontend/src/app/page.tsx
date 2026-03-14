@@ -112,6 +112,28 @@ export default function Home() {
       <HeroSection />
 
 
+      {/* Neural Nexus Teaser Section */}
+      <section className="bg-black py-24 px-6 relative overflow-hidden border-t border-white/5">
+        <div className="max-w-7xl mx-auto flex flex-col items-center text-center space-y-12">
+           <div className="space-y-4">
+              <span className="text-violet-500 font-black tracking-[0.4em] text-[10px] animate-pulse uppercase">// COGNITIVE_EXPANSION_NODE</span>
+              <h2 className="text-5xl md:text-8xl font-black text-white uppercase tracking-tighter italic leading-none">
+                 The DevTrack <span className="text-violet-500">AI</span>
+              </h2>
+              <p className="text-neutral-500 max-w-2xl mx-auto italic font-medium text-lg">
+                 Step into the high-dimensional visualization of global repository clusters. Analyze core authorship DNA with our neural engine.
+              </p>
+           </div>
+
+           <Link 
+             href="/ai"
+             className="px-12 py-6 bg-violet-600 text-white rounded-2xl font-black text-lg uppercase tracking-tighter hover:bg-violet-500 transition-all shadow-2xl shadow-violet-500/20 active:scale-95 group"
+           >
+              Launch Intelligence Core
+           </Link>
+        </div>
+      </section>
+
       {/* Intelligence Grid Section */}
       <Suspense fallback={<div className="h-96 bg-black" />}>
         <section className="bg-black py-24 px-6 relative overflow-hidden border-t border-white/5">

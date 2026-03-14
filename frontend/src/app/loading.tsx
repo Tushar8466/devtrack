@@ -7,7 +7,7 @@ export default function Loading() {
         <div className="absolute inset-4 border border-fuchsia-500/20 rounded-full animate-pulse" />
       </div>
       <div className="flex flex-col items-center gap-2">
-        <h2 className="text-xl font-black text-white italic tracking-tighter uppercase">Initializing Intelligence</h2>
+        <h2 className="text-xl font-black text-white italic tracking-tighter uppercase">Initializing DevTrack AI</h2>
         <div className="flex items-center gap-1.5">
           <div className="w-1.5 h-1.5 bg-violet-500 rounded-full animate-bounce [animation-delay:-0.3s]" />
           <div className="w-1.5 h-1.5 bg-violet-500 rounded-full animate-bounce [animation-delay:-0.15s]" />

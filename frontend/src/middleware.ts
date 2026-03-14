@@ -19,5 +19,6 @@ export const config = {
         "/analyze/:path*",
         "/opensource/:path*",
         "/contributors/:path*",
+        "/ai/:path*",
     ],
 };
