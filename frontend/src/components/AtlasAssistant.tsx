@@ -2,23 +2,29 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { 
-  Bot, 
-  X, 
-  Send, 
-  Zap, 
-  Sparkles, 
-  MessageSquare, 
-  ChevronRight, 
+import {
+  Bot,
+  X,
+  Send,
+  Zap,
+  Sparkles,
+  MessageSquare,
+  ChevronRight,
   Command,
   Search,
   User,
   Shield,
   HelpCircle,
-  Activity
+  Activity,
+  Mic,
+  MicOff,
+  Volume2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
+
+const VoiceAssistantAgent = dynamic(() => import("./voice"), { ssr: false });
 
 interface Message {
   id: string;
@@ -43,7 +49,9 @@ export function AtlasAssistant() {
   const [messages, setMessages] = useState<Message[]>([INITIAL_MESSAGE]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  const [isListening, setIsListening] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const recognitionRef = useRef<any>(null);
   const router = useRouter();
 
   // Mouse tracking for interactive spotlight
@@ -63,6 +71,41 @@ export function AtlasAssistant() {
     }
   }, [messages, isTyping]);
 
+  useEffect(() => {
+    // Initialize speech recognition
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      recognitionRef.current = new SpeechRecognition();
+      recognitionRef.current.continuous = false;
+      recognitionRef.current.interimResults = false;
+      recognitionRef.current.lang = "en-US";
+
+      recognitionRef.current.onresult = (event: any) => {
+        const transcript = event.results[0][0].transcript;
+        handleSend(transcript);
+        setIsListening(false);
+      };
+
+      recognitionRef.current.onerror = () => {
+        setIsListening(false);
+      };
+
+      recognitionRef.current.onend = () => {
+        setIsListening(false);
+      };
+    }
+  }, []);
+
+  const toggleListening = () => {
+    if (isListening) {
+      recognitionRef.current?.stop();
+      setIsListening(false);
+    } else {
+      setIsListening(true);
+      recognitionRef.current?.start();
+    }
+  };
+
   const handleSend = async (text: string) => {
     if (!text.trim()) return;
 
@@ -81,7 +124,7 @@ export function AtlasAssistant() {
 
   const getAITacticResponse = (text: string): Message => {
     const lowText = text.toLowerCase();
-    
+
     if (lowText.includes("scan") || lowText.includes("profile") || lowText.includes("user")) {
       return {
         id: Date.now().toString(),
@@ -101,13 +144,13 @@ export function AtlasAssistant() {
     }
 
     if (lowText.includes("compare") || lowText.includes("vs")) {
-        return {
-          id: Date.now().toString(),
-          type: "bot",
-          text: "Tactical comparison matrix ready. Input two handles to determine architectural dominance and style drift.",
-          actions: [{ label: "Launch Compare", route: "/compare" }]
-        };
-      }
+      return {
+        id: Date.now().toString(),
+        type: "bot",
+        text: "Tactical comparison matrix ready. Input two handles to determine architectural dominance and style drift.",
+        actions: [{ label: "Launch Compare", route: "/compare" }]
+      };
+    }
 
     return {
       id: Date.now().toString(),
@@ -137,7 +180,7 @@ export function AtlasAssistant() {
         <div className="absolute inset-0 bg-linear-to-br from-violet-600 to-fuchsia-600 animate-pulse" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.2),transparent)]" />
         <Sparkles size={28} className="relative z-10 text-white transition-transform duration-500 group-hover:scale-110" />
-        
+
         {/* HUD Ring Effect */}
         <div className="absolute inset-2 border border-white/20 rounded-full animate-[spin_4s_linear_infinite]" />
         <div className="absolute inset-3 border border-white/10 rounded-full animate-[spin_6s_linear_infinite_reverse]" />
@@ -153,7 +196,7 @@ export function AtlasAssistant() {
             className="fixed bottom-8 right-8 z-[10001] w-[400px] h-[600px] bg-black/90 border border-white/20 rounded-[2.5rem] backdrop-blur-3xl shadow-[0_0_100px_-20px_rgba(139,92,246,0.5)] flex flex-col overflow-hidden group/card"
           >
             {/* INTERACTIVE SPOTLIGHT */}
-            <div 
+            <div
               className="absolute inset-0 pointer-events-none opacity-0 group-hover/card:opacity-100 transition-opacity duration-500"
               style={{
                 background: `radial-gradient(600px circle at ${mousePos.x}px ${mousePos.y}px, rgba(139, 92, 246, 0.15), transparent 40%)`
@@ -163,20 +206,20 @@ export function AtlasAssistant() {
             <header className="p-6 border-b border-white/10 flex items-center justify-between bg-white/[0.02]">
               <div className="flex items-center gap-3">
                 <div className="relative">
-                    <div className="w-10 h-10 rounded-xl bg-linear-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center shadow-[0_0_20px_rgba(139,92,246,0.5)]">
-                        <Sparkles size={20} className="text-white" />
-                    </div>
-                    <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-emerald-500 rounded-full border-2 border-black animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
+                  <div className="w-12 h-12 rounded-xl bg-black/50 overflow-hidden flex items-center justify-center shadow-[0_0_20px_rgba(139,92,246,0.5)] border border-white/10">
+                    <VoiceAssistantAgent />
+                  </div>
+                  <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-emerald-500 rounded-full border-2 border-black animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
                 </div>
                 <div>
-                   <h3 className="text-sm font-black text-white uppercase tracking-tighter italic">A.T.L.A.S.</h3>
-                   <div className="flex items-center gap-2">
-                      <span className="text-[8px] font-mono text-violet-400 font-bold uppercase tracking-widest leading-none">Neural_Assistant_v4</span>
-                      <Activity size={8} className="text-violet-500 animate-pulse" />
-                   </div>
+                  <h3 className="text-sm font-black text-white uppercase tracking-tighter italic">A.T.L.A.S.</h3>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[8px] font-mono text-violet-400 font-bold uppercase tracking-widest leading-none">Neural_Assistant_v4</span>
+                    <Activity size={8} className="text-violet-500 animate-pulse" />
+                  </div>
                 </div>
               </div>
-              <button 
+              <button
                 onClick={() => setIsOpen(false)}
                 className="p-2 hover:bg-white/10 rounded-full transition-colors group/close"
               >
@@ -185,10 +228,17 @@ export function AtlasAssistant() {
             </header>
 
             {/* Messages Body */}
-            <div 
+            <div
               ref={scrollRef}
-              className="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-hide"
+              className="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-hide relative"
             >
+              {isListening && (
+                <div className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none opacity-40">
+                  <div className="w-full h-full scale-150">
+                    <VoiceAssistantAgent />
+                  </div>
+                </div>
+              )}
               {messages.map((msg) => (
                 <motion.div
                   key={msg.id}
@@ -201,13 +251,13 @@ export function AtlasAssistant() {
                 >
                   <div className={cn(
                     "p-4 rounded-3xl text-sm leading-relaxed",
-                    msg.type === "user" 
-                      ? "bg-violet-600 text-white rounded-tr-none" 
+                    msg.type === "user"
+                      ? "bg-violet-600 text-white rounded-tr-none"
                       : "bg-white/5 border border-white/5 text-neutral-300 rounded-tl-none font-medium italic"
                   )}>
                     {msg.text}
                   </div>
-                  
+
                   {msg.actions && (
                     <div className="flex flex-wrap gap-2 mt-3">
                       {msg.actions.map((action, i) => (
@@ -238,41 +288,55 @@ export function AtlasAssistant() {
 
             {/* Input Footer */}
             <footer className="p-6 border-t border-white/5 bg-black/40">
-              <form 
+              <form
                 onSubmit={(e) => { e.preventDefault(); handleSend(input); }}
-                className="relative"
+                className="relative flex gap-2"
               >
-                <input 
-                  type="text"
-                  placeholder="Intercept neural query..."
-                  className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-6 pr-14 text-sm text-white focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 transition-all placeholder:text-neutral-700"
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                />
-                <button 
-                  type="submit"
-                  className="absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-white text-black rounded-xl hover:bg-violet-500 hover:text-white transition-all disabled:opacity-50"
-                  disabled={!input.trim() || isTyping}
+                <button
+                  type="button"
+                  onClick={toggleListening}
+                  className={cn(
+                    "p-3 rounded-xl transition-all duration-300 border flex items-center justify-center",
+                    isListening
+                      ? "bg-red-500/20 text-red-500 border-red-500 animate-pulse"
+                      : "bg-white/5 text-neutral-400 border-white/10 hover:text-white"
+                  )}
                 >
-                  <Send size={16} />
+                  {isListening ? <MicOff size={18} /> : <Mic size={18} />}
                 </button>
+                <div className="relative flex-1">
+                  <input
+                    type="text"
+                    placeholder={isListening ? "Listening..." : "Intercept neural query..."}
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-6 pr-14 text-sm text-white focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 transition-all placeholder:text-neutral-700"
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                  />
+                  <button
+                    type="submit"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-white text-black rounded-xl hover:bg-violet-500 hover:text-white transition-all disabled:opacity-50"
+                    disabled={!input.trim() || isTyping}
+                  >
+                    <Send size={16} />
+                  </button>
+                </div>
               </form>
               <div className="mt-4 flex flex-col items-center gap-3">
-                 <div className="flex items-center justify-center gap-4">
-                    <div className="flex items-center gap-1.5 opacity-60 hover:opacity-100 transition-opacity cursor-help">
-                       <Command size={10} className="text-violet-400" />
-                       <span className="text-[8px] font-bold text-neutral-400 uppercase tracking-widest">Secure Uplink</span>
-                    </div>
-                    <div className="w-1 h-1 bg-white/20 rounded-full" />
-                    <div className="flex items-center gap-1.5 opacity-60 hover:opacity-100 transition-opacity cursor-help">
-                       <Activity size={10} className="text-emerald-400" />
-                       <span className="text-[8px] font-bold text-neutral-400 uppercase tracking-widest">Live Sync</span>
-                    </div>
-                 </div>
-                 <div className="flex items-center gap-1.5 py-1.5 px-3 bg-white/[0.03] border border-white/5 rounded-full shadow-inner">
-                    <Sparkles size={8} className="text-fuchsia-400 animate-pulse" />
-                    <span className="text-[7px] font-black text-neutral-300 uppercase tracking-[0.2em]">Powered by <span className="text-violet-400">Gemini 1.5 Pro</span></span>
-                 </div>
+                <div className="flex items-center justify-center gap-4">
+                  <div className="flex items-center gap-1.5 opacity-60 hover:opacity-100 transition-opacity cursor-help">
+                    <Command size={10} className="text-violet-400" />
+                    <span className="text-[8px] font-bold text-neutral-400 uppercase tracking-widest">Secure Uplink</span>
+                  </div>
+                  <div className="w-1 h-1 bg-white/20 rounded-full" />
+                  <div className="flex items-center gap-1.5 opacity-60 hover:opacity-100 transition-opacity cursor-help">
+                    <Activity size={10} className="text-emerald-400" />
+                    <span className="text-[8px] font-bold text-neutral-400 uppercase tracking-widest">Live Sync</span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1.5 py-1.5 px-3 bg-white/[0.03] border border-white/5 rounded-full shadow-inner">
+                  <Sparkles size={8} className="text-fuchsia-400 animate-pulse" />
+                  <span className="text-[7px] font-black text-neutral-300 uppercase tracking-[0.2em]">Powered by <span className="text-violet-400">Gemini 1.5 Pro</span></span>
+                </div>
               </div>
             </footer>
           </motion.div>

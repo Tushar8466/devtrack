@@ -1,19 +1,13 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import Link from "next/link";
 import HeroSection from "@/components/HeroSection";
 import { MacbookScroll } from "@/components/ui/macbook-scroll";
 import AnimatedDevTrackScreen from "@/components/ui/AnimatedDevTrackScreen";
 import { EvervaultCard } from "@/components/ui/evervault-card";
-import { Search, Brain, BarChart, User, Settings, Lock, Star } from "lucide-react";
-import { motion } from "motion/react";
+import { Search, Brain, BarChart, User, Settings, Lock } from "lucide-react";
 import dynamic from "next/dynamic";
-import { useState, useEffect } from "react";
-import { FeedbackForm } from "@/components/FeedbackForm";
 import { BackgroundRippleEffect } from "@/components/ui/background-ripple-effect";
-import { SparklesCore } from "@/components/ui/sparkles";
-import { FeedbackWall } from "@/components/FeedbackWall";
 import { IntelligenceGrid } from "@/components/IntelligenceGrid";
 import { Vortex } from "@/components/ui/vortex";
 
@@ -22,7 +16,6 @@ const Globe = dynamic(() => import("@/components/globe"), {
   loading: () => (
     <div className="w-full h-full flex flex-col items-center justify-center gap-4 text-neutral-500 bg-black/20">
       <div className="w-8 h-8 border-2 border-violet-500/20 border-t-violet-500 rounded-full animate-spin" />
-      <p className="text-xs font-medium uppercase tracking-widest animate-pulse">Initializing World Map...</p>
     </div>
   ),
 });
@@ -32,12 +25,10 @@ const SpecialEcosystem = dynamic(() => import("@/components/special"), {
   loading: () => (
     <div className="w-full h-full flex flex-col items-center justify-center gap-4 text-neutral-500 bg-black/20">
       <div className="w-8 h-8 border-2 border-cyan-500/20 border-t-cyan-500 rounded-full animate-spin" />
-      <p className="text-xs font-medium uppercase tracking-widest animate-pulse font-mono">Neural Syncing...</p>
     </div>
   ),
 });
 
-// ... (Icon definition same as before)
 const Icon = ({ className }: { className?: string }) => {
   return (
     <svg
@@ -55,156 +46,51 @@ const Icon = ({ className }: { className?: string }) => {
   );
 };
 
-// ... (features and steps same as before)
 const features = [
-  {
-    title: "AI Likelihood Score",
-    description: "Scan any GitHub PR or commit URL in seconds.",
-    icon: <Search className="w-12 h-12 sm:w-16 sm:h-16 text-blue-500" strokeWidth={1.5} />,
-  },
-  {
-    title: "Style Drift Indicator",
-    description: "Powered by CodeBERT — trained specifically on code, not text.",
-    icon: <Brain className="w-12 h-12 sm:w-16 sm:h-16 text-purple-500" strokeWidth={1.5} />,
-  },
-  {
-    title: "Post-Merge Stability",
-    description: "Get a 0–100% AI probability score with an explainability report.",
-    icon: <BarChart className="w-12 h-12 sm:w-16 sm:h-16 text-green-500" strokeWidth={1.5} />,
-  },
-  {
-    title: "Ownership Confidence",
-    description: "Detects deviations from a contributor's historical coding style.",
-    icon: <User className="w-12 h-12 sm:w-16 sm:h-16 text-amber-500" strokeWidth={1.5} />,
-  },
-  {
-    title: "Repository AI Influence Trend",
-    description: "Drop one config file into any repo. Scans run automatically.",
-    icon: <Settings className="w-12 h-12 sm:w-16 sm:h-16 text-pink-500" strokeWidth={1.5} />,
-  },
-  {
-    title: "Privacy First",
-    description: "Code is never stored. Scans are ephemeral. Always.",
-    icon: <Lock className="w-12 h-12 sm:w-16 sm:h-16 text-cyan-500" strokeWidth={1.5} />,
-  },
-];
-
-const steps = [
-  {
-    step: "01",
-    title: "Search a GitHub Username",
-    description: "Type any public GitHub username into the search bar on the Explore page.",
-  },
-  {
-    step: "02",
-    title: "We Fetch & Analyze",
-    description:
-      "DevTrack fetches repositories, commits, and contribution data from GitHub in real time and runs our AI analysis.",
-  },
-  {
-    step: "03",
-    title: "Review the Report",
-    description:
-      "Get a comprehensive report with risk scores, contribution history, pinned repos, and much more.",
-  },
+  { icon: <Search className="w-12 h-12 sm:w-16 sm:h-16 text-blue-500" strokeWidth={1.5} /> },
+  { icon: <Brain className="w-12 h-12 sm:w-16 sm:h-16 text-purple-500" strokeWidth={1.5} /> },
+  { icon: <BarChart className="w-12 h-12 sm:w-16 sm:h-16 text-green-500" strokeWidth={1.5} /> },
+  { icon: <User className="w-12 h-12 sm:w-16 sm:h-16 text-amber-500" strokeWidth={1.5} /> },
+  { icon: <Settings className="w-12 h-12 sm:w-16 sm:h-16 text-pink-500" strokeWidth={1.5} /> },
+  { icon: <Lock className="w-12 h-12 sm:w-16 sm:h-16 text-cyan-500" strokeWidth={1.5} /> },
 ];
 
 export default function Home() {
-  const { data: session } = useSession();
-  const nextRoute = session ? "/explore" : "/sign-in";
-
   return (
     <div className="bg-black">
-      {/* GitHub Star Badge */}
-      <motion.div
-        initial={{ opacity: 0, y: -80 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, ease: "easeOut" }}
-        className="fixed top-8 right-8 z-5000"
-      >
-        <Link
-          href="https://github.com/Tushar8466/devtrack"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center gap-2 rounded-full border border-white/10 bg-black/50 px-5 py-4 shadow-xl backdrop-blur-md transition-all hover:bg-white/10 group relative overflow-hidden"
-        >
-          <div className="absolute inset-0 bg-linear-to-r from-amber-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-          <Star size={18} className="text-amber-500 fill-amber-500/20 group-hover:fill-amber-500/40 transition-all group-hover:rotate-12" />
-          <span className="hidden sm:block uppercase tracking-widest text-[10px] font-black text-neutral-300 group-hover:text-white">
-            Star on GitHub
-          </span>
-        </Link>
-      </motion.div>
-
       <HeroSection />
 
-      {/* MacBook Scroll section */}
+      {/* MacBook Scroll section - Text Removed */}
       <div className="overflow-hidden bg-black w-full">
         <MacbookScroll
-          title={
-            <span className="text-white">
-              Analyze any GitHub profile. <br />
-              <span className="text-violet-400">Instantly.</span>
-            </span>
-          }
+          title={null}
           screenContent={<AnimatedDevTrackScreen />}
           showGradient={false}
         />
       </div>
 
-      {/* Intelligence Grid Section */}
+      {/* Intelligence Grid Section - Text Removed */}
       <section className="bg-black py-24 px-6 relative overflow-hidden">
         <div className="max-w-[1400px] mx-auto">
-          <div className="mb-16">
-            <h2 className="text-3xl md:text-5xl font-black text-white uppercase tracking-tighter italic">
-              Neural <span className="text-violet-500">Core</span> Capabilities
-            </h2>
-            <p className="text-neutral-500 mt-4 max-w-xl font-medium">
-              DevTrack leverages high-dimensional vector analysis to authenticate the true source of engineering talent.
-            </p>
-          </div>
           <IntelligenceGrid />
         </div>
       </section>
 
-
-      {/* Features section */}
+      {/* Features section - Text Removed */}
       <section className="bg-black py-24 px-6">
         <div className="relative z-20 w-full mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
-              Everything you need to detect AI code
-            </h2>
-            <p className="mt-4 text-lg text-neutral-400">
-              Powerful tools built for modern engineering teams.
-            </p>
-          </div>
-
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {features.map((feature, idx) => (
               <div
                 key={idx}
-                className="border border-white/10 flex flex-col items-start p-4 relative h-[30rem] bg-black/60 backdrop-blur-md rounded-2xl group"
+                className="border border-white/10 flex flex-col items-start p-4 relative h-[24rem] bg-black/60 backdrop-blur-md rounded-2xl group"
               >
-                {/* Corner icons */}
                 <Icon className="absolute h-6 w-6 -top-3 -left-3 text-white" />
                 <Icon className="absolute h-6 w-6 -bottom-3 -left-3 text-white" />
                 <Icon className="absolute h-6 w-6 -top-3 -right-3 text-white" />
                 <Icon className="absolute h-6 w-6 -bottom-3 -right-3 text-white" />
-
-                {/* Evervault interactive card */}
-                <div className="w-full flex-1 flex items-center justify-center">
+                <div className="w-full h-full flex items-center justify-center">
                   <EvervaultCard text={feature.icon} />
-                </div>
-
-                {/* Text */}
-                <div className="w-full mt-2 flex flex-col gap-3 pb-10">
-                  <h3 className="text-white text-xl font-bold">
-                    {feature.title}
-                  </h3>
-                  <p className="text-sm font-light border border-white/10 rounded-full px-4 py-2 text-neutral-400">
-                    {feature.description}
-                  </p>
                 </div>
               </div>
             ))}
@@ -212,8 +98,7 @@ export default function Home() {
         </div>
       </section>
 
-
-      {/* Special Neural Section with Vortex */}
+      {/* Special Neural Section with Vortex - Text Removed */}
       <section className="bg-black relative overflow-hidden">
         <Vortex
           backgroundColor="black"
@@ -224,36 +109,8 @@ export default function Home() {
           containerClassName="min-h-[800px] py-24 px-6"
         >
           <div className="max-w-7xl mx-auto relative z-10">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-              <div className="space-y-8 animate-in fade-in slide-in-from-left-8 duration-1000">
-                <div>
-                  <span className="px-3 py-1 rounded-full bg-transparent border border-white/10 text-cyan-400 text-[10px] font-bold uppercase tracking-[0.2em] mb-4 inline-block">
-                    Proprietary Neural Engine
-                  </span>
-                  <h2 className="text-4xl md:text-6xl font-black text-white tracking-tighter leading-none text-balance">
-                    DECONSTRUCTING <br />
-                    <span className="bg-linear-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent italic">CODE GENETICS</span>
-                  </h2>
-                </div>
-
-                <p className="text-neutral-400 text-lg leading-relaxed max-w-xl">
-                  Our core engine analyzes billions of code tokens to identify the unique fingerprints of human vs. synthetic authorship. Toggle the nodes to visualize the neural distribution.
-                </p>
-
-                <div className="flex flex-wrap gap-4">
-                  <div className="px-6 py-4 rounded-3xl bg-white/5 border border-white/10 group hover:border-cyan-500/30 transition-colors backdrop-blur-md">
-                    <div className="text-3xl font-black text-white">4.2M+</div>
-                    <div className="text-[10px] text-neutral-500 uppercase tracking-widest font-bold">Neural Weights</div>
-                  </div>
-                  <div className="px-6 py-4 rounded-3xl bg-white/5 border border-white/10 group hover:border-blue-500/30 transition-colors backdrop-blur-md">
-                    <div className="text-3xl font-black text-white">99.4%</div>
-                    <div className="text-[10px] text-neutral-500 uppercase tracking-widest font-bold">Signal Accuracy</div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="h-[500px] md:h-[650px] w-full relative group">
-                <div className="absolute -inset-4 bg-transparent transition-opacity duration-1000" />
+            <div className="flex items-center justify-center">
+              <div className="h-[600px] w-full max-w-4xl relative">
                 <SpecialEcosystem />
               </div>
             </div>
@@ -261,211 +118,26 @@ export default function Home() {
         </Vortex>
       </section>
 
-
-      {/* How it works section */}
-      <section className="bg-black py-32 px-6 relative overflow-hidden group/steps">
-        <div className="absolute inset-0 z-0 opacity-20 group-hover/steps:opacity-40 transition-opacity duration-1000">
+      {/* Architecture Visual - Text Removed */}
+      <section className="bg-black py-32 px-6 relative overflow-hidden">
+        <div className="absolute inset-0 z-0 opacity-20">
           <BackgroundRippleEffect rows={20} cols={40} cellSize={60} />
         </div>
-
-        <div className="max-w-5xl mx-auto relative z-10">
-          <div className="text-center mb-20">
-            <motion.span
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              className="text-violet-400 text-sm font-black uppercase tracking-[0.4em]"
-            >
-              The Architecture
-            </motion.span>
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="mt-4 text-5xl md:text-7xl font-black text-white tracking-tighter"
-            >
-              THREE STEPS TO <span className="text-violet-500">INSIGHT</span>
-            </motion.h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-            {steps.map((s, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                transition={{ delay: i * 0.1 }}
-                whileHover={{ y: -10 }}
-                className="flex flex-col items-center text-center relative group/step"
-              >
-                <div className="w-24 h-24 rounded-4xl bg-white/2 border border-white/10 flex items-center justify-center mb-8 group-hover/step:border-violet-500/50 transition-all duration-500 relative">
-                  <div className="absolute inset-0 bg-violet-600/10 blur-2xl rounded-full opacity-0 group-hover/step:opacity-100 transition-opacity" />
-                  <span className="text-violet-400 text-3xl font-black italic relative z-10">{s.step}</span>
-                </div>
-                <h3 className="text-white font-black text-2xl mb-4 uppercase tracking-tight">{s.title}</h3>
-                <p className="text-neutral-500 text-sm leading-relaxed group-hover:text-neutral-400 transition-colors">{s.description}</p>
-
-                {i < 2 && (
-                  <div className="hidden md:block absolute top-12 -right-6 w-12 h-px bg-linear-to-r from-violet-500/50 to-transparent" />
-                )}
-              </motion.div>
-            ))}
-          </div>
-        </div>
       </section>
 
-      {/* CTA section */}
-      <section className="bg-black py-32 px-6 relative overflow-hidden group/cta">
-        <div className="absolute inset-0 z-0 opacity-0 group-hover/cta:opacity-100 transition-opacity duration-1000">
-          {/* Sparkles removed */}
-        </div>
-
-        <div className="max-w-3xl mx-auto text-center relative z-10">
-          <motion.h2
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            className="text-5xl md:text-7xl font-black text-white mb-8 tracking-tighter"
-          >
-            READY TO DECODE <br />
-            <span className="bg-linear-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">DEVELOPER DNA</span>?
-          </motion.h2>
-          <p className="text-neutral-500 text-lg mb-12 max-w-xl mx-auto font-medium">
-            Join thousands of developers using DevTrack to verify authorship and ensure code integrity in the age of AI.
-          </p>
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <Link
-              href={nextRoute}
-              className="inline-block px-12 py-5 rounded-2xl bg-white text-black font-black text-lg transition-all duration-300 shadow-[0_0_50px_-5px_rgba(255,255,255,0.2)] hover:shadow-[0_0_70px_-5px_rgba(255,255,255,0.4)]"
-            >
-              START SCANNING NOW →
-            </Link>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Contribute Section */}
-      <section id="contribute" className="bg-black py-32 px-6">
-        <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-24">
-          <div className="flex-1 space-y-10 group">
-            <div>
-              <span className="text-violet-400 font-bold uppercase tracking-[0.3em] mb-4 inline-block text-[11px] animate-pulse">// OPEN SOURCE INITIATIVE</span>
-              <h2 className="text-5xl md:text-7xl font-black text-white leading-[0.9] tracking-tighter">
-                BE PART OF THE <br className="hidden md:block" />
-                <span className="bg-linear-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">EVOLUTION</span>
-              </h2>
-            </div>
-
-            <p className="text-neutral-500 text-xl leading-relaxed max-w-xl group-hover:text-neutral-400 transition-colors duration-500">
-              DevTrack is an open-source project aimed at creating a transparent, verifiable ecosystem for software authorship. Every line of our code is open for review and contribution.
-            </p>
-
-            <div className="flex flex-wrap gap-6 pt-4">
-              <Link
-                href="/contribute"
-                className="px-10 py-4 rounded-[2rem] bg-white text-black font-black hover:scale-105 transition-all shadow-xl shadow-white/5 active:scale-95"
-              >
-                CONTRIBUTE NOW
-              </Link>
-              <a
-                href="https://github.com/Tushar8466/devtrack"
-                target="_blank"
-                rel="noreferrer"
-                className="px-10 py-4 rounded-[2rem] bg-white/5 border border-white/10 text-white font-black hover:bg-white/10 transition-all active:scale-95"
-              >
-                GITHUB REPO
-              </a>
-            </div>
-          </div>
-
-          <div className="flex-1 w-full flex items-center justify-center relative group">
-            <div className="w-full aspect-square max-w-[500px] border border-white/10 rounded-[4rem] bg-black relative flex flex-col items-center justify-center p-12 text-center overflow-hidden shadow-[0_0_50px_-12px_rgba(124,58,237,0.2)] hover:border-violet-500/50 transition-all duration-700">
-              {/* Dynamic Background Effects */}
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(124,58,237,0.15),transparent_70%)] opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
-              <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-transparent via-violet-500/50 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-[2000ms] ease-in-out" />
-
-              <div className="relative mb-8">
-                <div className="relative w-28 h-28 flex items-center justify-center">
-                  <div className="absolute inset-0 bg-violet-600/20 blur-3xl animate-pulse" />
-                  <div className="absolute inset-0 border border-violet-500/10 rounded-full animate-[spin_10s_linear_infinite]" />
-                  <div className="absolute inset-2 border border-violet-500/5 rounded-full animate-[spin_15s_linear_infinite_reverse]" />
-                  <Settings className="relative w-16 h-16 text-violet-500 group-hover:rotate-180 transition-transform duration-1000 ease-out" strokeWidth={1} />
-                </div>
-              </div>
-
-              <div className="space-y-4 relative z-10">
-                <div className="flex items-center justify-center gap-2 mb-2">
-                  <div className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
-                  <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest">Live Integration</span>
-                </div>
-                <h4 className="text-3xl font-black text-white tracking-tighter uppercase leading-none">JOIN THE CORE</h4>
-                <div className="text-neutral-500 text-sm font-medium border-y border-white/5 py-4 px-6 inline-block uppercase tracking-widest">
-                  <span className="text-violet-400 font-bold mr-2 animate-pulse">GROWING</span>
-                  OPEN SOURCE MISSION
-                </div>
-              </div>
-
-              <p className="mt-8 text-neutral-500 text-xs italic leading-relaxed max-w-[280px]">
-                "Our mission is to help human ingenuity thrive in the age of synthetic code authorship."
-              </p>
-
-              {/* Decorative Corner Accents */}
-              <div className="absolute top-8 left-8 w-4 h-4 border-t-2 border-l-2 border-white/10 group-hover:border-violet-500/50 transition-colors" />
-              <div className="absolute bottom-8 right-8 w-4 h-4 border-b-2 border-r-2 border-white/10 group-hover:border-violet-500/50 transition-colors" />
-            </div>
-
-            {/* Outer Glows */}
-            <div className="absolute -inset-4 bg-violet-500/5 blur-3xl rounded-[4rem] opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none" />
-          </div>
-          {/* Absolute decorative items */}
-          <div className="absolute -top-10 -right-10 w-32 h-32 bg-violet-600/5 blur-3xl rounded-full" />
-          <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-fuchsia-600/5 blur-3xl rounded-full" />
-        </div>
-      </section>
-
-      {/* Feedback Section */}
-      <section id="feedback" className="bg-black py-32 px-6 relative overflow-hidden">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[1px] bg-linear-to-r from-transparent via-white/5 to-transparent" />
-
-        <FeedbackForm />
-
-        {/* Public Feedback Wall Integration */}
-        <div className="mt-32">
-          <FeedbackWall />
-        </div>
-      </section>
-
-      {/* Global Interactive Section */}
-      <section id="global-map" className="bg-black py-24 px-6 overflow-hidden relative min-h-[600px] flex flex-col items-center">
-        <div className="absolute inset-0 bg-black pointer-events-none" />
-
-        <div className="max-w-5xl mx-auto text-center mb-16 relative z-10">
-          <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">
-            A Global Insight Into <span className="text-violet-400">Software Authorship</span>
-          </h2>
-          <p className="text-neutral-400 max-w-2xl mx-auto">
-            Interactive visualization of real-time developer metrics across the global ecosystem.
-          </p>
-        </div>
-
-        <div className="w-full max-w-6xl h-[600px] md:h-[800px] relative z-10 bg-black border border-indigo-500/10 rounded-[3rem] p-1 backdrop-blur-sm group hover:border-violet-500/20 transition-all duration-700">
+      {/* Global Interactive Section - Text Removed */}
+      <section id="global-map" className="bg-black py-24 px-6 overflow-hidden relative min-h-[800px] flex flex-col items-center">
+        <div className="w-full max-w-6xl h-[600px] md:h-[800px] relative z-10 bg-black border border-indigo-500/10 rounded-[3rem] p-1 backdrop-blur-sm">
           <div className="w-full h-full rounded-[2.8rem] overflow-hidden">
             <Globe />
           </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-black py-8 px-6">
+      {/* Footer - Minimal */}
+      <footer className="bg-black py-12 px-6 border-t border-white/5">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-neutral-500 text-sm">© 2026 DevTrack. All rights reserved.</p>
-          <div className="flex items-center gap-6">
-            <Link href={nextRoute} className="text-neutral-500 hover:text-white text-sm transition-colors">Explore</Link>
-            <Link href="/contribute" className="text-neutral-500 hover:text-white text-sm transition-colors">Contribute</Link>
-            <Link href="/opensource" className="text-neutral-500 hover:text-white text-sm transition-colors">Open Source</Link>
-            <a href="https://github.com/Tushar8466/devtrack" target="_blank" rel="noreferrer" className="text-neutral-500 hover:text-white text-sm transition-colors">GitHub</a>
-          </div>
+          <p className="text-neutral-500 text-xs">© 2026 DevTrack.</p>
         </div>
       </footer>
     </div>
