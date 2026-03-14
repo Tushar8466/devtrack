@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="banner.png" alt="DevTrack Banner" width="100%">
+  <img src="/hero.png" alt="DevTrack Banner" width="100%">
 
   # DEVTRACK_
   ### Decoding the Future of Software Authorship
