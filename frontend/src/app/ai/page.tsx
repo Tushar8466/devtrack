@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState, Suspense } from "react";
+import { useEffect, useState, Suspense, useRef } from "react";
 import AIVisual from "@/components/ai";
 import { motion, AnimatePresence } from "motion/react";
-import { Shield, Cpu, ArrowLeft, Terminal, Send, Sparkles } from "lucide-react";
+import { Shield, Cpu, ArrowLeft, Terminal, Send, Sparkles, Bot, User, Zap } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -18,6 +18,23 @@ const INTERCEPT_MESSAGES = [
   "INTERCEPTING_PACKET_0x9F4",
   "CALIBRATING_LOGIC_GATES"
 ];
+
+const DEV_TRACK_ANSWERS: Record<string, string> = {
+  "what is devtrack": "DevTrack is an advanced GitHub contribution tracker and impact analyzer. It uses Neural DNA mapping to visualize the real-world impact of your open-source contributions across the global repository network.",
+  "what is code dna": "Code DNA is our proprietary architectural analysis engine. It scans commit patterns to determine authorship signatures (e.g., Stable_Typed vs Low_Level), code genetic styles, and AI-to-human authorship ratios.",
+  "how to scan": "To initiate a scan, simply type 'analyze [username]' or paste a GitHub username/URL here. I'll perform a high-dimensional topological analysis of the target's contributor entropy and coding fingerprints.",
+  "who are you": "I am the DevTrack Tactical Intelligence Core. My function is to monitor global open-source nodes, decode authorship signatures, and guide users through the DevTrack reconnaissance network.",
+  "satellite": "The Satellite Interception Feed provides a real-time tactical map of global system events, cache rebuilds, and node synchronizations happening across the OSS landscape.",
+  "dashboard": "Strategic sector: Your personalized dashboard displays connected identities, core metrics, and your historical impact trajectory within the network.",
+  "explore": "The Explore module allows you to traverse the global repository network, using our Health Scouter to verify the pulse and structural integrity of any project.",
+  "compare": "Variance tool: Use the Compare sector to place two identities side-by-side, analyzing the genetic variance in their coding signatures and architectural patterns.",
+  "pulse": "DevTrack Pulse is the real-time stream of the global OSS heart rate. It monitors incoming commit shards and node activity across all tracked sectors.",
+  "contribute": "You can expand our neural coverage by joining the contribution node. Check the 'Contribute' link in the navigation to see our open-source repositories and join the collective.",
+  "os tracker": "The OS Tracker monitors the trajectory of major open-source projects, analyzing their architectural evolution and architectural health in real-time.",
+  "how to use": "You can ask me technical questions about DevTrack features or provide a GitHub ID to initiate a deep-level DNA scan. Try asking 'What is Code DNA?' or typing 'analyze torvalds'.",
+  "projects": "The Projects sector highlights key initiatives, collective builds, and high-impact repositories currently under high-resolution surveillance by the DevTrack core.",
+  "default": "Data stream synchronized. I am currently monitoring all DevTrack sectors. Please provide a GitHub ID for deep DNA scanning or ask a tactical question about our operational modules (e.g., Pulse, Code DNA, Satellite)."
+};
 
 const DiagnosticBar = ({ value, label, color }: { value: number, label: string, color: string }) => (
   <div className="space-y-1">
@@ -42,6 +59,8 @@ export default function AIPage() {
   const [pulseData, setPulseData] = useState<number[]>(Array(12).fill(20));
   const [input, setInput] = useState("");
   const [targetId, setTargetId] = useState("");
+  const [aiResponse, setAiResponse] = useState<string | null>(null);
+  const [isTyping, setIsTyping] = useState(false);
 
   useEffect(() => {
     const logInterval = setInterval(() => {
@@ -64,40 +83,75 @@ export default function AIPage() {
     const trimmedInput = input.trim();
     if (!trimmedInput || isScanning) return;
 
-    // Intelligent Extraction
-    let extractedId = trimmedInput;
-    const words = trimmedInput.split(/\s+/);
+    const lowerInput = trimmedInput.toLowerCase();
+    
+    // INTENT ANALYSIS
+    const questionKeywords = ["what", "how", "who", "why", "tell", "explain", "info", "help", "guide"];
+    const isQuestion = questionKeywords.some(k => lowerInput.includes(k));
+    const isExplicitScan = lowerInput.startsWith("analyze") || lowerInput.startsWith("scan") || lowerInput.startsWith("search");
+    const isRepoLink = lowerInput.includes("github.com/");
+    
+    // REDIRECTION PROTOCOL
+    if ((isExplicitScan || isRepoLink || !isQuestion) && trimmedInput.length > 2) {
+        let extractedId = trimmedInput;
+        const words = trimmedInput.split(/\s+/);
 
-    if (words.length > 1) {
-      const fromIndex = words.findIndex((w: string) => w.toLowerCase() === 'from');
-      const analyzeIndex = words.findIndex((w: string) => w.toLowerCase() === 'analyze');
-      const atIndex = words.findIndex((w: string) => w.startsWith('@'));
+        if (words.length > 1) {
+          const fromIndex = words.findIndex((w: string) => w.toLowerCase() === 'from');
+          const analyzeIndex = words.findIndex((w: string) => w.toLowerCase() === 'analyze');
+          const atIndex = words.findIndex((w: string) => w.startsWith('@'));
 
-      if (fromIndex !== -1 && words[fromIndex + 1]) {
-        extractedId = words[fromIndex + 1];
-      } else if (analyzeIndex !== -1 && words[analyzeIndex + 1]) {
-        extractedId = words[analyzeIndex + 1];
-      } else if (atIndex !== -1) {
-        extractedId = words[atIndex].substring(1);
-      } else {
-        extractedId = words[words.length - 1];
-      }
+          if (fromIndex !== -1 && words[fromIndex + 1]) extractedId = words[fromIndex + 1];
+          else if (analyzeIndex !== -1 && words[analyzeIndex + 1]) extractedId = words[analyzeIndex + 1];
+          else if (atIndex !== -1) extractedId = words[atIndex].substring(1);
+          else extractedId = words[words.length - 1];
+        }
+
+        extractedId = extractedId.replace(/[?.!,]$/, "");
+        if (extractedId.includes("github.com/")) {
+          const parts = extractedId.split("/");
+          extractedId = parts[parts.length - 1];
+        }
+
+        // Check if extractedId is a reserved keyword (not a user)
+        const reserved = ["repo", "repository", "commits", "dna", "devtrack"];
+        if (reserved.includes(extractedId.toLowerCase())) {
+            // Fallback to question mode if it's a keyword
+            handleQuestion(lowerInput);
+            return;
+        }
+
+        setTargetId(extractedId);
+        setIsScanning(true);
+        setAiResponse(`INITIATING_TOPOLOGICAL_RECONNAISSANCE: ${extractedId}`);
+
+        setTimeout(() => {
+          window.location.href = `/analyze/${extractedId}`;
+        }, 2200);
+    } else {
+        handleQuestion(lowerInput);
     }
+  };
 
-    // Clean extractedId
-    extractedId = extractedId.replace(/[?.!,]$/, "");
-    setTargetId(extractedId);
-    setIsScanning(true);
-
-    // Final check: if user actually typed a URL
-    if (extractedId.includes("github.com/")) {
-      const parts = extractedId.split("/");
-      extractedId = parts[parts.length - 1];
-    }
+  const handleQuestion = (lowerInput: string) => {
+    setIsTyping(true);
+    setAiResponse(null);
+    setInput("");
 
     setTimeout(() => {
-      window.location.href = `/analyze/${extractedId}`;
-    }, 2500);
+        let response = DEV_TRACK_ANSWERS["default"];
+        let bestMatch = "";
+        for (const key in DEV_TRACK_ANSWERS) {
+            if (lowerInput.includes(key) && key !== "default") {
+                if (key.length > bestMatch.length) {
+                    bestMatch = key;
+                }
+            }
+        }
+        if (bestMatch) response = DEV_TRACK_ANSWERS[bestMatch];
+        setAiResponse(response);
+        setIsTyping(false);
+    }, 1000);
   };
 
   return (
@@ -157,37 +211,88 @@ export default function AIPage() {
           </div>
         </div>
 
+        {/* FLOATING AI RESPONSE BUBBLE */}
+        <div className="absolute bottom-40 left-1/2 -translate-x-1/2 w-full max-w-xl px-8 pointer-events-none">
+            <AnimatePresence mode="wait">
+                {(isTyping || aiResponse) && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 20, scale: 0.9 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.95, filter: "blur(10px)" }}
+                        className="bg-black/60 backdrop-blur-3xl border border-violet-500/20 p-6 rounded-3xl shadow-[0_0_50px_rgba(139,92,246,0.1)] relative overflow-hidden group"
+                    >
+                        <div className="absolute top-0 left-0 w-1 h-full bg-linear-to-b from-violet-600 to-transparent" />
+                        <div className="flex gap-4 items-start">
+                           <div className="p-2 bg-violet-600/20 rounded-xl border border-violet-500/30">
+                              <Bot size={18} className="text-violet-500" />
+                           </div>
+                           <div className="flex-1 pt-1">
+                              {isTyping ? (
+                                  <div className="flex gap-1 items-center h-4">
+                                      <motion.div animate={{ opacity: [0.2, 1, 0.2] }} transition={{ repeat: Infinity, duration: 1 }} className="w-1 h-1 bg-violet-500 rounded-full" />
+                                      <motion.div animate={{ opacity: [0.2, 1, 0.2] }} transition={{ repeat: Infinity, duration: 1, delay: 0.2 }} className="w-1 h-1 bg-violet-500 rounded-full" />
+                                      <motion.div animate={{ opacity: [0.2, 1, 0.2] }} transition={{ repeat: Infinity, duration: 1, delay: 0.4 }} className="w-1 h-1 bg-violet-500 rounded-full" />
+                                  </div>
+                              ) : (
+                                  <p className="text-xs font-medium text-violet-100 leading-relaxed italic">
+                                      {aiResponse}
+                                  </p>
+                              )}
+                           </div>
+                        </div>
+                        {/* DECORATIVE BITS */}
+                        <div className="absolute bottom-2 right-3 text-[6px] font-black text-violet-500/30 uppercase tracking-[0.2em] group-hover:text-violet-500/60 transition-colors">
+                           Neural_Process: 0x8A9
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div>
+
         {/* CENTERED BOTTOM INPUT: BIG COMMAND TERMINAL */}
-        <div className="absolute bottom-12 left-1/2 -translate-x-1/2 w-full max-w-2xl px-8 pointer-events-auto">
-          <form onSubmit={handleSubmit} className="relative group">
-            <div className="absolute -inset-1 bg-linear-to-r from-violet-600 to-fuchsia-600 rounded-4xl blur opacity-25 group-focus-within:opacity-50 transition duration-1000 group-hover:duration-200"></div>
-            <div className="relative flex items-center bg-black/80 backdrop-blur-3xl border border-white/10 rounded-3xl p-2 pl-4">
-              <div className="flex items-center gap-3 shrink-0">
-                <Sparkles size={18} className="text-violet-500 animate-pulse" />
-                <div className="h-4 w-px bg-white/10" />
+        <div className="absolute bottom-12 left-1/2 -translate-x-1/2 w-full max-w-3xl px-8 pointer-events-auto">
+          <form onSubmit={handleSubmit} className="relative group/form">
+            <div className="absolute -inset-2 bg-linear-to-r from-violet-600/20 to-fuchsia-600/20 rounded-[40px] blur-xl opacity-0 group-focus-within/form:opacity-100 transition duration-1000"></div>
+            <div className="relative flex items-center bg-black/40 backdrop-blur-3xl border border-white/10 rounded-[32px] p-3 pl-6 hover:border-violet-500/30 transition-all duration-500 shadow-2xl">
+              <div className="flex items-center gap-4 shrink-0">
+                <div className="relative">
+                   <Sparkles size={22} className="text-violet-500 animate-pulse" />
+                   <motion.div animate={{ scale: [1, 1.5, 1], opacity: [0.5, 0, 0.5] }} transition={{ duration: 2, repeat: Infinity }} className="absolute inset-0 bg-violet-500 rounded-full blur-md" />
+                </div>
+                <div className="h-6 w-px bg-white/10" />
               </div>
               <input
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="Enter GitHub ID to analyze DNA fingerprints..."
-                className="flex-1 bg-transparent border-none py-5 px-6 text-sm font-medium italic text-white placeholder-neutral-600 focus:outline-none focus:ring-0 transition-all selection:bg-violet-500/50"
+                placeholder="Ask intelligence about DevTrack or enter GitHub ID to scan..."
+                className="flex-1 bg-transparent border-none py-6 px-6 text-base font-medium italic text-white placeholder-neutral-600 focus:outline-none focus:ring-0 transition-all selection:bg-violet-500/50"
               />
               <button
                 type="submit"
                 disabled={!input.trim() || isScanning}
-                className="bg-violet-600 hover:bg-violet-500 disabled:opacity-20 text-white p-4 rounded-2xl transition-all shadow-xl shadow-violet-500/20 active:scale-95 flex items-center gap-2 group/btn"
+                className="bg-linear-to-br from-violet-600 to-fuchsia-600 hover:scale-105 disabled:opacity-20 disabled:grayscale text-white px-8 py-5 rounded-[22px] transition-all shadow-xl shadow-violet-500/20 active:scale-95 flex items-center gap-3 group/btn overflow-hidden relative"
               >
-                <span className="text-[10px] font-black uppercase tracking-widest hidden sm:block">Analyze_ID</span>
+                <div className="absolute inset-0 bg-white/10 opacity-0 group-hover/btn:opacity-100 transition-opacity" />
+                <span className="text-xs font-black uppercase tracking-widest hidden sm:block">Analyze_Core</span>
                 <Send size={18} className="group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1 transition-transform duration-300" />
               </button>
             </div>
-            <div className="flex justify-between items-center px-6 mt-3 text-[7px] font-black text-neutral-600 uppercase tracking-[0.3em]">
-              <span>System_Ready: 0x8F</span>
-              <span className="flex items-center gap-2">
-                <div className="w-1 h-1 bg-emerald-500 rounded-full animate-ping" />
-                Neural_Link_Stable
-              </span>
+            
+            {/* STATUS FOOTER */}
+            <div className="flex justify-between items-center px-10 mt-5 text-[8px] font-black text-neutral-600 uppercase tracking-[0.4em]">
+              <div className="flex items-center gap-4">
+                 <span className="flex items-center gap-2">
+                    <div className="w-1 h-1 bg-emerald-500 rounded-full animate-ping" />
+                    Neural_Link_Stable
+                 </span>
+                 <span className="opacity-40">|</span>
+                 <span>Buffer: 0x00FF</span>
+              </div>
+              <div className="flex items-center gap-2 text-violet-500/50">
+                 <Zap size={10} />
+                 Tactical_Ready
+              </div>
             </div>
           </form>
         </div>
@@ -247,7 +352,7 @@ export default function AIPage() {
       </div>
 
       {/* THE MAIN VISUAL */}
-      <div className="absolute inset-x-0 bottom-0 top-32 z-10">
+      <div className="absolute inset-x-0 bottom-0 top-72 z-10">
         <Suspense fallback={
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="flex flex-col items-center gap-4">

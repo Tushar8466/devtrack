@@ -378,7 +378,7 @@ function NeuralGraph({ login }: { login: string }) {
                 <div className="w-1.5 h-6 bg-violet-500 rounded-full" />
                 Architectural Neural Network
             </h3>
-            
+
             <div className="relative w-full h-[300px]">
                 <svg viewBox="0 0 350 180" className="w-full h-full">
                     <defs>
@@ -390,7 +390,7 @@ function NeuralGraph({ login }: { login: string }) {
                             </feMerge>
                         </filter>
                     </defs>
-                    
+
                     {/* Links */}
                     {links.map(([s, t], i) => {
                         const start = nodes.find(n => n.id === s)!;
@@ -421,11 +421,11 @@ function NeuralGraph({ login }: { login: string }) {
                                 filter="url(#glow)"
                                 whileHover={{ scale: 1.5, fill: "#8b5cf6" }}
                             />
-                            <text 
-                                x={node.x} y={node.y + node.size + 4} 
-                                textAnchor="middle" 
-                                fill="#666" 
-                                fontSize="6" 
+                            <text
+                                x={node.x} y={node.y + node.size + 4}
+                                textAnchor="middle"
+                                fill="#666"
+                                fontSize="6"
                                 className="font-mono uppercase tracking-widest"
                             >
                                 {node.label}
@@ -434,7 +434,7 @@ function NeuralGraph({ login }: { login: string }) {
                     ))}
                 </svg>
             </div>
-            
+
             <div className="mt-8 flex items-center justify-between pt-8 border-t border-white/5">
                 <div className="flex gap-4">
                     <div className="text-center">
@@ -456,30 +456,30 @@ function NeuralGraph({ login }: { login: string }) {
 
 function CodingHabits({ login }: { login: string }) {
     const habits = useMemo(() => [
-        { 
-            label: "Focus Peak", 
-            value: (hashScore(login + "fp", 0, 23)).toString().padStart(2, '0') + ":00", 
+        {
+            label: "Focus Peak",
+            value: (hashScore(login + "fp", 0, 23)).toString().padStart(2, '0') + ":00",
             sub: hashScore(login + "fp", 10, 20) > 15 ? "Night Owl" : "Early Bird",
             icon: "🌙",
             color: "text-indigo-400"
         },
-        { 
-            label: "Mood Index", 
-            value: hashScore(login + "mi", 70, 99) + "%", 
+        {
+            label: "Mood Index",
+            value: hashScore(login + "mi", 70, 99) + "%",
             sub: "Stable / Focused",
             icon: "🧠",
             color: "text-emerald-400"
         },
-        { 
-            label: "Code Entropy", 
-            value: (hashScore(login + "ce", 10, 48) / 10).toFixed(1), 
+        {
+            label: "Code Entropy",
+            value: (hashScore(login + "ce", 10, 48) / 10).toFixed(1),
             sub: "Neural Complexity",
             icon: "🌀",
             color: "text-violet-400"
         },
-        { 
-            label: "Burst Buffer", 
-            value: hashScore(login + "bb", 5, 25) + "ms", 
+        {
+            label: "Burst Buffer",
+            value: hashScore(login + "bb", 5, 25) + "ms",
             sub: "Neural Latency",
             icon: "⚡",
             color: "text-amber-400"
@@ -567,10 +567,10 @@ export default function ProfileResults({ data, onBack }: ProfileResultsProps) {
                             </div>
                         )}
                         {/* Scan Line Animation */}
-                        <motion.div 
+                        <motion.div
                             animate={{ top: ["0%", "100%", "0%"] }}
                             transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-                            className="absolute left-0 right-0 h-0.5 bg-violet-500/50 shadow-[0_0_15px_#8b5cf6] z-10" 
+                            className="absolute left-0 right-0 h-0.5 bg-violet-500/50 shadow-[0_0_15px_#8b5cf6] z-10"
                         />
                     </div>
                     {/* Status Pip */}
@@ -615,7 +615,7 @@ export default function ProfileResults({ data, onBack }: ProfileResultsProps) {
 
                 {/* Metadata Registry */}
                 <div className="w-full h-px bg-linear-to-r from-transparent via-white/10 to-transparent" />
-                
+
                 <div className="w-full space-y-4 px-2">
                     {[
                         { icon: "📍", label: "Registry", val: location || "Global_Node" },
@@ -670,11 +670,11 @@ export default function ProfileResults({ data, onBack }: ProfileResultsProps) {
                         </h1>
                         <p className="text-neutral-500 text-sm font-medium tracking-tight">Intelligence snapshot for Node_{login.toUpperCase()}</p>
                     </div>
-                    
+
                     <div className="flex items-center gap-6">
                         <div className="flex flex-col items-end gap-2">
                             <div className="flex gap-2">
-                                <button 
+                                <button
                                     onClick={() => {
                                         navigator.clipboard.writeText(window.location.href);
                                         alert("Analysis link copied to clipboard!");
@@ -684,7 +684,7 @@ export default function ProfileResults({ data, onBack }: ProfileResultsProps) {
                                 >
                                     <IconShare size={20} className="group-hover:rotate-12 transition-transform" />
                                 </button>
-                                <button 
+                                <button
                                     onClick={() => window.print()}
                                     className="p-3 rounded-2xl bg-white text-black hover:bg-neutral-200 transition-all shadow-[0_0_20px_rgba(255,255,255,0.1)] group"
                                     title="Download Report"
@@ -700,7 +700,7 @@ export default function ProfileResults({ data, onBack }: ProfileResultsProps) {
                 </header>
 
                 {/* Status Indicator Banner */}
-                <motion.div 
+                <motion.div
                     initial={{ opacity: 0, scale: 0.98 }}
                     animate={{ opacity: 1, scale: 1 }}
                     className={`flex items-center justify-between p-1 pr-6 rounded-2xl border ${overallRisk.bannerColor.split(' ')[2]} ${overallRisk.bannerColor.split(' ')[0]} bg-black/40 backdrop-blur-sm`}
@@ -715,7 +715,7 @@ export default function ProfileResults({ data, onBack }: ProfileResultsProps) {
                         </div>
                     </div>
                     <div className="flex items-center gap-8">
-                         <div className="text-right">
+                        <div className="text-right">
                             <div className="text-[10px] font-black opacity-30 uppercase tracking-widest leading-none mb-1">Probability</div>
                             <div className="text-lg font-black italic">{overallScore}%</div>
                         </div>
@@ -729,14 +729,14 @@ export default function ProfileResults({ data, onBack }: ProfileResultsProps) {
                 {/* Primary Intelligence Section */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     {/* DNA Radar Card */}
-                    <motion.div 
+                    <motion.div
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.2 }}
                         className="p-8 rounded-[3.5rem] bg-[#050505] border border-white/10 relative overflow-hidden group/radar shadow-2xl"
                     >
                         <div className="absolute top-0 right-0 p-10 opacity-5 group-hover/radar:rotate-12 transition-transform duration-700">
-                             <IconFingerprint size={120} />
+                            <IconFingerprint size={120} />
                         </div>
                         <div className="flex items-center justify-between mb-8">
                             <div className="flex items-center gap-3">
@@ -747,7 +747,7 @@ export default function ProfileResults({ data, onBack }: ProfileResultsProps) {
                             </div>
                             <div className="text-[9px] font-mono text-neutral-600 animate-pulse uppercase tracking-widest">Sequencing_Neural_Vector...</div>
                         </div>
-                        
+
                         <div className="h-80 w-full relative">
                             <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none">
                                 <div className="w-[80%] h-[80%] border border-white/10 rounded-full" />
@@ -769,17 +769,17 @@ export default function ProfileResults({ data, onBack }: ProfileResultsProps) {
                             </ResponsiveContainer>
                         </div>
                         <div className="mt-6 flex items-center justify-between px-2">
-                             <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-2">
                                 <span className="w-2 h-2 rounded-full bg-violet-500 animate-pulse" />
                                 <span className="text-[9px] font-black text-neutral-600 uppercase tracking-widest">Confidence: 94.2%</span>
-                             </div>
-                             <span className="text-[9px] font-mono text-neutral-700">TRACE_v2_DNA_LOG</span>
+                            </div>
+                            <span className="text-[9px] font-mono text-neutral-700">TRACE_v2_DNA_LOG</span>
                         </div>
                     </motion.div>
 
                     {/* Secondary Metrics Column */}
                     <div className="flex flex-col gap-6">
-                        <motion.div 
+                        <motion.div
                             initial={{ opacity: 0, x: 20 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: 0.3 }}
@@ -797,7 +797,7 @@ export default function ProfileResults({ data, onBack }: ProfileResultsProps) {
                                     {overallScore < 40 ? "Node exhibits high original authorship preservation. External linguistic influence is minimal, suggesting proprietary stylistic integrity." : "Evidence of augmented workflow patterns detected. Observations indicate frequent reliance on neural translation and architectural drafting aids."}
                                 </p>
                             </div>
-                            
+
                             <div className="grid grid-cols-2 gap-4 mt-12 relative z-10">
                                 <div className="p-6 rounded-3xl bg-black/40 border border-white/5 hover:border-violet-500/30 transition-all">
                                     <p className="text-[9px] text-neutral-600 font-black uppercase tracking-widest mb-2">Unique Primitives</p>
@@ -821,32 +821,32 @@ export default function ProfileResults({ data, onBack }: ProfileResultsProps) {
                 {/* Tactical Metrics Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {[
-                        { 
-                            icon: <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />, 
-                            color: "text-amber-400", bg: "bg-amber-500/15", border: "border-amber-500/20", 
-                            title: "AI Likelihood", score: aiScore, 
+                        {
+                            icon: <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />,
+                            color: "text-amber-400", bg: "bg-amber-500/15", border: "border-amber-500/20",
+                            title: "AI Likelihood", score: aiScore,
                             desc: "Commit patterns and code entropy match known generation signatures."
                         },
-                        { 
-                            icon: <rect x="3" y="12" width="4" height="9" />, 
-                            color: "text-violet-400", bg: "bg-violet-500/15", border: "border-violet-500/20", 
-                            title: "Style Drift", score: styleDrift, 
+                        {
+                            icon: <rect x="3" y="12" width="4" height="9" />,
+                            color: "text-violet-400", bg: "bg-violet-500/15", border: "border-violet-500/20",
+                            title: "Style Drift", score: styleDrift,
                             desc: "Detects sudden shifts in coding patterns coinciding with neural adoption."
                         },
-                        { 
-                            icon: <circle cx="18" cy="18" r="3" />, 
-                            color: "text-cyan-400", bg: "bg-cyan-500/15", border: "border-cyan-500/20", 
-                            title: "Merge Stability", score: postMerge, 
+                        {
+                            icon: <circle cx="18" cy="18" r="3" />,
+                            color: "text-cyan-400", bg: "bg-cyan-500/15", border: "border-cyan-500/20",
+                            title: "Merge Stability", score: postMerge,
                             desc: "Tracks hotfixes and reverts within 72 hours of integration sequences."
                         },
-                        { 
-                            icon: <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />, 
-                            color: "text-emerald-400", bg: "bg-emerald-500/15", border: "border-emerald-500/20", 
-                            title: "Ownership Index", score: ownership, 
+                        {
+                            icon: <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />,
+                            color: "text-emerald-400", bg: "bg-emerald-500/15", border: "border-emerald-500/20",
+                            title: "Ownership Index", score: ownership,
                             desc: "GAUGE true authorship through PR review quality and discussion depth."
                         }
                     ].map((m, i) => (
-                        <motion.div 
+                        <motion.div
                             key={i}
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
