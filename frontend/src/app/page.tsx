@@ -1,23 +1,18 @@
 "use client";
 
 import HeroSection from "@/components/HeroSection";
-import { MacbookScroll } from "@/components/ui/macbook-scroll";
-import AnimatedDevTrackScreen from "@/components/ui/AnimatedDevTrackScreen";
 import { EvervaultCard } from "@/components/ui/evervault-card";
 import { Search, Brain, BarChart, User, Settings, Lock } from "lucide-react";
 import dynamic from "next/dynamic";
 import { BackgroundRippleEffect } from "@/components/ui/background-ripple-effect";
 import { IntelligenceGrid } from "@/components/IntelligenceGrid";
-import { Vortex } from "@/components/ui/vortex";
 import { FeedbackWall } from "@/components/FeedbackWall";
 import { FeedbackForm } from "@/components/FeedbackForm";
 import { motion, AnimatePresence } from "motion/react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { Star, Sparkles, ChevronRight, Activity, Globe as GlobeIcon, Zap as ZapIcon, Shield } from "lucide-react";
+import { Star, ChevronRight } from "lucide-react";
 import { SparklesCore } from "@/components/ui/sparkles";
-import { ActivityFeed } from "@/components/ui/activity-feed";
-import { BadgeShelf } from "@/components/ui/badge-shelf";
 
 const Globe = dynamic(() => import("@/components/globe"), {
   ssr: false,
@@ -28,14 +23,6 @@ const Globe = dynamic(() => import("@/components/globe"), {
   ),
 });
 
-const SpecialEcosystem = dynamic(() => import("@/components/special"), {
-  ssr: false,
-  loading: () => (
-    <div className="w-full h-full flex flex-col items-center justify-center gap-4 text-neutral-500 bg-black/20">
-      <div className="w-8 h-8 border-2 border-cyan-500/20 border-t-cyan-500 rounded-full animate-spin" />
-    </div>
-  ),
-});
 
 const Icon = ({ className }: { className?: string }) => {
   return (
@@ -123,22 +110,6 @@ export default function Home() {
 
       <HeroSection />
 
-      {/* MacBook Scroll section */}
-      <div className="overflow-hidden bg-black w-full pb-20">
-        <MacbookScroll
-          title={
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              className="text-white text-4xl md:text-6xl font-black uppercase tracking-tighter"
-            >
-              Command Your <span className="text-violet-500">Workspace</span>
-            </motion.h2>
-          }
-          screenContent={<AnimatedDevTrackScreen />}
-          showGradient={false}
-        />
-      </div>
 
       {/* Intelligence Grid Section */}
       <section className="bg-black py-24 px-6 relative overflow-hidden border-t border-white/5">
