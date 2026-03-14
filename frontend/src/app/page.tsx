@@ -238,19 +238,19 @@ export default function Home() {
       {/* How it works section */}
       <section className="bg-black py-32 px-6 relative overflow-hidden group/steps">
         <div className="absolute inset-0 z-0 opacity-20 group-hover/steps:opacity-40 transition-opacity duration-1000">
-           <BackgroundRippleEffect rows={20} cols={40} cellSize={60} />
+          <BackgroundRippleEffect rows={20} cols={40} cellSize={60} />
         </div>
 
         <div className="max-w-5xl mx-auto relative z-10">
           <div className="text-center mb-20">
-            <motion.span 
+            <motion.span
               initial={{ opacity: 0, y: 10 }}
               whileInView={{ opacity: 1, y: 0 }}
               className="text-violet-400 text-sm font-black uppercase tracking-[0.4em]"
             >
               The Architecture
             </motion.span>
-            <motion.h2 
+            <motion.h2
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
@@ -262,8 +262,8 @@ export default function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
             {steps.map((s, i) => (
-              <motion.div 
-                key={i} 
+              <motion.div
+                key={i}
                 initial={{ opacity: 0, scale: 0.9 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 transition={{ delay: i * 0.1 }}
@@ -276,9 +276,9 @@ export default function Home() {
                 </div>
                 <h3 className="text-white font-black text-2xl mb-4 uppercase tracking-tight">{s.title}</h3>
                 <p className="text-neutral-500 text-sm leading-relaxed group-hover:text-neutral-400 transition-colors">{s.description}</p>
-                
+
                 {i < 2 && (
-                    <div className="hidden md:block absolute top-12 -right-6 w-12 h-px bg-linear-to-r from-violet-500/50 to-transparent" />
+                  <div className="hidden md:block absolute top-12 -right-6 w-12 h-px bg-linear-to-r from-violet-500/50 to-transparent" />
                 )}
               </motion.div>
             ))}
@@ -289,11 +289,11 @@ export default function Home() {
       {/* CTA section */}
       <section className="bg-black py-32 px-6 relative overflow-hidden group/cta">
         <div className="absolute inset-0 z-0 opacity-0 group-hover/cta:opacity-100 transition-opacity duration-1000">
-           {/* Sparkles removed */}
+          {/* Sparkles removed */}
         </div>
 
         <div className="max-w-3xl mx-auto text-center relative z-10">
-          <motion.h2 
+          <motion.h2
             initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
             className="text-5xl md:text-7xl font-black text-white mb-8 tracking-tighter"
@@ -309,10 +309,10 @@ export default function Home() {
             whileTap={{ scale: 0.95 }}
           >
             <Link
-                href={nextRoute}
-                className="inline-block px-12 py-5 rounded-2xl bg-white text-black font-black text-lg transition-all duration-300 shadow-[0_0_50px_-5px_rgba(255,255,255,0.2)] hover:shadow-[0_0_70px_-5px_rgba(255,255,255,0.4)]"
+              href={nextRoute}
+              className="inline-block px-12 py-5 rounded-2xl bg-white text-black font-black text-lg transition-all duration-300 shadow-[0_0_50px_-5px_rgba(255,255,255,0.2)] hover:shadow-[0_0_70px_-5px_rgba(255,255,255,0.4)]"
             >
-                START SCANNING NOW →
+              START SCANNING NOW →
             </Link>
           </motion.div>
         </div>
@@ -402,7 +402,7 @@ export default function Home() {
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[1px] bg-linear-to-r from-transparent via-white/5 to-transparent" />
 
         <FeedbackForm />
-        
+
         {/* Public Feedback Wall Integration */}
         <div className="mt-32">
           <FeedbackWall />
