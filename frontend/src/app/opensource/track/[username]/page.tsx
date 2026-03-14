@@ -9,13 +9,13 @@ import { WavyBackground } from "@/components/ui/wavy-background";
 import { motion, AnimatePresence } from "motion/react";
 import { useOutsideClick } from "@/hooks/use-outside-click";
 import { MultiStepLoader } from "@/components/ui/multi-step-loader";
-import { 
-    ResponsiveContainer, 
-    BarChart, 
-    Bar, 
-    XAxis, 
-    YAxis, 
-    Tooltip, 
+import {
+    ResponsiveContainer,
+    BarChart,
+    Bar,
+    XAxis,
+    YAxis,
+    Tooltip,
     Cell,
     PieChart,
     Pie
@@ -234,7 +234,7 @@ export default function TrackerResultsPage() {
                                         <BarChart data={repoStats} layout="vertical">
                                             <XAxis type="number" hide />
                                             <YAxis dataKey="name" type="category" width={120} tick={{ fontSize: 9, fill: '#666', fontWeight: 900 }} axisLine={false} tickLine={false} />
-                                            <Tooltip 
+                                            <Tooltip
                                                 contentStyle={{ backgroundColor: '#000', border: '1px solid #ffffff10', fontSize: '10px' }}
                                                 itemStyle={{ color: '#8b5cf6' }}
                                             />

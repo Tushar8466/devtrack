@@ -32,6 +32,19 @@ const GlowingEffect = memo(
     const containerRef = useRef<HTMLDivElement>(null);
     const lastPosition = useRef({ x: 0, y: 0 });
     const animationFrameRef = useRef<number>(0);
+    const dims = useRef({ left: 0, top: 0, width: 0, height: 0 });
+
+    const updateDims = useCallback(() => {
+      if (containerRef.current) {
+        const rect = containerRef.current.getBoundingClientRect();
+        dims.current = {
+          left: rect.left,
+          top: rect.top,
+          width: rect.width,
+          height: rect.height
+        };
+      }
+    }, []);
 
     const handleMove = useCallback(
       (e?: MouseEvent | { x: number; y: number }) => {
@@ -45,7 +58,7 @@ const GlowingEffect = memo(
           const element = containerRef.current;
           if (!element) return;
 
-          const { left, top, width, height } = element.getBoundingClientRect();
+          const { left, top, width, height } = dims.current;
           const mouseX = e?.x ?? lastPosition.current.x;
           const mouseY = e?.y ?? lastPosition.current.y;
 
@@ -100,10 +113,23 @@ const GlowingEffect = memo(
     useEffect(() => {
       if (disabled) return;
 
-      const handleScroll = () => handleMove();
-      const handlePointerMove = (e: PointerEvent) => handleMove(e);
+      const element = containerRef.current;
+      if (!element) return;
+
+      updateDims();
+      
+      const resizeObserver = new ResizeObserver(updateDims);
+      resizeObserver.observe(element);
+
+      const handleScroll = () => {
+        updateDims();
+        handleMove();
+      };
+      
+      const handlePointerMove = (e: PointerEvent) => handleMove({ x: e.clientX, y: e.clientY });
 
       window.addEventListener("scroll", handleScroll, { passive: true });
+      window.addEventListener("resize", updateDims, { passive: true });
       document.body.addEventListener("pointermove", handlePointerMove, {
         passive: true,
       });
@@ -112,10 +138,12 @@ const GlowingEffect = memo(
         if (animationFrameRef.current) {
           cancelAnimationFrame(animationFrameRef.current);
         }
+        resizeObserver.disconnect();
         window.removeEventListener("scroll", handleScroll);
+        window.removeEventListener("resize", updateDims);
         document.body.removeEventListener("pointermove", handlePointerMove);
       };
-    }, [handleMove, disabled]);
+    }, [handleMove, disabled, updateDims]);
 
     return (
       <>

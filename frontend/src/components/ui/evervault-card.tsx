@@ -1,6 +1,6 @@
 "use client";
 import { useMotionValue } from "motion/react";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useMotionTemplate, motion } from "motion/react";
 import { cn } from "@/lib/utils";
 
@@ -16,18 +16,19 @@ export const EvervaultCard = ({
 
   const [randomString, setRandomString] = useState("");
 
-  useEffect(() => {
-    let str = generateRandomString(1500);
-    setRandomString(str);
-  }, []);
+  const lastUpdate = useRef(0);
 
   function onMouseMove({ currentTarget, clientX, clientY }: any) {
     let { left, top } = currentTarget.getBoundingClientRect();
     mouseX.set(clientX - left);
     mouseY.set(clientY - top);
 
-    const str = generateRandomString(1500);
-    setRandomString(str);
+    const now = Date.now();
+    if (now - lastUpdate.current > 50) {
+      const str = generateRandomString(1500);
+      setRandomString(str);
+      lastUpdate.current = now;
+    }
   }
 
   return (

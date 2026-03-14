@@ -505,7 +505,7 @@ function OSExplorerContent() {
                               {/* Background Rings */}
                               <div className="absolute inset-0 border border-white/5 rounded-full" />
                               <div className="absolute inset-4 border border-white/5 rounded-full border-dashed animate-spin-slow opacity-20" />
-                              
+
                               <svg className="w-full h-full -rotate-90 drop-shadow-[0_0_15px_rgba(6,182,212,0.3)]">
                                  <circle cx="80" cy="80" r="74" fill="none" stroke="currentColor" strokeWidth="1" className="text-white/5" />
                                  <motion.circle
@@ -519,7 +519,7 @@ function OSExplorerContent() {
                                  />
                               </svg>
                               <div className="absolute flex flex-col items-center">
-                                 <motion.span 
+                                 <motion.span
                                     initial={{ opacity: 0, scale: 0.5 }}
                                     animate={{ opacity: 1, scale: 1 }}
                                     className="text-4xl font-black text-white italic leading-none tracking-tighter"
@@ -531,7 +531,7 @@ function OSExplorerContent() {
                            </div>
                            <div className="space-y-1">
                               <h4 className="text-lg font-black text-white uppercase tracking-tighter italic">Structural Buffer</h4>
-                              <p className="text-[10px] font-mono text-neutral-600 uppercase tracking-widest">Efficiency_Index::{ (healthScore * 0.94).toFixed(2) }v</p>
+                              <p className="text-[10px] font-mono text-neutral-600 uppercase tracking-widest">Efficiency_Index::{(healthScore * 0.94).toFixed(2)}v</p>
                            </div>
                         </div>
                      </div>
@@ -860,7 +860,7 @@ function OSExplorerContent() {
                                     <img src={event.actor.avatar_url} className="w-8 h-8 rounded-lg border border-white/10 grayscale group-hover:grayscale-0 transition-all opacity-60 group-hover:opacity-100" />
                                     <p className="text-xs text-neutral-400 leading-none">
                                        <span className="text-white font-black italic tracking-tight">{event.actor.display_login}</span>
-                                       <span className="block mt-1 text-[9px] font-mono text-neutral-600">ACTION_RELAY_SEQ::{(Math.random()*1000).toFixed(0)}</span>
+                                       <span className="block mt-1 text-[9px] font-mono text-neutral-600">ACTION_RELAY_SEQ::{(Math.random() * 1000).toFixed(0)}</span>
                                     </p>
                                  </div>
                                  {event.payload.commits && (

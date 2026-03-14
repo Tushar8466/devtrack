@@ -4,6 +4,7 @@ import HeroSection from "@/components/HeroSection";
 import { EvervaultCard } from "@/components/ui/evervault-card";
 import { Search, Brain, BarChart, User, Settings, Lock } from "lucide-react";
 import dynamic from "next/dynamic";
+import { Suspense } from "react";
 import { BackgroundRippleEffect } from "@/components/ui/background-ripple-effect";
 import { IntelligenceGrid } from "@/components/IntelligenceGrid";
 import { FeedbackWall } from "@/components/FeedbackWall";
@@ -112,19 +113,21 @@ export default function Home() {
 
 
       {/* Intelligence Grid Section */}
-      <section className="bg-black py-24 px-6 relative overflow-hidden border-t border-white/5">
-        <div className="max-w-[1400px] mx-auto">
-          <div className="mb-20 text-center">
-            <h2 className="text-3xl md:text-5xl font-black text-white uppercase tracking-tighter italic">
-              Neural <span className="text-violet-500">Core</span> Capabilities
-            </h2>
-            <p className="text-neutral-500 mt-4 max-w-xl mx-auto font-medium">
-              Leveraging high-dimensional vector analysis to authenticate the true source of engineering talent.
-            </p>
+      <Suspense fallback={<div className="h-96 bg-black" />}>
+        <section className="bg-black py-24 px-6 relative overflow-hidden border-t border-white/5">
+          <div className="max-w-[1400px] mx-auto">
+            <div className="mb-20 text-center">
+              <h2 className="text-3xl md:text-5xl font-black text-white uppercase tracking-tighter italic">
+                Neural <span className="text-violet-500">Core</span> Capabilities
+              </h2>
+              <p className="text-neutral-500 mt-4 max-w-xl mx-auto font-medium">
+                Leveraging high-dimensional vector analysis to authenticate the true source of engineering talent.
+              </p>
+            </div>
+            <IntelligenceGrid />
           </div>
-          <IntelligenceGrid />
-        </div>
-      </section>
+        </section>
+      </Suspense>
 
       {/* Features section */}
       <section className="bg-black py-24 px-6 border-t border-white/5">
@@ -228,7 +231,7 @@ export default function Home() {
       </section>
 
       {/* Contribute (Open Source Node) Section */}
-      <section id="contribute" className="bg-black py-32 px-6 border-t border-white/5 overflow-hidden">
+      <section id="open-source-mission" className="bg-black py-32 px-6 border-t border-white/5 overflow-hidden">
         <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-24 relative">
           <div className="flex-1 space-y-10 group">
             <div>
@@ -246,7 +249,8 @@ export default function Home() {
             <div className="flex flex-wrap gap-6 pt-4">
               <Link
                 href="/contribute"
-                className="px-10 py-4 rounded-[2rem] bg-white text-black font-black hover:scale-105 transition-all shadow-xl shadow-white/5 active:scale-95 uppercase tracking-tighter"
+                prefetch={true}
+                className="relative z-20 px-10 py-4 rounded-[2rem] bg-white text-black font-black hover:scale-105 transition-[transform,shadow,background-color] duration-300 shadow-xl shadow-white/5 active:scale-95 uppercase tracking-tighter text-center will-change-transform"
               >
                 Contribute Now
               </Link>
@@ -316,26 +320,28 @@ export default function Home() {
       </section>
 
       {/* Global Interactive Section & Satellite Interception Feed */}
-      <section id="global-map" className="bg-black py-24 px-6 overflow-hidden relative min-h-[900px] flex flex-col items-center border-t border-white/5">
-        <div className="max-w-5xl mx-auto text-center mb-20 relative z-10">
-          <span className="text-violet-500 font-black tracking-[0.4em] text-[10px] animate-pulse mb-4 block">// SATELLITE_INTERCEPTION_FEED</span>
-          <h2 className="text-4xl md:text-6xl font-black text-white uppercase tracking-tighter mb-4">
-            Global Integration <span className="text-violet-500">Nodes</span>
-          </h2>
-          <p className="text-neutral-500 font-medium italic underline decoration-violet-500/30 underline-offset-8">
-            Synchronized across 40+ global repository clusters. Real-time interception of development pulses.
-          </p>
-        </div>
+      <Suspense fallback={<div className="h-[600px] bg-black" />}>
+        <section id="global-map" className="bg-black py-24 px-6 overflow-hidden relative min-h-[900px] flex flex-col items-center border-t border-white/5">
+          <div className="max-w-5xl mx-auto text-center mb-20 relative z-10">
+            <span className="text-violet-500 font-black tracking-[0.4em] text-[10px] animate-pulse mb-4 block">// SATELLITE_INTERCEPTION_FEED</span>
+            <h2 className="text-4xl md:text-6xl font-black text-white uppercase tracking-tighter mb-4">
+              Global Integration <span className="text-violet-500">Nodes</span>
+            </h2>
+            <p className="text-neutral-500 font-medium italic underline decoration-violet-500/30 underline-offset-8">
+              Synchronized across 40+ global repository clusters. Real-time interception of development pulses.
+            </p>
+          </div>
 
-        <div className="w-full max-w-7xl relative z-10">
-          {/* Globe Visualization */}
-          <div className="w-full h-[600px] md:h-[800px] relative bg-black border border-indigo-500/10 rounded-[4rem] p-1 backdrop-blur-sm shadow-[0_0_80px_rgba(139,92,246,0.1)] group hover:border-violet-500/20 transition-all duration-700">
-            <div className="w-full h-full rounded-[3.8rem] overflow-hidden">
-              <Globe />
+          <div className="w-full max-w-7xl relative z-10">
+            {/* Globe Visualization */}
+            <div className="w-full h-[600px] md:h-[800px] relative bg-black border border-indigo-500/10 rounded-[4rem] p-1 backdrop-blur-sm shadow-[0_0_80px_rgba(139,92,246,0.1)] group hover:border-violet-500/20 transition-all duration-700">
+              <div className="w-full h-full rounded-[3.8rem] overflow-hidden">
+                <Globe />
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </Suspense>
 
       {/* Footer */}
       <footer className="bg-black py-24 px-6 border-t border-white/5 relative z-10">
