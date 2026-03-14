@@ -1,6 +1,5 @@
 "use client";
 
-import { useSession } from "next-auth/react";
 import HeroSection from "@/components/HeroSection";
 import { MacbookScroll } from "@/components/ui/macbook-scroll";
 import AnimatedDevTrackScreen from "@/components/ui/AnimatedDevTrackScreen";

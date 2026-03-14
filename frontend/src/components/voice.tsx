@@ -1,7 +1,11 @@
 "use client";
 
-import Spline from '@splinetool/react-spline/next';
+import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
+
+const Spline = dynamic(() => import('@splinetool/react-spline'), {
+  ssr: false,
+});
 
 export default function VoiceAssistantAgent() {
   return (
@@ -11,10 +15,12 @@ export default function VoiceAssistantAgent() {
           <div className="w-8 h-8 border-2 border-violet-500/20 border-t-violet-500 rounded-full animate-spin" />
         </div>
       }>
-        <Spline
-          scene="https://prod.spline.design/N6V-P-eZEHBhbItC/scene.splinecode" 
-          className="w-full h-full"
-        />
+        <div className="w-full h-full">
+          <Spline
+            scene="https://prod.spline.design/N6V-P-eZEHBhbItC/scene.splinecode" 
+            className="w-full h-full"
+          />
+        </div>
       </Suspense>
     </div>
   );
