@@ -24,7 +24,7 @@ import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 
-const VoiceAssistantAgent = dynamic(() => import("./voice"), { ssr: false });
+const BotAgent = dynamic(() => import("./bot"), { ssr: false });
 
 interface Message {
   id: string;
@@ -207,7 +207,7 @@ export function AtlasAssistant() {
               <div className="flex items-center gap-3">
                 <div className="relative">
                   <div className="w-12 h-12 rounded-xl bg-black/50 overflow-hidden flex items-center justify-center shadow-[0_0_20px_rgba(139,92,246,0.5)] border border-white/10">
-                    <VoiceAssistantAgent />
+                    <BotAgent />
                   </div>
                   <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-emerald-500 rounded-full border-2 border-black animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
                 </div>
@@ -235,7 +235,7 @@ export function AtlasAssistant() {
               {isListening && (
                 <div className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none opacity-40">
                   <div className="w-full h-full scale-150">
-                    <VoiceAssistantAgent />
+                    <BotAgent />
                   </div>
                 </div>
               )}
