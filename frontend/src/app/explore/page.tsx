@@ -149,8 +149,8 @@ export default function ExplorePage() {
                     {searchType === 'profile'
                         ? "Enter a GitHub username to scan for AI-generated contribution signals."
                         : searchType === 'repo'
-                        ? "Retrieve architectural health and health pulses for any repository."
-                        : "Enter a GitHub repository to instantly view its most recent commit history."}
+                            ? "Retrieve architectural health and health pulses for any repository."
+                            : "Enter a GitHub repository to instantly view its most recent commit history."}
                 </p>
 
                 <form onSubmit={handleSearch} className="flex flex-col gap-3">
