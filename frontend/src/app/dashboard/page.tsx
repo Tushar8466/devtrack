@@ -10,7 +10,7 @@ import { Box, Users, GitFork, FileText, Camera } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { GlowingCard } from "@/components/ui/glowing-card";
 import { FileUpload } from "@/components/ui/file-upload";
-import { X, Fingerprint, Activity, Clock, Award, Terminal, Flame, AlertCircle, ShieldCheck } from "lucide-react";
+import { X, Fingerprint, Activity, Clock, Award, Terminal, Flame, AlertCircle, ShieldCheck, Dna } from "lucide-react";
 import { MultiStepLoader } from "@/components/ui/multi-step-loader";
 import { motion } from "motion/react";
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer } from 'recharts';
@@ -94,11 +94,11 @@ export default function DashboardPage() {
         const tomorrow = new Date(now);
         tomorrow.setHours(24, 0, 0, 0);
         const diff = tomorrow.getTime() - now.getTime();
-        
+
         const h = Math.floor(diff / (1000 * 60 * 60));
         const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
         const s = Math.floor((diff % (1000 * 60)) / 1000);
-        
+
         // Dynamic Threat Level Logic
         if (h >= 12) {
           setThreatLevel({ color: "amber", label: "Sequence_Pending", status: "Sync_Required", intensity: "500" });
@@ -224,8 +224,8 @@ export default function DashboardPage() {
           `/api/streak/check?username=${encodeURIComponent(effectiveUsername)}&localDate=${localDate}&offset=${offset}`
         );
         if (!res.ok) return;
-        const data = (await res.json()) as { 
-          hasCommittedToday?: boolean; 
+        const data = (await res.json()) as {
+          hasCommittedToday?: boolean;
           hasCommittedYesterday?: boolean;
           currentStreak?: number;
           totalActiveDays?: number;
@@ -233,7 +233,7 @@ export default function DashboardPage() {
         if (!cancelled) {
           const pushed = data.hasCommittedToday === true;
           const pushedYesterday = data.hasCommittedYesterday === true;
-          
+
           setHasPushedToday(pushed);
           // Alert visibility: Only at risk if they pushed yesterday but not today
           setStreakAtRisk(!pushed && pushedYesterday);
@@ -251,13 +251,13 @@ export default function DashboardPage() {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
-                streak:  streakVal,
+                streak: streakVal,
                 commits: totalCommits,
                 // These come from githubData loaded in parallel — may already be set
-                repos:   0,   // will be a real value once githubData loads
-                prs:     0,
-                issues:  0,
-                stars:   0,
+                repos: 0,   // will be a real value once githubData loads
+                prs: 0,
+                issues: 0,
+                stars: 0,
                 languages: [],
               })
             });
@@ -307,12 +307,12 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-[#030303] pt-28 pb-20 px-4 text-white font-sans selection:bg-violet-500/30">
       <BadgeNotificationProvider newlyUnlocked={newBadges} />
-      
+
       <div className="max-w-[1400px] mx-auto space-y-12">
 
         {/* STREAK AT RISK BANNER */}
         {streakChecked && streakAtRisk && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: -20, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             className="relative group "
@@ -320,25 +320,25 @@ export default function DashboardPage() {
             {/* Ambient Base Glow */}
             <div className={cn(
               "absolute inset-0 blur-3xl opacity-30 group-hover:opacity-60 transition-all duration-2000",
-              threatLevel.color === "red" ? "bg-red-600/50" : 
-              threatLevel.color === "orange" ? "bg-orange-500/50" : "bg-amber-500/50"
+              threatLevel.color === "red" ? "bg-red-600/50" :
+                threatLevel.color === "orange" ? "bg-orange-500/50" : "bg-amber-500/50"
             )} />
 
             <div className={cn(
               "relative flex items-center justify-between px-6 md:px-12 py-8 rounded-4xl border backdrop-blur-3xl transition-all duration-2000 overflow-hidden shadow-2xl z-10",
-              threatLevel.color === "red" ? "border-red-500/40 shadow-red-500/20" : 
-              threatLevel.color === "orange" ? "border-orange-500/40 shadow-orange-500/20" : 
-              "border-amber-500/40 shadow-amber-500/20",
+              threatLevel.color === "red" ? "border-red-500/40 shadow-red-500/20" :
+                threatLevel.color === "orange" ? "border-orange-500/40 shadow-orange-500/20" :
+                  "border-amber-500/40 shadow-amber-500/20",
               "bg-[#050505]/95" // Deep dark background
             )}>
               {/* Tactical Warning Stripes */}
               <div className={cn(
                 "absolute inset-0 opacity-[0.03] transition-colors duration-1000 pointer-events-none mix-blend-plus-lighter",
                 "bg-[repeating-linear-gradient(-45deg,currentColor,currentColor_15px,transparent_15px,transparent_30px)]",
-                threatLevel.color === "red" ? "text-red-500" : 
-                threatLevel.color === "orange" ? "text-orange-500" : "text-amber-500"
+                threatLevel.color === "red" ? "text-red-500" :
+                  threatLevel.color === "orange" ? "text-orange-500" : "text-amber-500"
               )} />
-              
+
               {/* Moving Laser Sweep */}
               <motion.div
                 animate={{ x: ["-100%", "200%"] }}
@@ -346,8 +346,8 @@ export default function DashboardPage() {
                 className={cn(
                   "absolute top-0 bottom-0 w-[50%] opacity-[0.05] pointer-events-none skew-x-[-20deg]",
                   "bg-linear-to-r from-transparent via-current to-transparent",
-                  threatLevel.color === "red" ? "text-red-500" : 
-                  threatLevel.color === "orange" ? "text-orange-500" : "text-amber-500"
+                  threatLevel.color === "red" ? "text-red-500" :
+                    threatLevel.color === "orange" ? "text-orange-500" : "text-amber-500"
                 )}
               />
 
@@ -356,81 +356,81 @@ export default function DashboardPage() {
 
               <div className="relative flex flex-col md:flex-row items-center justify-between w-full gap-8 z-10">
                 <div className="flex flex-col md:flex-row items-center gap-8 w-full md:w-auto text-center md:text-left">
-                  
+
                   {/* Central Icon Container */}
                   <div className="relative shrink-0">
                     <div className="absolute inset-0 bg-black rounded-3xl blur-[10px]" />
                     <div className={cn(
                       "w-20 h-20 rounded-3xl border-2 flex items-center justify-center transition-colors duration-1000 relative z-10 bg-black overflow-hidden shadow-inner group-hover:scale-110",
-                      threatLevel.color === "red" ? "border-red-500/50 shadow-red-500/20" : 
-                      threatLevel.color === "orange" ? "border-orange-500/50 shadow-orange-500/20" : 
-                      "border-amber-500/50 shadow-amber-500/20"
+                      threatLevel.color === "red" ? "border-red-500/50 shadow-red-500/20" :
+                        threatLevel.color === "orange" ? "border-orange-500/50 shadow-orange-500/20" :
+                          "border-amber-500/50 shadow-amber-500/20"
                     )}>
                       <div className={cn(
                         "absolute inset-0 opacity-20",
-                        threatLevel.color === "red" ? "bg-red-500" : 
-                        threatLevel.color === "orange" ? "bg-orange-500" : "bg-amber-500"
+                        threatLevel.color === "red" ? "bg-red-500" :
+                          threatLevel.color === "orange" ? "bg-orange-500" : "bg-amber-500"
                       )} />
                       <Activity className={cn(
                         "w-10 h-10 transition-colors duration-1000 animate-pulse",
-                        threatLevel.color === "red" ? "text-red-500" : 
-                        threatLevel.color === "orange" ? "text-orange-500" : "text-amber-500"
+                        threatLevel.color === "red" ? "text-red-500" :
+                          threatLevel.color === "orange" ? "text-orange-500" : "text-amber-500"
                       )} />
                     </div>
                     {/* Floating Orbs */}
-                    <motion.div 
+                    <motion.div
                       animate={{ scale: [1, 1.5, 1], opacity: [0.5, 1, 0.5] }}
                       transition={{ duration: 2, repeat: Infinity }}
                       className={cn(
                         "absolute -top-2 -right-2 w-4 h-4 rounded-full transition-colors duration-1000 z-20 blur-[2px]",
                         threatLevel.color === "red" ? "bg-red-500" : threatLevel.color === "orange" ? "bg-orange-500" : "bg-amber-500"
-                      )} 
+                      )}
                     />
                     <div className={cn(
                       "absolute -bottom-1 -left-1 w-2 h-2 rounded-full animate-ping transition-colors duration-1000 z-20",
                       threatLevel.color === "red" ? "bg-red-500" : threatLevel.color === "orange" ? "bg-orange-500" : "bg-amber-500"
                     )} />
                   </div>
-                  
+
                   {/* Typography Block */}
                   <div>
                     <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 mb-3">
                       <span className={cn(
                         "flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.4em] transition-colors duration-1000",
-                        threatLevel.color === "red" ? "text-red-500" : 
-                        threatLevel.color === "orange" ? "text-orange-500" : "text-amber-500"
+                        threatLevel.color === "red" ? "text-red-500" :
+                          threatLevel.color === "orange" ? "text-orange-500" : "text-amber-500"
                       )}>
                         <div className="w-1.5 h-1.5 rounded-full bg-current animate-pulse shadow-[0_0_10px_currentColor]" />
                         {threatLevel.label}
                       </span>
                       <span className={cn(
                         "px-3 py-1 border rounded-md bg-black text-[10px] font-black uppercase tracking-widest transition-all duration-1000",
-                        threatLevel.color === "red" ? "border-red-500/80 text-red-500 shadow-[0_0_15px_rgba(239,68,68,0.4)]" : 
-                        threatLevel.color === "orange" ? "border-orange-500/80 text-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.4)]" : 
-                        "border-amber-500/80 text-amber-500 shadow-[0_0_15px_rgba(245,158,11,0.4)]"
+                        threatLevel.color === "red" ? "border-red-500/80 text-red-500 shadow-[0_0_15px_rgba(239,68,68,0.4)]" :
+                          threatLevel.color === "orange" ? "border-orange-500/80 text-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.4)]" :
+                            "border-amber-500/80 text-amber-500 shadow-[0_0_15px_rgba(245,158,11,0.4)]"
                       )}>{threatLevel.status}</span>
                     </div>
-                    
+
                     <h3 className="text-xl md:text-2xl font-black text-white uppercase tracking-tighter italic flex flex-wrap justify-center md:justify-start gap-2 items-baseline relative z-10 drop-shadow-2xl">
                       <span className={cn(
                         "transition-colors duration-1000 opacity-90",
-                        threatLevel.color === "red" ? "text-red-50/90" : 
-                        threatLevel.color === "orange" ? "text-orange-50/90" : "text-amber-50/90"
+                        threatLevel.color === "red" ? "text-red-50/90" :
+                          threatLevel.color === "orange" ? "text-orange-50/90" : "text-amber-50/90"
                       )}>NEURAL LINK EXPIRING:</span>
                       <span className={cn(
                         "transition-all duration-1000 drop-shadow-xl animate-pulse",
-                        threatLevel.color === "red" ? "text-red-500" : 
-                        threatLevel.color === "orange" ? "text-orange-500" : "text-amber-500"
+                        threatLevel.color === "red" ? "text-red-500" :
+                          threatLevel.color === "orange" ? "text-orange-500" : "text-amber-500"
                       )}>{currentStreak || 0} DAY STREAK</span>
                     </h3>
-                    
+
                     <p className="text-xs text-neutral-400 font-medium italic mt-4 flex items-center justify-center md:justify-start gap-2 max-w-lg">
                       <ShieldCheck size={16} className="opacity-50 shrink-0" />
                       Synchronize your work today to maintain sequence integrity and prevent neural degradation.
                     </p>
                   </div>
                 </div>
-                
+
                 {/* Clock Display */}
                 <div className="relative z-10 flex flex-col items-center md:items-end shrink-0 md:pl-10 md:border-l border-white/10 md:h-full justify-center mt-6 md:mt-0">
                   <span className="text-[10px] font-mono text-neutral-500 uppercase tracking-[0.4em] mb-2 flex items-center gap-2">
@@ -439,8 +439,8 @@ export default function DashboardPage() {
                   </span>
                   <span className={cn(
                     "text-3xl md:text-4xl font-mono font-black tabular-nums transition-colors duration-1000 tracking-tighter drop-shadow-[0_0_20px_currentColor]",
-                     threatLevel.color === "red" ? "text-red-500" : 
-                     threatLevel.color === "orange" ? "text-orange-500" : "text-amber-500"
+                    threatLevel.color === "red" ? "text-red-500" :
+                      threatLevel.color === "orange" ? "text-orange-500" : "text-amber-500"
                   )}>
                     {timeLeft || "00:00:00"}
                   </span>
@@ -451,9 +451,9 @@ export default function DashboardPage() {
               <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-black/50">
                 <div className={cn(
                   "h-full transition-all duration-1000 w-full animate-pulse",
-                  threatLevel.color === "red" ? "bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.8)]" : 
-                  threatLevel.color === "orange" ? "bg-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.8)]" : 
-                  "bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.8)]"
+                  threatLevel.color === "red" ? "bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.8)]" :
+                    threatLevel.color === "orange" ? "bg-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.8)]" :
+                      "bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.8)]"
                 )} />
               </div>
             </div>
@@ -462,7 +462,7 @@ export default function DashboardPage() {
 
         {/* STREAK SUCCESS BANNER */}
         {streakChecked && hasPushedToday && currentStreak > 0 && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
             className="relative group "
@@ -649,6 +649,16 @@ export default function DashboardPage() {
                   {githubData?.bio || "DevTrack autonomous intelligence engine. Mapping neural authorship across global repositories."}
                 </p>
 
+                <div className="flex gap-4 pt-2">
+                   <Link 
+                     href={`/dna/${effectiveUsername}`}
+                     className="px-6 py-2 bg-indigo-500/10 border border-indigo-500/20 rounded-full text-[10px] font-black text-indigo-400 uppercase tracking-widest hover:bg-indigo-500/20 transition-all flex items-center gap-2"
+                   >
+                     <Fingerprint className="w-3 h-3" />
+                     View_Code_DNA
+                   </Link>
+                </div>
+
                 <div className="flex flex-wrap items-center justify-center md:justify-start gap-6 pt-2">
                   <div className="flex items-center gap-2">
                     <Fingerprint className="w-4 h-4 text-violet-500" />
@@ -675,9 +685,16 @@ export default function DashboardPage() {
               </div>
 
               <div className="flex flex-col gap-3">
+                <Link
+                  href={`/dna/${effectiveUsername}`}
+                  className="px-8 py-4 bg-white text-black rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] hover:bg-neutral-200 transition-all shadow-xl flex items-center justify-center gap-2"
+                >
+                  <Dna className="w-4 h-4" />
+                  GENERATE_DNA_SCAN
+                </Link>
                 <button
                   onClick={() => signOut({ callbackUrl: "/" })}
-                  className="px-8 py-4 bg-white/5 border border-white/10 rounded-2xl text-[11px] font-black text-white uppercase tracking-[0.2em] hover:bg-red-500/10 hover:border-red-500/30 hover:text-red-400 transition-all shadow-xl"
+                  className="px-8 py-4 bg-white/5 border border-white/10 rounded-2xl text-[11px] font-black text-white uppercase tracking-[0.2em] hover:bg-red-500/10 hover:border-red-500/30 hover:text-red-400 transition-all"
                 >
                   DISCONNECT_NODE
                 </button>

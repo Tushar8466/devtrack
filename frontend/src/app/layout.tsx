@@ -10,10 +10,12 @@ export default function RootLayout({
 }) {
   const navItems = [
     { name: "Home", link: "/" },
+    { name: "Pulse", link: "/pulse" },
+    { name: "Code DNA", link: "/dna" },
+    { name: "Projects", link: "/projects" },
     { name: "OS Tracker", link: "/opensource" },
     { name: "Explore", link: "/explore" },
     { name: "Compare", link: "/compare" },
-    { name: "Feedback", link: "/#feedback" },
   ];
 
   return (
