@@ -19,14 +19,14 @@ export default function RootLayout({
 }) {
   const navItems = [
     { name: "Home", link: "/" },
-    { name: "Pulse", link: "/pulse" },
-    { name: "Code DNA", link: "/dna" },
+    { name: "Explore", link: "/explore" },
     { name: "Projects", link: "/projects" },
+    { name: "Pulse", link: "/pulse" },
     { name: "Satellite", link: "/satellite" },
     { name: "OS Tracker", link: "/opensource" },
-    { name: "Explore", link: "/explore" },
-    { name: "DevTrack AI", link: "/ai" },
     { name: "Compare", link: "/compare" },
+    { name: "DevTrack AI", link: "/ai" },
+    { name: "Code DNA", link: "/dna" },
   ];
 
   return (
