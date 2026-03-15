@@ -4,6 +4,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useSession, signOut } from "next-auth/react";
+import { usePathname } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { Inbox, Star } from "lucide-react";
@@ -24,6 +25,7 @@ export const FloatingNav: React.FC<FloatingNavProps> = ({
   className,
 }) => {
   const { data: session } = useSession();
+  const pathname = usePathname();
   const [customAvatar, setCustomAvatar] = React.useState<string | null>(null);
 
   React.useEffect(() => {
@@ -66,17 +68,32 @@ export const FloatingNav: React.FC<FloatingNavProps> = ({
           {navItems.map((item, index) => {
             const isProtected = protectedRoutes.some(route => item.link.startsWith(route));
             const href = (!session && isProtected) ? "/sign-in" : item.link;
+            
+            // Check if active
+            const isActive = pathname === item.link || (item.link !== "/" && pathname?.startsWith(item.link));
 
             return (
               <Link
                 key={index}
                 href={href}
-                className="flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium text-neutral-700 transition hover:bg-neutral-200 hover:text-black dark:text-neutral-300 dark:hover:bg-white/10 dark:hover:text-white"
+                className={cn(
+                  "flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all duration-300",
+                  isActive 
+                    ? "bg-violet-600/10 text-violet-600 dark:bg-white/10 dark:text-white"
+                    : "text-neutral-700 hover:bg-neutral-200 hover:text-black dark:text-neutral-300 dark:hover:bg-white/5 dark:hover:text-white"
+                )}
               >
                 {item.icon && (
                   <span className="block sm:hidden">{item.icon}</span>
                 )}
-                <span className="hidden sm:block">{item.name}</span>
+                <span className="hidden sm:block whitespace-nowrap">{item.name}</span>
+                {isActive && (
+                  <motion.div 
+                    layoutId="activeNav"
+                    className="absolute inset-0 bg-violet-600/5 dark:bg-white/5 rounded-full -z-10"
+                    transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                  />
+                )}
               </Link>
             );
           })}
@@ -91,7 +108,12 @@ export const FloatingNav: React.FC<FloatingNavProps> = ({
             <div className="flex items-center gap-3">
               <Link
                 href="/dashboard"
-                className="flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium text-neutral-700 transition hover:bg-neutral-200 hover:text-black dark:text-neutral-300 dark:hover:bg-white/10 dark:hover:text-white"
+                className={cn(
+                  "flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all duration-300",
+                  pathname?.startsWith("/dashboard")
+                    ? "bg-violet-600/10 text-violet-600 dark:bg-white/10 dark:text-white"
+                    : "text-neutral-700 hover:bg-neutral-200 hover:text-black dark:text-neutral-300 dark:hover:bg-white/5 dark:hover:text-white"
+                )}
               >
                 {customAvatar || session.user?.image ? (
                   <div className="relative w-6 h-6">
@@ -108,6 +130,13 @@ export const FloatingNav: React.FC<FloatingNavProps> = ({
                   </div>
                 )}
                 <span>Profile</span>
+                {pathname?.startsWith("/dashboard") && (
+                  <motion.div 
+                    layoutId="activeNav"
+                    className="absolute inset-0 bg-violet-600/5 dark:bg-white/5 rounded-full -z-10"
+                    transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                  />
+                )}
               </Link>
               <button
                 onClick={() => signOut({ callbackUrl: '/' })}

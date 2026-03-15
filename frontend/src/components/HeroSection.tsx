@@ -17,7 +17,7 @@ export default function HeroSection() {
   return (
     <div ref={containerRef} className="relative h-screen w-full bg-black overflow-hidden flex flex-col items-center justify-center">
       {/* BACKGROUND STACK */}
-      <motion.div 
+      <motion.div
         style={{ y, opacity, scale }}
         className="absolute inset-0 w-full h-full"
       >
