@@ -1,6 +1,6 @@
 {
   "name": "devtrack-vscode",
-  "displayName": "DevTrack",
+  "displayName": "DevTrack: A Code Explorer",
   "description": "Analyze GitHub repositories and OSS projects directly inside VS Code. Get repo health, contributor stats, and activity insights without leaving your editor.",
   "version": "0.1.0",
   "engines": {
