@@ -22,7 +22,6 @@ export default function RootLayout({
     { name: "Explore", link: "/explore" },
     { name: "Projects", link: "/projects" },
     { name: "Pulse", link: "/pulse" },
-    { name: "Satellite", link: "/satellite" },
     { name: "OS Tracker", link: "/opensource" },
     { name: "Compare", link: "/compare" },
     { name: "DevTrack AI", link: "/ai" },
