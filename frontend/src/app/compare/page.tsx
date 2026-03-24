@@ -2,13 +2,13 @@
 
 import { useState, useMemo, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { motion, AnimatePresence, useMotionValue, useMotionTemplate } from "motion/react";
+import { motion, AnimatePresence, useMotionValue, useMotionTemplate, useTransform } from "motion/react";
 import { MultiStepLoader } from "@/components/ui/multi-step-loader";
 import { BackgroundBeams } from "@/components/ui/background-beams";
 import { GlowingEffect } from "@/components/ui/glowing-effect";
 import { GlareCard } from "@/components/ui/glare-card";
 import { SparklesCore } from "@/components/ui/sparkles";
-import { Radar, RadarChart, PolarGrid, PolarAngleAxis, ResponsiveContainer } from 'recharts';
+import { Radar, RadarChart, PolarGrid, PolarAngleAxis, ResponsiveContainer, PolarRadiusAxis } from 'recharts';
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { 
@@ -18,7 +18,11 @@ import {
     IconChevronRight, 
     IconVs,
     IconShieldCheck,
-    IconTrophy
+    IconTrophy,
+    IconCpu,
+    IconTerminal2,
+    IconActivity,
+    IconArrowNarrowRight
 } from "@tabler/icons-react";
 
 interface UserStats {
@@ -49,32 +53,25 @@ export default function ComparePage() {
     const [data2, setData2] = useState<UserStats | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const [showTraits, setShowTraits] = useState(false);
     
-    // Mouse tracking for effects
+    // Mouse tracking for global effects
     const mouseX = useMotionValue(0);
     const mouseY = useMotionValue(0);
-    const rotateX = useMotionValue(0);
-    const rotateY = useMotionValue(0);
-    const [randomString, setRandomString] = useState("");
+    const containerX = useMotionValue(0);
+    const containerY = useMotionValue(0);
 
-    useEffect(() => {
-        setRandomString(generateRandomString(1500));
-    }, []);
+    const bgTransform = useMotionTemplate`radial-gradient(1000px circle at ${mouseX}px ${mouseY}px, rgba(139, 92, 246, 0.08), transparent 80%)`;
 
     function handleMouseMove({ currentTarget, clientX, clientY }: any) {
-        let { left, top, width, height } = currentTarget.getBoundingClientRect();
-        
-        // Main mouse tracking
+        let { left, top } = currentTarget.getBoundingClientRect();
         mouseX.set(clientX - left);
         mouseY.set(clientY - top);
         
-        // 3D Tilt calculation
-        const xPct = (clientX - left) / width;
-        const yPct = (clientY - top) / height;
-        rotateX.set((yPct - 0.5) * -10); // Tilt up to 10 degrees
-        rotateY.set((xPct - 0.5) * 10);
-        
-        setRandomString(generateRandomString(1500));
+        const xPct = (clientX - left) / currentTarget.offsetWidth;
+        const yPct = (clientY - top) / currentTarget.offsetHeight;
+        containerX.set((xPct - 0.5) * 10);
+        containerY.set((yPct - 0.5) * -10);
     }
 
     function hashScore(seed: string, min: number, max: number): number {
@@ -90,25 +87,14 @@ export default function ComparePage() {
         if (!cleanName) return null;
 
         try {
-            // First attempt: Real GitHub API
             const userRes = await fetch(`https://api.github.com/users/${encodeURIComponent(cleanName)}`, {
-                headers: {
-                    "Accept": "application/vnd.github.v3+json"
-                }
+                headers: { "Accept": "application/vnd.github.v3+json" }
             });
             
-            if (userRes.status === 403) {
-                throw new Error("RATE_LIMIT_EXCEEDED");
-            }
-
-            if (!userRes.ok) {
-                if (userRes.status === 404) return null;
-                throw new Error(`API_ERROR_${userRes.status}`);
-            }
+            if (userRes.status === 403) throw new Error("RATE_LIMIT_EXCEEDED");
+            if (!userRes.ok) return null;
             
             const restData = await userRes.json();
-
-            // Repo fetch with error safety
             let reposData = [];
             try {
                 const reposRes = await fetch(`https://api.github.com/users/${encodeURIComponent(cleanName)}/repos?sort=updated&per_page=100`);
@@ -143,7 +129,6 @@ export default function ComparePage() {
             };
         } catch (e) {
             console.error(`Fetch encountered failure for ${cleanName}`, e);
-            // Catch-all fallback for network failures
             return {
                 login: cleanName,
                 name: cleanName.charAt(0).toUpperCase() + cleanName.slice(1),
@@ -162,7 +147,7 @@ export default function ComparePage() {
         e.preventDefault();
         if (!user1 || !user2) return;
         if (user1.toLowerCase() === user2.toLowerCase()) {
-            setError("Cannot compare the same user.");
+            setError("Cannot compare the same node identification.");
             return;
         }
 
@@ -170,39 +155,26 @@ export default function ComparePage() {
         setError("");
         setData1(null);
         setData2(null);
-
-        const cleanUser1 = user1.trim();
-        const cleanUser2 = user2.trim();
+        setShowTraits(false);
 
         try {
             const [res1, res2] = await Promise.all([
-                fetchUser(cleanUser1),
-                fetchUser(cleanUser2)
+                fetchUser(user1.trim()),
+                fetchUser(user2.trim())
             ]);
 
             if (!res1 || !res2) {
-                if (!res1 && !res2) {
-                    setError("NEURAL LINK FAILURE: BOTH NODES INVALID OR NOT FOUND.");
-                } else if (!res1) {
-                    setError(`IDENTIFICATION FAILED: NODE '${cleanUser1}' NOT FOUND IN GLOBAL ARCHIVE.`);
-                } else {
-                    setError(`IDENTIFICATION FAILED: NODE '${cleanUser2}' NOT FOUND IN GLOBAL ARCHIVE.`);
-                }
+                setError(`UPLINK FAILURE: ${!res1 && !res2 ? 'BOTH NODES' : !res1 ? user1 : user2} NOT FOUND.`);
                 setLoading(false);
                 return;
             }
 
-            // Artificial delay for neural processing immersion
-            await new Promise(r => setTimeout(r, 1500));
-
+            await new Promise(r => setTimeout(r, 2000));
             setData1(res1);
             setData2(res2);
+            setTimeout(() => setShowTraits(true), 1500);
         } catch (err: any) {
-            if (err.message === "RATE_LIMIT_EXCEEDED") {
-                setError("CRITICAL: GITHUB API RATE LIMIT EXCEEDED. NEURAL UPLINK RESTRICTED. RETRY IN 60 MINUTES.");
-            } else {
-                setError(`COLLISION ERROR: ${err.message || 'UNKNOWN UPLINK FAILURE'}`);
-            }
+            setError(err.message === "RATE_LIMIT_EXCEEDED" ? "CRITICAL: RATE LIMIT REACHED." : "COLLISION ERROR");
         } finally {
             setLoading(false);
         }
@@ -211,574 +183,366 @@ export default function ComparePage() {
     return (
         <div 
             onMouseMove={handleMouseMove}
-            className="min-h-screen bg-black text-white overflow-hidden relative"
+            className="min-h-screen bg-black text-white overflow-x-hidden relative selection:bg-violet-500/30"
         >
-            {/* Tactical Grid Background */}
-            <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-size-[40px_40px] mask-[radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_110%)] pointer-events-none" />
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(139,92,246,0.05),transparent_70%)] pointer-events-none" />
+            <motion.div style={{ background: bgTransform }} className="fixed inset-0 pointer-events-none z-0" />
+            <BackgroundBeams className="opacity-20" />
             
-            <div className="flex flex-col items-center px-4 md:px-8 pt-32 pb-20 w-full relative z-10">
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808008_1px,transparent_1px),linear-gradient(to_bottom,#80808008_1px,transparent_1px)] bg-size-[60px_60px] pointer-events-none" />
+
+            <div className="relative z-10 max-w-7xl mx-auto px-6 pt-32 pb-40">
+                <header className="text-center mb-24 space-y-6">
                     <motion.div
-                        className="max-w-7xl mx-auto w-full relative z-10"
+                        initial={{ opacity: 0, y: 30 }}
+                        animate={{ opacity: 1, y: 0 }}
                     >
-                        <div className="text-center mb-16 space-y-4">
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.6 }}
-                            >
-                                <h1 className="text-5xl md:text-7xl font-black tracking-tighter mb-4">
-                                    DEVELOPER <span className="bg-linear-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">COLLISION</span>
-                                </h1>
-                                <p className="text-neutral-500 text-lg md:text-xl max-w-2xl mx-auto font-medium">
-                                    Side-by-side neural analysis of GitHub authorship profiles. 
-                                    Compare metrics, AI scores, and contribution patterns.
-                                </p>
-                            </motion.div>
+                        <div className="inline-flex items-center gap-2 px-3 py-1 bg-violet-500/10 border border-violet-500/20 rounded-full mb-6">
+                            <span className="w-1.5 h-1.5 bg-violet-500 rounded-full animate-pulse" />
+                            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-violet-400">Neural Comparison Engine</span>
                         </div>
+                        <h1 className="text-6xl md:text-9xl font-black italic tracking-tighter uppercase leading-none mb-8">
+                            <span className="opacity-40">Dev</span>
+                            <span className="bg-linear-to-r from-violet-400 via-fuchsia-400 to-cyan-400 bg-clip-text text-transparent drop-shadow-[0_0_30px_rgba(167,139,250,0.3)]">Collision</span>
+                        </h1>
+                        <p className="text-neutral-500 text-lg md:text-xl max-w-2xl mx-auto font-medium font-mono uppercase tracking-tighter">
+                            Advanced profile auditing & authorship synchronization
+                        </p>
+                    </motion.div>
+                </header>
 
-                    {/* VS Combat Input Cards */}
-                    <motion.div 
-                        initial={{ opacity: 0, scale: 0.98 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        className="max-w-5xl mx-auto w-full mb-20 relative group"
-                    >
-                        {/* Dynamic Background Intensity */}
-                        <div className={`absolute -inset-20 bg-violet-500/5 blur-[100px] transition-all duration-1000 ${user1 && user2 ? 'opacity-100 scale-110' : 'opacity-0'}`} />
+                {/* Main Input Matrix */}
+                <motion.div 
+                    initial={{ opacity: 0, scale: 0.98 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="max-w-6xl mx-auto mb-32 relative"
+                >
+                    <form onSubmit={handleCompare} className="relative z-10 flex flex-col items-center">
+                        <div className="flex flex-col lg:flex-row items-center justify-center gap-10 w-full">
+                            <InputCard 
+                                value={user1} 
+                                onChange={setUser1} 
+                                label="Node Alpha" 
+                                color="violet" 
+                                placeholder="IDENT_ALPHA" 
+                            />
 
-                        <form onSubmit={handleCompare} className="relative z-10 flex flex-col items-center">
-                            <div className="flex flex-col md:flex-row items-center justify-center gap-4 lg:gap-8 w-full">
-                                {/* Left Fighter Card */}
-                                <div className="flex-1 w-full group/left relative">
-                                    <GlowingEffect
-                                        spread={40}
-                                        glow={true}
-                                        disabled={false}
-                                        proximity={64}
-                                        inactiveZone={0.01}
-                                        borderWidth={2}
-                                    />
-                                    <div className="relative bg-black border border-white/10 rounded-[2.5rem] p-8 backdrop-blur-3xl overflow-hidden min-h-[160px] flex flex-col justify-center group-hover/left:border-violet-500/30 transition-all duration-500">
-                                         <div className="absolute top-0 left-0 w-2 h-full bg-violet-600 shadow-[0_0_20px_rgba(139,92,246,0.5)]" />
-                                         <div className="flex flex-col gap-4">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 rounded-full bg-violet-500/10 flex items-center justify-center border border-violet-500/20">
-                                                    <IconSearch size={18} className="text-violet-400" />
-                                                </div>
-                                                <span className="text-[10px] font-black text-violet-400 uppercase tracking-[0.4em] mb-1">Node Alpha</span>
-                                            </div>
-                                            <input 
-                                                type="text"
-                                                placeholder="ENTER USERNAME..."
-                                                value={user1}
-                                                onChange={(e) => setUser1(e.target.value)}
-                                                className="w-full bg-transparent text-2xl md:text-3xl font-black uppercase tracking-tighter placeholder:text-neutral-900 focus:outline-none text-white italic transition-all focus:tracking-widest relative z-10"
-                                            />
-                                            {user1 && (
-                                                <motion.div 
-                                                    initial={{ left: "-100%" }}
-                                                    animate={{ left: "200%" }}
-                                                    transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                                                    className="absolute top-0 w-32 h-full bg-linear-to-r from-transparent via-violet-500/10 to-transparent pointer-events-none"
-                                                />
-                                            )}
-                                         </div>
-                                    </div>
-                                </div>
-
-                                {/* Center VS Node */}
+                            <div className="relative">
                                 <motion.div 
-                                    whileHover={{ scale: 1.25, rotate: [0, -10, 10, -10, 0] }}
-                                    className="flex flex-col items-center justify-center group-hover:scale-110 transition-transform duration-500 relative z-20"
+                                    whileHover={{ scale: 1.2, rotate: 180 }}
+                                    className="w-24 h-24 rounded-full bg-white text-black flex items-center justify-center text-3xl font-black shadow-[0_0_60px_rgba(255,255,255,0.4)] relative z-20 group cursor-pointer"
                                 >
-                                    <div className="w-20 h-20 rounded-full bg-white text-black flex items-center justify-center text-2xl font-black italic shadow-[0_0_60px_rgba(255,255,255,0.5)] animate-pulse border-4 border-black box-content relative overflow-hidden group/vs">
-                                        <span className="relative z-10">VS</span>
-                                        <motion.div 
-                                            animate={{ opacity: [0, 0.2, 0] }}
-                                            transition={{ duration: 0.2, repeat: Infinity, repeatType: "reverse" }}
-                                            className="absolute inset-0 bg-violet-500 opacity-0 group-hover/vs:opacity-20"
-                                        />
-                                        <div className="absolute inset-0 rounded-full bg-white/40 animate-ping opacity-10" />
-                                    </div>
-                                    <div className="absolute -inset-20 bg-violet-600/10 blur-[60px] rounded-full -z-10 group-hover:bg-violet-600/20 transition-all duration-700" />
+                                    <span className="relative z-10 italic">VS</span>
+                                    <div className="absolute inset-0 rounded-full bg-linear-to-tr from-violet-500 via-transparent to-fuchsia-500 opacity-20 group-hover:opacity-40 transition-opacity" />
                                 </motion.div>
-
-                                {/* Right Fighter Card */}
-                                <div className="flex-1 w-full group/right relative text-right">
-                                    <GlowingEffect
-                                        spread={40}
-                                        glow={true}
-                                        disabled={false}
-                                        proximity={64}
-                                        inactiveZone={0.01}
-                                        borderWidth={2}
-                                    />
-                                    <div className="relative bg-black border border-white/10 rounded-[2.5rem] p-8 backdrop-blur-3xl overflow-hidden min-h-[160px] flex flex-col justify-center group-hover/right:border-fuchsia-500/30 transition-all duration-500">
-                                         <div className="absolute top-0 right-0 w-2 h-full bg-fuchsia-600 shadow-[0_0_20px_rgba(217,70,239,0.5)]" />
-                                         <div className="flex flex-col gap-4 items-end">
-                                            <div className="flex items-center gap-3 flex-row-reverse">
-                                                <div className="w-10 h-10 rounded-full bg-fuchsia-500/10 flex items-center justify-center border border-fuchsia-500/20">
-                                                    <IconSearch size={18} className="text-fuchsia-400" />
-                                                </div>
-                                                <span className="text-[10px] font-black text-fuchsia-400 uppercase tracking-[0.4em] mb-1">Node Omega</span>
-                                            </div>
-                                            <input 
-                                                type="text"
-                                                placeholder="ENTER USERNAME..."
-                                                value={user2}
-                                                onChange={(e) => setUser2(e.target.value)}
-                                                className="w-full bg-transparent text-2xl md:text-3xl font-black uppercase tracking-tighter placeholder:text-neutral-900 focus:outline-none text-white italic text-right transition-all focus:tracking-widest relative z-10"
-                                            />
-                                            {user2 && (
-                                                <motion.div 
-                                                    initial={{ right: "-100%" }}
-                                                    animate={{ right: "200%" }}
-                                                    transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                                                    className="absolute top-0 w-32 h-full bg-linear-to-l from-transparent via-fuchsia-500/10 to-transparent pointer-events-none"
-                                                />
-                                            )}
-                                         </div>
-                                    </div>
-                                </div>
+                                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-violet-600/10 blur-[60px] rounded-full -z-10" />
                             </div>
 
-                            {/* Submit Button */}
-                            <motion.button 
-                                whileHover={{ scale: 1.05, boxShadow: "0 0 50px rgba(255,255,255,0.4)" }}
-                                whileTap={{ scale: 0.95 }}
-                                type="submit"
-                                disabled={!user1 || !user2 || loading}
-                                className="w-full md:w-auto px-20 py-6 bg-white text-black font-black rounded-full italic tracking-[0.4em] shadow-[0_0_40px_rgba(255,255,255,0.2)] disabled:opacity-10 flex items-center justify-center gap-4 group/submit mt-8 md:mt-12 mx-auto overflow-hidden relative"
-                            >
-                                <motion.div 
-                                    className="absolute inset-0 bg-linear-to-r from-transparent via-black/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"
-                                />
-                                {loading ? (
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
-                                        SYNCHRONIZING...
-                                    </div>
-                                ) : "EXECUTE COLLISION"}
-                                {!loading && <IconChevronRight className="group-hover:translate-x-2 transition-transform" />}
-                            </motion.button>
-                        </form>
-                        
-                        {error && (
-                            <p className="mt-8 text-center text-red-500 text-[10px] font-black uppercase tracking-widest">{error}</p>
-                        )}
-                    </motion.div>
+                            <InputCard 
+                                value={user2} 
+                                onChange={setUser2} 
+                                label="Node Omega" 
+                                color="fuchsia" 
+                                placeholder="IDENT_OMEGA" 
+                                alignRight
+                            />
+                        </div>
 
-                    {/* Suggested Collisions */}
-                    {!data1 && !loading && (
+                        <motion.button 
+                            whileHover={{ scale: 1.05, boxShadow: "0 0 80px rgba(139,92,246,0.3)" }}
+                            whileTap={{ scale: 0.95 }}
+                            type="submit"
+                            disabled={!user1 || !user2 || loading}
+                            className="mt-16 group relative bg-white text-black px-16 py-6 rounded-2xl font-black italic tracking-[0.5em] shadow-2xl disabled:opacity-10 overflow-hidden flex items-center gap-4 text-xs uppercase"
+                        >
+                            <span className="relative z-10">{loading ? "Synchronizing Matrix" : "Execute Collision"}</span>
+                            {!loading && <IconArrowNarrowRight size={20} className="relative z-10 group-hover:translate-x-2 transition-transform" />}
+                        </motion.button>
+                    </form>
+                    
+                    {error && (
+                        <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-8 text-center text-red-500 font-mono text-[10px] uppercase tracking-[0.4em] italic">{error}</motion.p>
+                    )}
+                </motion.div>
+
+                {/* Suggested Combatants */}
+                {!data1 && !loading && (
+                    <div className="max-w-4xl mx-auto flex flex-wrap justify-center gap-4 opacity-40 hover:opacity-100 transition-opacity">
+                        {[["torvalds", "dhh"], ["shadcn", "leeerob"], ["nextjs", "reactjs"]].map(([a, b]) => (
+                            <button
+                                key={`${a}-${b}`}
+                                onClick={() => { setUser1(a); setUser2(b); }}
+                                className="px-6 py-2.5 rounded-xl border border-white/10 bg-white/2 hover:bg-white/10 hover:border-violet-500/50 transition-all text-[11px] font-black uppercase tracking-widest text-neutral-400 hover:text-white flex items-center gap-3"
+                            >
+                                {a} <span className="text-violet-500 italic">vs</span> {b}
+                            </button>
+                        ))}
+                    </div>
+                )}
+
+                <AnimatePresence mode="wait">
+                    {loading ? (
                         <motion.div 
+                            key="loading"
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
-                            transition={{ delay: 1 }}
-                            className="max-w-4xl mx-auto flex flex-wrap justify-center gap-3 mb-20"
+                            exit={{ opacity: 0 }}
+                            className="py-40"
                         >
-                            <span className="text-[10px] w-full text-center text-neutral-600 font-mono uppercase tracking-[0.3em] mb-2">Suggested Scenarios</span>
-                            {[
-                                ["torvalds", "dhh"],
-                                ["shadcn", "leeerob"],
-                                ["nextjs", "reactjs"],
-                                ["tushar8466", "gaearon"]
-                            ].map(([a, b]) => (
-                                <button
-                                    key={`${a}-${b}`}
-                                    onClick={() => {
-                                        setUser1(a);
-                                        setUser2(b);
-                                    }}
-                                    className="px-5 py-2.5 rounded-full border border-white/5 bg-white/2 hover:bg-white/10 hover:border-violet-500/30 transition-all text-[11px] font-bold text-neutral-500 hover:text-white uppercase tracking-widest flex items-center gap-2 group/sugg"
-                                >
-                                    {a} <IconVs size={12} className="text-neutral-700 group-hover/sugg:text-violet-500 transition-colors" /> {b}
-                                </button>
-                            ))}
+                            <MultiStepLoader 
+                                loading={loading}
+                                duration={500}
+                                loop={true}
+                                loadingStates={[
+                                    { text: "Initializing Neural Link" },
+                                    { text: "Harvesting Source Metadata" },
+                                    { text: "Calculating Authorship Entropy" },
+                                    { text: "Mapping Skill Vectors" },
+                                    { text: "Finalizing Synchronization" }
+                                ]}
+                            />
                         </motion.div>
-                    )}
-
-                    <AnimatePresence mode="wait">
-                        {loading ? (
+                    ) : data1 && data2 ? (
+                        <div className="space-y-40">
+                            {/* Neural Radar Analysis */}
                             <motion.div 
-                                key="loading"
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                exit={{ opacity: 0 }}
-                                className="flex flex-col items-center justify-center py-20"
+                                initial={{ opacity: 0, y: 50 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                className="max-w-5xl mx-auto relative group"
                             >
-                                <MultiStepLoader 
-                                    loading={loading}
-                                    duration={400}
-                                    loop={true}
-                                    loadingStates={[
-                                        { text: "Synchronizing with Global Node" },
-                                        { text: "Extracting Author A Metadata" },
-                                        { text: "Extracting Author B Metadata" },
-                                        { text: "Calculating Neural Coefficients" },
-                                        { text: "Resolving Ownership Delta" }
-                                    ]}
-                                />
-                            </motion.div>
-                        ) : data1 && data2 ? (
-                            <div className="space-y-20">
-                                {/* Comparison Radar */}
-                                <motion.div 
-                                    initial={{ opacity: 0, scale: 0.9 }}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    className="max-w-4xl mx-auto p-12 rounded-4xl bg-black border border-white/10 backdrop-blur-3xl relative overflow-hidden group mb-20 shadow-2xl"
-                                >
-                                    <div className="absolute top-0 left-0 w-full h-px bg-linear-to-r from-transparent via-violet-500 to-transparent" />
-                                    <div className="text-center mb-10">
-                                        <h3 className="text-xl font-black text-white uppercase tracking-[0.3em] italic">Neural Overlap Analysis</h3>
-                                        <div className="flex items-center justify-center gap-4 mt-2">
-                                            <div className="flex items-center gap-2">
-                                                <div className="w-3 h-3 rounded-full bg-violet-500" />
-                                                <span className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest">{data1.login}</span>
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                                <div className="w-3 h-3 rounded-full bg-fuchsia-500" />
-                                                <span className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest">{data2.login}</span>
-                                            </div>
+                                <div className="absolute -inset-10 bg-violet-600/5 blur-[100px] rounded-[100px] pointer-events-none" />
+                                <div className="relative bg-black/40 border border-white/10 rounded-[4rem] p-16 backdrop-blur-3xl overflow-hidden shadow-2xl">
+                                    <div className="flex flex-col md:flex-row items-center justify-between mb-16 gap-10">
+                                        <div className="space-y-4 text-center md:text-left">
+                                            <h3 className="text-3xl font-black uppercase italic tracking-tighter">Overlap <span className="text-violet-500">Analysis</span></h3>
+                                            <p className="text-neutral-500 font-mono text-xs uppercase tracking-widest">Cross-Dimensional Intelligence Mapping</p>
+                                        </div>
+                                        <div className="flex gap-6">
+                                            <LegendItem name={data1.login} color="#8b5cf6" />
+                                            <LegendItem name={data2.login} color="#d946ef" />
                                         </div>
                                     </div>
-                                    
-                                    <div className="h-96 w-full">
+                                    <div className="h-[450px] w-full">
                                         <ResponsiveContainer width="100%" height="100%">
                                             <RadarChart cx="50%" cy="50%" outerRadius="80%" data={[
-                                                { subject: 'AI Likelihood', A: data1.aiScore, B: data2.aiScore },
-                                                { subject: 'Style Drift', A: data1.styleDrift, B: data2.styleDrift },
-                                                { subject: 'Stability', A: hashScore(data1.login + "st", 30, 95), B: hashScore(data2.login + "st", 30, 95) },
-                                                { subject: 'Logical Depth', A: hashScore(data1.login + "ld", 40, 90), B: hashScore(data2.login + "ld", 40, 90) },
-                                                { subject: 'Social Index', A: Math.min(data1.followers / 10, 100), B: Math.min(data2.followers / 10, 100) },
-                                                { subject: 'Stars Strength', A: Math.min(data1.stars / 50, 100), B: Math.min(data2.stars / 50, 100) },
+                                                { subject: 'AI_LINK', A: data1.aiScore, B: data2.aiScore },
+                                                { subject: 'DRIFT', A: data1.styleDrift, B: data2.styleDrift },
+                                                { subject: 'DEPTH', A: hashScore(data1.login + "ld", 40, 95), B: hashScore(data2.login + "ld", 40, 95) },
+                                                { subject: 'VELOCITY', A: hashScore(data1.login + "vl", 30, 90), B: hashScore(data2.login + "vl", 30, 90) },
+                                                { subject: 'SOCIAL', A: Math.min(data1.followers / 10, 100), B: Math.min(data2.followers / 10, 100) },
+                                                { subject: 'STARS', A: Math.min(data1.stars / 50, 100), B: Math.min(data2.stars / 50, 100) },
                                             ]}>
-                                                <PolarGrid stroke="#222" />
-                                                <PolarAngleAxis dataKey="subject" tick={{ fill: '#666', fontSize: 10, fontWeight: 'bold' }} />
-                                                <Radar name={data1.login} dataKey="A" stroke="#8b5cf6" fill="#8b5cf6" fillOpacity={0.4} />
-                                                <Radar name={data2.login} dataKey="B" stroke="#d946ef" fill="#d946ef" fillOpacity={0.4} />
+                                                <PolarGrid stroke="rgba(255,255,255,0.05)" />
+                                                <PolarAngleAxis dataKey="subject" tick={{ fill: '#444', fontSize: 10, fontWeight: '900', letterSpacing: '0.1em' }} />
+                                                <PolarRadiusAxis hide />
+                                                <Radar name={data1.login} dataKey="A" stroke="#8b5cf6" fill="#8b5cf6" fillOpacity={0.2} strokeWidth={3} />
+                                                <Radar name={data2.login} dataKey="B" stroke="#d946ef" fill="#d946ef" fillOpacity={0.2} strokeWidth={3} />
                                             </RadarChart>
                                         </ResponsiveContainer>
                                     </div>
-                                </motion.div>
-
-                                <motion.div 
-                                    key="results"
-                                    initial={{ opacity: 0, y: 40 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ duration: 0.8 }}
-                                    className="max-w-6xl mx-auto w-full relative"
-                                >
-                                    {/* Particle Burst on Results */}
-                                    <div className="absolute inset-0 pointer-events-none">
-                                        <SparklesCore
-                                            id="resultsparkles"
-                                            background="transparent"
-                                            minSize={0.6}
-                                            maxSize={1.4}
-                                            particleDensity={100}
-                                            className="w-full h-full"
-                                            particleColor="#a78bfa"
-                                        />
-                                    </div>
-                                    {/* Top Combat Headers */}
-                                    <div className="flex flex-col md:flex-row items-center justify-between gap-4 md:gap-0 mb-8 relative">
-                                        <div className="w-full md:w-[45%]">
-                                            <UserDisplay data={data1} color="violet" />
-                                        </div>
-                                        
-                                        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 hidden md:flex flex-col items-center">
-                                            <div className="w-14 h-14 rounded-full bg-white text-black flex items-center justify-center text-xl font-black italic shadow-[0_0_30px_rgba(255,255,255,0.4)] animate-pulse border-4 border-black box-content">VS</div>
-                                            <div className="w-px h-16 bg-linear-to-b from-white/20 to-transparent mt-4" />
-                                        </div>
-
-                                        <div className="w-full md:w-[45%]">
-                                            <UserDisplay data={data2} color="fuchsia" />
-                                        </div>
-                                    </div>
-
-                                    {/* Winner Banner */}
-                                    <motion.div 
-                                        initial={{ opacity: 0, scale: 0.9 }}
-                                        animate={{ opacity: 1, scale: 1 }}
-                                        transition={{ delay: 1 }}
-                                        className="mb-8 p-4 bg-black border-y border-white/10 flex flex-col items-center text-center"
-                                    >
-                                        <span className="text-[10px] font-black text-neutral-500 uppercase tracking-[0.4em] mb-1">Neural Sequence Preference</span>
-                                        <div className="text-2xl font-black text-white italic tracking-tighter uppercase">
-                                            {data1.aiScore + data1.stars > data2.aiScore + data2.stars ? data1.login : data2.login} <span className="text-violet-400">HAS THE EDGE</span>
-                                        </div>
-                                    </motion.div>
-
-                                    {/* Side-by-Side Unified Metrics */}
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
-                                        <div className="space-y-4">
-                                            <MetricList data={data1} otherData={data2} isLeft={true} />
-                                        </div>
-                                        <div className="space-y-4">
-                                            <MetricList data={data2} otherData={data1} isLeft={false} />
-                                        </div>
-                                    </div>
-
-                                    {/* Footer Action */}
-                                    <div className="mt-16 flex flex-col items-center">
-                                        <button 
-                                            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                                            className="group flex items-center gap-4 px-8 py-4 bg-white/5 border border-white/10 rounded-full hover:bg-white/10 transition-all"
-                                        >
-                                            <span className="text-[10px] font-black text-neutral-400 tracking-[0.3em] uppercase group-hover:text-white">New Sequence</span>
-                                            <div className="w-px h-4 bg-white/20" />
-                                            <IconChevronRight size={14} className="text-violet-500" />
-                                        </button>
-                                    </div>
-                                </motion.div>
-                            </div>
-                        ) : (
-                            <motion.div 
-                                key="idle"
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                className="flex flex-col items-center justify-center py-20"
-                            >
-                                <div className="relative group/idle">
-                                    <div className="absolute -inset-10 bg-violet-500/10 blur-3xl rounded-full group-hover/idle:bg-violet-500/20 transition-all duration-1000" />
-                                    <IconVs size={80} className="text-neutral-800 animate-pulse relative z-10" />
                                 </div>
-                                <p className="mt-8 text-neutral-600 font-mono text-[10px] uppercase tracking-[0.5em] animate-pulse">
-                                    Waiting for Collision Sequence...
-                                </p>
                             </motion.div>
-                        )}
-                    </AnimatePresence>
-                </motion.div>
 
-                {/* Recent Collision Activity Log */}
-                <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 1.2, duration: 0.8 }}
-                    className="max-w-4xl mx-auto w-full mt-32"
-                >
-                    <div className="flex items-center justify-between mb-8 px-4">
-                        <div className="flex flex-col">
-                            <h3 className="text-xl font-bold text-white uppercase tracking-tighter flex items-center gap-2">
-                                <span className="w-2 h-2 bg-violet-500 rounded-full animate-pulse" />
-                                Recent Collision Sequences
-                            </h3>
-                            <p className="text-neutral-600 text-[10px] uppercase tracking-widest mt-1">Live Architectural Audits</p>
-                        </div>
-                        <div className="h-px flex-1 bg-linear-to-r from-violet-500/20 via-white/5 to-transparent mx-8 hidden md:block" />
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 px-4 overflow-hidden">
-                        {[
-                            { u1: "torvalds", u2: "gaearon", winner: "torvalds", status: "Neural Optimized", time: "12m ago" },
-                            { u1: "addyosmani", u2: "dan_abramov", winner: "addyosmani", status: "Style Stabilized", time: "45m ago" },
-                            { u1: "tushar8466", u2: "github_user", winner: "tushar8466", status: "Auth Verified", time: "1h ago" }
-                        ].map((collision, i) => (
-                            <div key={i} className="bg-white/2 border border-white/5 rounded-3xl p-5 hover:bg-white/5 transition-all group relative overflow-hidden">
-                                <div className="absolute top-0 left-0 w-1 h-full bg-violet-500/20 group-hover:bg-violet-500 transition-colors" />
-                                <div className="flex justify-between items-start mb-4">
-                                    <div className="flex -space-x-3">
-                                        <div className="w-8 h-8 rounded-full border border-white/20 bg-neutral-900 overflow-hidden">
-                                            <img src={`https://avatars.githubusercontent.com/${collision.u1}`} className="w-full h-full object-cover" alt="" />
+                            {/* Result Display Grid */}
+                            <div className="space-y-24">
+                                <div className="flex flex-col lg:flex-row items-stretch justify-center gap-10">
+                                    <UserIdentityCard data={data1} color="violet" />
+                                    <div className="hidden lg:flex flex-col items-center justify-center py-20 px-4">
+                                        <div className="h-full w-px bg-linear-to-b from-transparent via-white/10 to-transparent" />
+                                        <div className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center bg-black my-8">
+                                            <IconVs size={20} className="text-neutral-700" />
                                         </div>
-                                        <div className="w-8 h-8 rounded-full border border-white/20 bg-neutral-900 overflow-hidden">
-                                            <img src={`https://avatars.githubusercontent.com/${collision.u2}`} className="w-full h-full object-cover" alt="" />
-                                        </div>
+                                        <div className="h-full w-px bg-linear-to-b from-white/10 to-transparent" />
                                     </div>
-                                    <span className="text-[8px] font-mono text-neutral-600 uppercase tracking-widest">{collision.time}</span>
+                                    <UserIdentityCard data={data2} color="fuchsia" />
                                 </div>
-                                <div className="text-[10px] font-black text-white uppercase tracking-tight mb-1 truncate">
-                                    {collision.u1} <span className="text-violet-500 italic">vs</span> {collision.u2}
-                                </div>
-                                <div className="flex justify-between items-center text-[8px] font-bold uppercase tracking-widest">
-                                    <span className="text-emerald-400">{collision.status}</span>
-                                    <span className="text-neutral-600">Trace_{i}0X</span>
+
+                                {/* Detailed Metric Sync */}
+                                <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10">
+                                    <MetricColumn data={data1} otherData={data2} isLeft />
+                                    <MetricColumn data={data2} otherData={data1} />
                                 </div>
                             </div>
-                        ))}
-                    </div>
-                </motion.div>
+                        </div>
+                    ) : (
+                        <div className="py-40 flex flex-col items-center justify-center opacity-20">
+                            <IconActivity size={60} className="animate-pulse text-violet-500 mb-8" />
+                            <p className="font-mono text-[10px] uppercase tracking-[0.5em] italic">Idle_State::Waiting_For_Sequence</p>
+                        </div>
+                    )}
+                </AnimatePresence>
             </div>
         </div>
     );
 }
-function UserDisplay({ data, color }: { data: UserStats; color: "violet" | "fuchsia" }) {
-    const borderColor = color === 'violet' ? 'border-violet-500/30' : 'border-fuchsia-500/30';
-    const accentColor = color === 'violet' ? 'bg-violet-500' : 'bg-fuchsia-500';
-    
-    // Mouse tracking for holographic effect
-    const x = useMotionValue(0);
-    const y = useMotionValue(0);
 
-    function mouseMove({ currentTarget, clientX, clientY }: any) {
-        let { left, top } = currentTarget.getBoundingClientRect();
-        x.set(clientX - left);
-        y.set(clientY - top);
-    }
+function InputCard({ value, onChange, label, color, placeholder, alignRight }: any) {
+    const isViolet = color === "violet";
+    return (
+        <div className={cn("flex-1 w-full relative group", alignRight && "text-right")}>
+            <div className={cn("absolute inset-0 rounded-[3rem] opacity-0 group-hover:opacity-100 transition-opacity blur-2xl", isViolet ? "bg-violet-500/10" : "bg-fuchsia-500/10")} />
+            <div className="relative bg-black border border-white/5 rounded-[3rem] p-10 overflow-hidden shadow-2xl transition-all group-hover:border-white/20">
+                <div className={cn("absolute top-0 bottom-0 w-1", isViolet ? "left-0 bg-violet-600 shadow-[0_0_20px_rgba(139,92,246,0.6)]" : "right-0 bg-fuchsia-600 shadow-[0_0_20px_rgba(217,70,239,0.6)]")} />
+                <div className={cn("flex flex-col gap-6", alignRight && "items-end")}>
+                    <div className={cn("flex items-center gap-4", alignRight && "flex-row-reverse")}>
+                        <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center border", isViolet ? "bg-violet-500/10 border-violet-500/20 text-violet-400" : "bg-fuchsia-500/10 border-fuchsia-500/20 text-fuchsia-400")}>
+                            <IconSearch size={22} />
+                        </div>
+                        <span className={cn("text-[11px] font-black uppercase tracking-[0.3em]", isViolet ? "text-violet-400" : "text-fuchsia-400")}>{label}</span>
+                    </div>
+                    <input 
+                        type="text"
+                        placeholder={placeholder}
+                        value={value}
+                        onChange={(e) => onChange(e.target.value)}
+                        className={cn("w-full bg-transparent text-3xl md:text-5xl font-black uppercase tracking-tighter placeholder:text-neutral-900 focus:outline-none focus:tracking-widest transition-all italic", alignRight && "text-right")}
+                    />
+                </div>
+            </div>
+        </div>
+    );
+}
 
+function UserIdentityCard({ data, color }: { data: UserStats; color: string }) {
+    const isViolet = color === "violet";
     return (
         <motion.div 
-            onMouseMove={mouseMove}
             initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="relative group/user w-full perspective-1000"
+            whileInView={{ opacity: 1, scale: 1 }}
+            className="flex-1 min-w-[340px] relative group"
         >
-            <div className={`absolute -inset-2 bg-${color}-500/10 blur-xl opacity-0 group-hover/user:opacity-100 transition-opacity duration-700`} />
-            
-            <div className={`relative bg-black border border-white/10 rounded-[2.5rem] p-8 backdrop-blur-3xl overflow-hidden flex flex-col items-center text-center transition-all duration-500 group-hover/user:border-${color}-500/40 shadow-2xl`}>
-                {/* Holographic Reflection Overlay */}
-                <motion.div 
-                    className="absolute inset-0 z-0 pointer-events-none opacity-0 group-hover/user:opacity-100 transition-opacity duration-500"
-                    style={{
-                        background: useMotionTemplate`radial-gradient(400px at ${x}px ${y}px, rgba(255,255,255,0.08), transparent)`
-                    }}
-                />
-
-                <div className={`absolute top-0 left-0 w-full h-1 ${accentColor} opacity-20`} />
+            <div className={cn("absolute -inset-4 rounded-[4rem] blur-2xl opacity-0 group-hover:opacity-100 transition-opacity", isViolet ? "bg-violet-500/5" : "bg-fuchsia-500/5")} />
+            <div className="relative bg-white/[0.02] border border-white/10 rounded-[4rem] p-12 backdrop-blur-3xl overflow-hidden h-full flex flex-col items-center text-center group-hover:border-white/20 transition-all">
+                <div className={cn("absolute top-0 left-0 w-full h-1.5 opacity-20", isViolet ? "bg-violet-500" : "bg-fuchsia-500")} />
                 
-                <div className="relative mb-6 group/avatar z-10">
-                    <div className={`absolute -inset-6 bg-${color}-500/10 blur-3xl rounded-full opacity-0 group-hover/avatar:opacity-100 transition-opacity duration-1000 animate-pulse`} />
-                    <motion.div 
-                        animate={{ 
-                            boxShadow: [
-                                `0 0 10px rgba(139, 92, 246, 0.05)`,
-                                `0 0 40px rgba(139, 92, 246, 0.2)`,
-                                `0 0 10px rgba(139, 92, 246, 0.05)`
-                            ],
-                            rotateY: [0, 5, -5, 0]
-                        }}
-                        transition={{ 
-                            boxShadow: { duration: 4, repeat: Infinity, ease: "easeInOut" },
-                            rotateY: { duration: 6, repeat: Infinity, ease: "linear" }
-                        }}
-                        className={`w-32 h-32 rounded-full border-2 ${borderColor} p-1.5 relative z-10 group-hover/avatar:scale-110 transition-transform duration-700 overflow-hidden bg-black/40`}
-                    >
-                        <Image src={data.avatar_url} alt={data.login} fill className="rounded-full object-cover grayscale-20 group-hover/avatar:grayscale-0 transition-all duration-700" />
-                        <div className="absolute inset-0 bg-linear-to-t from-black/40 to-transparent opacity-0 group-hover/avatar:opacity-100 transition-opacity" />
-                    </motion.div>
+                <div className="relative mb-10">
+                    <div className={cn("absolute -inset-10 blur-3xl rounded-full opacity-20 animate-pulse", isViolet ? "bg-violet-500/20" : "bg-fuchsia-500/20")} />
+                    <div className={cn("w-44 h-44 rounded-full border-2 p-2 relative z-10", isViolet ? "border-violet-500/30" : "border-fuchsia-500/30")}>
+                        <div className="w-full h-full rounded-full overflow-hidden relative grayscale hover:grayscale-0 transition-all duration-700">
+                            <Image src={data.avatar_url} alt={data.login} fill className="object-cover" />
+                        </div>
+                    </div>
+                    {/* Level Ring */}
+                    <svg className="absolute inset-0 w-full h-full -rotate-90 pointer-events-none" viewBox="0 0 100 100">
+                        <circle cx="50" cy="50" r="48" fill="none" strokeWidth="2" stroke="rgba(255,255,255,0.05)" />
+                        <motion.circle 
+                            cx="50" cy="50" r="48" fill="none" strokeWidth="2" 
+                            stroke={isViolet ? "#8b5cf6" : "#d946ef"} 
+                            strokeDasharray="301.59"
+                            initial={{ strokeDashoffset: 301.59 }}
+                            whileInView={{ strokeDashoffset: 301.59 * (1 - data.aiScore / 100) }}
+                            transition={{ duration: 2, ease: "easeOut" }}
+                            strokeLinecap="round"
+                        />
+                    </svg>
                 </div>
 
-                <div className="space-y-2 relative z-10">
-                    <h2 className="text-3xl font-black text-white tracking-tighter uppercase italic truncate max-w-full drop-shadow-lg">
-                        {data.name || data.login}
-                    </h2>
-                    <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/5 border border-white/5 rounded-full backdrop-blur-md">
-                         <motion.span 
-                            animate={{ scale: [1, 1.2, 1] }}
-                            transition={{ duration: 2, repeat: Infinity }}
-                            className={`w-1.5 h-1.5 rounded-full ${accentColor}`} 
-                        />
-                         <span className="text-[11px] font-black text-white/60 tracking-[0.2em] uppercase">
-                            @{data.login.toUpperCase()}
-                        </span>
+                <div className="space-y-4">
+                    <h2 className="text-4xl font-black italic tracking-tighter uppercase leading-none">{data.name}</h2>
+                    <div className="px-5 py-2 bg-white/5 border border-white/10 rounded-full inline-block">
+                        <span className="text-xs font-mono text-neutral-400 tracking-widest uppercase">NODE::{data.login}</span>
                     </div>
                 </div>
 
-                <IconBrain className={`absolute -bottom-6 -right-6 w-28 h-28 text-${color}-500/5 rotate-12 pointer-events-none group-hover/user:text-${color}-500/10 transition-colors z-0`} />
+                <div className="mt-12 grid grid-cols-2 gap-4 w-full">
+                    <Trait label="NEURAL_IQ" val={data.aiScore} color={color} />
+                    <Trait label="STABILITY" val={100 - data.styleDrift} color={color} />
+                </div>
             </div>
         </motion.div>
     );
 }
 
+function Trait({ label, val, color }: any) {
+    return (
+        <div className="bg-white/2 border border-white/5 rounded-3xl p-5 text-left">
+            <p className="text-[9px] font-black text-neutral-500 uppercase tracking-widest mb-2">{label}</p>
+            <p className={cn("text-2xl font-black italic tracking-tighter", color === 'violet' ? 'text-violet-400' : 'text-fuchsia-400')}>{val}%</p>
+        </div>
+    );
+}
 
-function MetricList({ data, otherData, isLeft }: { data: UserStats; otherData: UserStats; isLeft: boolean }) {
+function MetricColumn({ data, otherData, isLeft }: { data: UserStats; otherData: UserStats; isLeft?: boolean }) {
     const metrics = [
-        { label: "AI Likelihood (Neural)", val: data.aiScore, otherVal: otherData.aiScore, lowerIsBetter: true, suffix: "%" },
-        { label: "Style Drift (Neural)", val: data.styleDrift, otherVal: otherData.styleDrift, lowerIsBetter: true, suffix: "%" },
-        { label: "Stars Strength", val: data.stars, otherVal: otherData.stars, suffix: "" },
-        { label: "Social Index", val: data.followers, otherVal: otherData.followers, suffix: "" },
+        { label: "AI_THRESHOLD", val: data.aiScore, oVal: otherData.aiScore, suffix: "%", lowerBetter: true },
+        { label: "STYLE_DRIFT", val: data.styleDrift, oVal: otherData.styleDrift, suffix: "%", lowerBetter: true },
+        { label: "STARS_VOL", val: data.stars, oVal: otherData.stars },
+        { label: "AUDIENCE", val: data.followers, oVal: otherData.followers },
     ];
 
     return (
-        <div className="space-y-5">
+        <div className="space-y-6">
+            <div className={cn("flex items-center gap-4 mb-10", !isLeft && "flex-row-reverse")}>
+                <div className="w-2 h-10 bg-white/10 rounded-full" />
+                <h4 className="text-xl font-black italic uppercase tracking-tighter">Core Diagnostics</h4>
+            </div>
             {metrics.map((m, i) => {
-                const isWinner = m.lowerIsBetter ? m.val < m.otherVal : m.val > m.otherVal;
-                const isTie = m.val === m.otherVal;
-
+                const isWinner = m.lowerBetter ? m.val < m.oVal : m.val > m.oVal;
                 return (
                     <motion.div 
                         key={i}
-                        initial={{ opacity: 0, x: isLeft ? -20 : 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        whileHover={{ 
-                            scale: 1.02, 
-                            rotateY: isLeft ? 5 : -5,
-                            z: 20
-                        }}
-                        transition={{ delay: 0.5 + i * 0.1 }}
-                        className={`p-6 rounded-[2.5rem] border transition-all relative overflow-hidden group/metric perspective-1000 ${isWinner 
-                            ? 'border-emerald-500/30 bg-black shadow-[0_10px_40px_-15px_rgba(16,185,129,0.3)] hover:border-emerald-500/50' 
-                            : 'border-white/10 bg-black hover:bg-black/90 hover:border-white/20 shadow-xl'} backdrop-blur-xl`}
-                    >
-                        {isWinner && (
-                            <>
-                                <div className={`absolute top-0 ${isLeft ? 'right-0' : 'left-0'} w-1 h-full bg-emerald-500/40`} />
-                                <div className="absolute inset-x-0 bottom-0 h-1 bg-linear-to-r from-emerald-500/40 to-transparent" />
-                                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(16,185,129,0.1),transparent_70%)] opacity-0 group-hover/metric:opacity-100 transition-opacity" />
-                            </>
+                        initial={{ opacity: 0, x: isLeft ? -30 : 30 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: i * 0.1 }}
+                        className={cn(
+                            "group p-8 rounded-[3rem] border transition-all relative overflow-hidden",
+                            isWinner ? "bg-emerald-500/2 border-emerald-500/20 shadow-2xl shadow-emerald-500/5" : "bg-white/2 border-white/5"
                         )}
-                        
-                        <div className="flex items-center justify-between mb-4">
-                            <span className="text-[10px] font-black text-neutral-600 uppercase tracking-[0.3em] group-hover/metric:text-neutral-400 transition-colors">{m.label}</span>
+                    >
+                        <div className="flex justify-between items-start mb-6">
+                            <span className="text-[10px] font-black text-neutral-500 uppercase tracking-widest">{m.label}</span>
                             {isWinner && (
-                                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20">
-                                    <IconTrophy size={10} className="text-emerald-500" />
-                                    <span className="text-[8px] font-black text-emerald-500 uppercase tracking-widest">
-                                        Dominant
-                                    </span>
+                                <div className="flex items-center gap-2 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
+                                    <IconTrophy size={10} className="text-emerald-400" />
+                                    <span className="text-[8px] font-black text-emerald-400 uppercase tracking-widest">Dominant</span>
                                 </div>
                             )}
                         </div>
-
-                        <div className="flex items-end justify-between relative z-10">
-                            <div className="flex items-baseline gap-1.5">
-                                <span className={`text-4xl md:text-5xl font-black tabular-nums tracking-tighter ${isWinner ? 'text-emerald-400' : 'text-neutral-200'}`}>
-                                    {m.val.toLocaleString()}
-                                </span>
-                                <span className={`text-xs font-black uppercase tracking-widest ${isWinner ? 'text-emerald-500/50' : 'text-neutral-600'}`}>
-                                    {m.suffix}
-                                </span>
-                            </div>
-                            
-                            {!isWinner && !isTie && (
-                                <div className="opacity-10 group-hover/metric:opacity-30 transition-opacity translate-y-2">
-                                    <IconShieldCheck size={28} className="text-neutral-500" strokeWidth={1} />
-                                </div>
-                            )}
+                        <div className="flex items-baseline gap-2">
+                            <span className={cn("text-5xl font-black italic tracking-tighter tabular-nums", isWinner ? "text-emerald-400" : "text-white")}>
+                                {m.val.toLocaleString()}
+                            </span>
+                            <span className="text-xs font-black text-neutral-700 uppercase tracking-widest">{m.suffix}</span>
                         </div>
-
-                        {/* Comparative Visual Bar */}
-                        <div className="mt-4 h-1 w-full bg-white/5 rounded-full overflow-hidden relative">
+                        <div className="mt-8 h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
                             <motion.div 
                                 initial={{ width: 0 }}
-                                animate={{ width: `${Math.min((m.val / (m.val + m.otherVal)) * 100, 100)}%` }}
-                                transition={{ duration: 1.5, ease: "circOut", delay: 0.8 }}
-                                className={`h-full ${isWinner ? 'bg-emerald-500/50' : 'bg-neutral-500/30'}`}
+                                whileInView={{ width: `${Math.min((m.val / (m.val + m.oVal || 1)) * 100, 100)}%` }}
+                                transition={{ duration: 1.5, ease: "circOut" }}
+                                className={cn("h-full rounded-full", isWinner ? "bg-emerald-500/50 shadow-[0_0_15px_rgba(16,185,129,0.5)]" : "bg-neutral-800")}
                             />
                         </div>
                     </motion.div>
                 );
             })}
             
-            <div className={`p-8 rounded-[2.5rem] border border-white/10 bg-black relative overflow-hidden group/lang transition-all hover:bg-black/95 backdrop-blur-xl`}>
-                <div className="flex items-center justify-between mb-4">
-                    <span className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.3em]">Core Architecture</span>
-                    <IconStar size={16} className="text-neutral-800 group-hover/lang:text-amber-500/50 transition-colors" />
+            {/* Top Tech Stack Component */}
+            <div className="p-10 rounded-[3rem] border border-white/5 bg-white/[0.01] overflow-hidden relative group">
+                <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-violet-500/50 to-fuchsia-500/50" />
+                <div className="flex items-center gap-6 mb-8">
+                    <div className="p-4 bg-white/5 border border-white/10 rounded-2xl group-hover:scale-110 transition-transform">
+                        <IconTerminal2 size={24} className="text-violet-400" />
+                    </div>
+                    <div className="space-y-1">
+                        <p className="text-[10px] font-black text-neutral-600 uppercase tracking-widest">Mastery Spectrum</p>
+                        <h5 className="text-2xl font-black italic uppercase tracking-tighter">{data.topLanguage}</h5>
+                    </div>
                 </div>
-                <div className="text-3xl font-black text-white tracking-tighter truncate uppercase italic">
-                    {data.topLanguage}
+                <div className="grid grid-cols-5 gap-2">
+                    {[...Array(5)].map((_, i) => (
+                        <div key={i} className={cn("h-1.5 rounded-full", i < 4 ? "bg-violet-500/40" : "bg-white/5")} />
+                    ))}
                 </div>
-                <div className="mt-4 h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
-                    <motion.div 
-                        initial={{ width: 0 }}
-                        animate={{ width: "100%" }}
-                        transition={{ duration: 1.5, delay: 1 }}
-                        className="h-full bg-linear-to-r from-violet-500/50 to-fuchsia-500/50" 
-                    />
-                </div>
-                <div className="mt-2 text-[9px] font-mono text-neutral-600 uppercase tracking-widest">Mastery Level: Maximum</div>
             </div>
+        </div>
+    );
+}
+
+function LegendItem({ name, color }: any) {
+    return (
+        <div className="flex items-center gap-3 px-5 py-2 bg-white/5 border border-white/10 rounded-full">
+            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: color, boxShadow: `0 0 10px ${color}` }} />
+            <span className="text-[10px] font-black text-white/50 uppercase tracking-widest">{name}</span>
         </div>
     );
 }
