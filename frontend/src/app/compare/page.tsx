@@ -216,8 +216,7 @@ export default function ComparePage() {
 
             <motion.div style={{ background: bgTransform }} className="fixed inset-0 pointer-events-none z-0" />
             <BackgroundBeams className="opacity-20" />
-
-            <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808008_1px,transparent_1px),linear-gradient(to_bottom,#80808008_1px,transparent_1px)] bg-size-[60px_60px] pointer-events-none" />
+            <div className="absolute inset-x-0 bottom-0 top-0 bg-size-[40px_40px] opacity-10 mask-[radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] bg-[radial-gradient(circle_at_2px_2px,#ffffff22_1px,transparent_0)]" />
 
             <div className="relative z-10 max-w-7xl mx-auto px-6 pt-32 pb-40">
                 <header className="text-center mb-24 space-y-6">
@@ -363,7 +362,7 @@ export default function ComparePage() {
                                 className="max-w-5xl mx-auto relative group"
                             >
                                 <div className="absolute -inset-10 bg-violet-600/5 blur-[100px] rounded-[100px] pointer-events-none" />
-                                <div className="relative bg-black/40 border border-white/10 rounded-[4rem] p-16 backdrop-blur-3xl overflow-hidden shadow-2xl">
+                                <div className="bg-black/40 border border-white/10 rounded-4xl p-10 backdrop-blur-3xl relative overflow-hidden group shadow-2xl">
                                     <div className="flex flex-col md:flex-row items-center justify-between mb-16 gap-10">
                                         <div className="space-y-4 text-center md:text-left">
                                             <h3 className="text-3xl font-black uppercase italic tracking-tighter">Overlap <span className="text-violet-500">Analysis</span></h3>
@@ -507,7 +506,7 @@ function UserIdentityCard({ data, color }: { data: UserStats; color: string }) {
 
 function Trait({ label, val, color }: any) {
     return (
-        <div className="bg-white/2 border border-white/5 rounded-[2rem] p-6 text-left shadow-2xl">
+        <div className="bg-white/2 border border-white/5 rounded-4xl p-6 text-left shadow-2xl">
             <p className="text-[9px] font-black text-neutral-600 uppercase tracking-widest mb-3 font-mono">{label}</p>
             <p className={cn("text-3xl font-black italic tracking-tighter", color === 'violet' ? 'text-violet-400' : 'text-fuchsia-400')}>{val}%</p>
         </div>
@@ -538,7 +537,7 @@ function MetricColumn({ data, otherData, isLeft }: { data: UserStats; otherData:
                         viewport={{ once: true }}
                         transition={{ delay: i * 0.1, duration: 0.8 }}
                         className={cn(
-                            "group p-10 rounded-[3rem] border transition-all relative overflow-hidden shadow-2xl",
+                            "group p-10 rounded-4xl border transition-all relative overflow-hidden shadow-2xl",
                             isWinner ? "bg-emerald-500/5 border-emerald-500/20 shadow-emerald-500/5" : "bg-white/2 border-white/5"
                         )}
                     >
@@ -552,9 +551,7 @@ function MetricColumn({ data, otherData, isLeft }: { data: UserStats; otherData:
                             )}
                         </div>
                         <div className="flex items-baseline gap-3">
-                            <span className={cn("text-6xl font-black italic tracking-tighter tabular-nums leading-none", isWinner ? "text-emerald-400" : "text-white")}>
-                                {m.val.toLocaleString()}
-                            </span>
+                            <span className="text-6xl font-black italic tracking-tighter tabular-nums leading-none">{m.val.toLocaleString()}</span>
                             <span className="text-[10px] font-black text-neutral-700 uppercase tracking-[0.3em] font-mono">{m.suffix}</span>
                         </div>
                         <div className="mt-10 h-2 w-full bg-white/5 rounded-full overflow-hidden shadow-inner">
@@ -573,7 +570,7 @@ function MetricColumn({ data, otherData, isLeft }: { data: UserStats; otherData:
             <div className="p-12 rounded-[3.5rem] border border-white/5 bg-white/[0.01] overflow-hidden relative group shadow-2xl">
                 <div className="absolute top-0 left-0 w-full h-1.5 bg-linear-to-r from-violet-500 via-fuchsia-500 to-cyan-500 opacity-40" />
                 <div className="flex items-center gap-8 mb-10">
-                    <div className="p-5 bg-white/5 border border-white/10 rounded-2xl group-hover:scale-110 transition-transform duration-500 shadow-2xl">
+                    <div className="bg-black/20 border border-white/5 rounded-2xl p-4 hover:bg-white/3 transition-all cursor-default">
                         <IconTerminal2 size={28} className="text-violet-400" />
                     </div>
                     <div className="space-y-2">

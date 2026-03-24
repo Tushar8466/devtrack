@@ -602,47 +602,58 @@ function ContributionCard({ contribution, type }: { contribution: Contribution; 
             >
                 <GlareCard
                     containerClassName="!w-full !h-full ![aspect-ratio:3/2] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.5)] rounded-4xl!"
-                    className="flex flex-col items-start justify-between p-7 h-full rounded-4xl!"
+                    className="flex flex-col items-start justify-between p-7 h-full rounded-4xl! relative overflow-hidden"
                 >
-                    <div className="w-full flex justify-between items-start mb-6">
-                        <div className="p-3 bg-white/5 rounded-xl border border-white/10 group-hover:bg-white/10 transition-all group-hover:scale-110 shadow-2xl">
-                            {type === "pr" ? (
-                                <GitPullRequest className="w-5 h-5 text-blue-400" />
-                            ) : type === "issue" ? (
-                                <AlertCircle className="w-5 h-5 text-yellow-400" />
-                            ) : (
-                                <GitMerge className="w-5 h-5 text-purple-400" />
-                            )}
+                    <GlowingEffect
+                        blur={20}
+                        borderWidth={1}
+                        spread={60}
+                        glow={true}
+                        disabled={false}
+                        proximity={80}
+                        inactiveZone={0.01}
+                    />
+                    <div className="relative z-10 w-full flex flex-col h-full justify-between">
+                        <div className="w-full flex justify-between items-start mb-6">
+                            <div className="p-3 bg-white/5 rounded-xl border border-white/10 group-hover:bg-white/10 transition-all group-hover:scale-110 shadow-2xl shrink-0">
+                                {type === "pr" ? (
+                                    <GitPullRequest className="w-5 h-5 text-blue-400" />
+                                ) : type === "issue" ? (
+                                    <AlertCircle className="w-5 h-5 text-yellow-400" />
+                                ) : (
+                                    <GitMerge className="w-5 h-5 text-purple-400" />
+                                )}
+                            </div>
+                            <span className="text-[9px] text-neutral-600 uppercase tracking-tighter font-black font-mono bg-white/5 px-2 py-0.5 rounded border border-white/5 group-hover:border-white/10 transition-colors">
+                                #{contribution.number}
+                            </span>
                         </div>
-                        <span className="text-[9px] text-neutral-600 uppercase tracking-tighter font-black font-mono bg-white/5 px-2 py-0.5 rounded border border-white/5 group-hover:border-white/10 transition-colors">
-                            #{contribution.number}
-                        </span>
-                    </div>
 
-                    <div className="flex-1 w-full space-y-4">
-                        <h4 className="text-[9px] text-neutral-500 font-black uppercase tracking-[0.2em] line-clamp-1 border-b border-white/5 pb-2 font-mono">
-                            {contribution.repo_name || "Repository"}
-                        </h4>
-                        <motion.p
-                            layoutId={`title-${contribution.id}`}
-                            className="text-white text-base font-black leading-tight line-clamp-2 group-hover:text-violet-400 transition-colors duration-500 uppercase italic tracking-tighter"
-                        >
-                            {contribution.title}
-                        </motion.p>
-                    </div>
+                        <div className="flex-1 w-full space-y-4">
+                            <h4 className="text-[9px] text-neutral-500 font-black uppercase tracking-[0.2em] line-clamp-1 border-b border-white/5 pb-2 font-mono">
+                                {contribution.repo_name || "Repository"}
+                            </h4>
+                            <motion.p
+                                layoutId={`title-${contribution.id}`}
+                                className="text-white text-base font-black leading-tight line-clamp-2 group-hover:text-violet-400 transition-colors duration-500 uppercase italic tracking-tighter"
+                            >
+                                {contribution.title}
+                            </motion.p>
+                        </div>
 
-                    <div className="w-full pt-4 mt-6 border-t border-white/5 flex justify-between items-center">
-                        <span className="text-[9px] text-neutral-600 font-black uppercase tracking-[0.2em] font-mono">
-                            {new Date(contribution.created_at).toLocaleDateString(undefined, {
-                                month: 'short',
-                                day: 'numeric',
-                                year: '2-digit'
-                            }).toUpperCase()}
-                        </span>
-                        <div className="flex items-center gap-2 opacity-40 group-hover:opacity-100 transition-all">
-                            <span className="text-[9px] text-violet-500 font-black uppercase tracking-widest">Intercept</span>
-                            <div className="w-6 h-6 rounded-full bg-violet-600 text-white flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-                                <Search className="w-3 h-3" />
+                        <div className="w-full pt-4 mt-6 border-t border-white/5 flex justify-between items-center">
+                            <span className="text-[9px] text-neutral-600 font-black uppercase tracking-[0.2em] font-mono">
+                                {new Date(contribution.created_at).toLocaleDateString(undefined, {
+                                    month: 'short',
+                                    day: 'numeric',
+                                    year: '2-digit'
+                                }).toUpperCase()}
+                            </span>
+                            <div className="flex items-center gap-2 opacity-40 group-hover:opacity-100 transition-all">
+                                <span className="text-[9px] text-violet-500 font-black uppercase tracking-widest">Intercept</span>
+                                <div className="w-6 h-6 rounded-full bg-violet-600 text-white flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                                    <Search className="w-3 h-3" />
+                                </div>
                             </div>
                         </div>
                     </div>

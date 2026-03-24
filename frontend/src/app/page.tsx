@@ -289,7 +289,7 @@ export default function Home() {
           </div>
 
           <div className="flex-1 w-full flex items-center justify-center relative group order-1 lg:order-2 mb-12 lg:mb-0">
-            <div className="w-full aspect-square max-w-[320px] sm:max-w-[400px] lg:max-w-[500px] border border-white/10 rounded-[3rem] sm:rounded-[4rem] bg-black relative flex flex-col items-center justify-center p-8 sm:p-12 text-center overflow-hidden shadow-[0_0_50px_-12px_rgba(124,58,237,0.2)] hover:border-violet-500/50 transition-all duration-700">
+            <div className="w-full aspect-square max-w-[320px] sm:max-w-[400px] lg:max-w-[500px] border border-white/10 rounded-4xl sm:rounded-5xl bg-black relative flex flex-col items-center justify-center p-8 sm:p-12 text-center overflow-hidden shadow-[0_0_50px_-12px_rgba(124,58,237,0.2)] hover:border-violet-500/50 transition-all duration-700">
               {/* Dynamic Background Effects */}
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(124,58,237,0.15),transparent_70%)] opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
               <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-transparent via-violet-500/50 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-2000 ease-in-out" />
@@ -325,7 +325,7 @@ export default function Home() {
             </div>
 
             {/* Outer Glows */}
-            <div className="absolute -inset-4 bg-violet-500/5 blur-3xl rounded-[4rem] opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none" />
+            <div className="absolute -inset-4 bg-violet-500/5 blur-3xl rounded-5xl opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none" />
           </div>
 
           {/* Absolute decorative items */}
@@ -357,8 +357,8 @@ export default function Home() {
 
           <div className="w-full max-w-7xl relative z-10">
             {/* Globe Visualization */}
-            <div className="w-full h-[400px] sm:h-[600px] md:h-[800px] relative bg-black border border-indigo-500/10 rounded-[2rem] sm:rounded-[3rem] md:rounded-[4rem] p-0.5 sm:p-1 backdrop-blur-sm shadow-[0_0_80px_rgba(139,92,246,0.1)] group hover:border-violet-500/20 transition-all duration-700">
-              <div className="w-full h-full rounded-[1.9rem] sm:rounded-[2.9rem] md:rounded-[3.8rem] overflow-hidden">
+            <div className="w-full h-[400px] sm:h-[600px] md:h-[800px] relative bg-black border border-indigo-500/10 rounded-4xl sm:rounded-4xl md:rounded-5xl p-0.5 sm:p-1 backdrop-blur-sm shadow-[0_0_80px_rgba(139,92,246,0.1)] group hover:border-violet-500/20 transition-all duration-700">
+              <div className="w-full h-full rounded-4xl sm:rounded-4xl md:rounded-5xl overflow-hidden">
                 <Globe />
               </div>
             </div>

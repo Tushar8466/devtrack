@@ -193,7 +193,7 @@ export default function RepositoryCommitsPage() {
             </AnimatePresence>
             {/* BACKGROUND INFRASTRUCTURE */}
             <div className="absolute inset-0 z-0">
-                <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
+                <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-size-[40px_40px] mask-[radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
                 <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-[#00e676]/5 rounded-full blur-[150px] pointer-events-none opacity-50" />
             </div>
 
@@ -211,7 +211,7 @@ export default function RepositoryCommitsPage() {
                 <div className="w-full bg-black border border-white/10 rounded-2xl shadow-2xl flex flex-col h-[85vh] max-h-[900px] overflow-hidden ring-1 ring-white/5">
 
                     {/* Header Title area */}
-                    <div className="px-8 py-8 border-b border-white/10 flex flex-col md:flex-row md:items-end justify-between gap-6 bg-white/[0.02] relative overflow-hidden group/header">
+                    <div className="px-8 py-8 border-b border-white/10 flex flex-col md:flex-row md:items-end justify-between gap-6 bg-white/2 relative overflow-hidden group/header">
                         <div className="absolute top-0 right-0 p-12 opacity-5 group-hover/header:rotate-12 transition-transform duration-1000">
                             <IconGitCommit size={120} />
                         </div>
@@ -307,7 +307,7 @@ export default function RepositoryCommitsPage() {
                                                 rel="noreferrer"
                                                 initial={{ opacity: 0, x: -10 }}
                                                 animate={{ opacity: 1, x: 0 }}
-                                                className="relative flex flex-col sm:flex-row gap-5 group p-6 md:p-8 md:-ml-[2.8rem] -ml-10 rounded-[2.5rem] hover:bg-white/[0.03] transition-all border border-transparent hover:border-white/10 hover:shadow-2xl hover:shadow-[#00e676]/5 active:scale-[0.99]"
+                                                className="relative flex flex-col sm:flex-row gap-5 group p-6 md:p-8 md:-ml-[2.8rem] -ml-10 rounded-4xl hover:bg-white/3 transition-all border border-transparent hover:border-white/10 hover:shadow-2xl hover:shadow-[#00e676]/5 active:scale-[0.99]"
                                             >
                                                 {/* Timeline dot */}
                                                 <div className="absolute left-[34px] md:left-[38px] top-[42px] w-2.5 h-2.5 rounded-full bg-neutral-900 border-2 border-neutral-700 group-hover:bg-[#00e676] group-hover:border-[#00e676] group-hover:scale-125 transition-all duration-300 z-10 shadow-[0_0_15px_rgba(0,230,118,0)] group-hover:shadow-[0_0_15px_rgba(0,230,118,0.5)]" />
@@ -350,7 +350,7 @@ export default function RepositoryCommitsPage() {
                                                         </p>
                                                     )}
 
-                                                    <div className="flex items-center gap-3 text-xs text-neutral-500 font-bold uppercase tracking-widest mt-4 pt-4 border-t border-white/[0.03]">
+                                                    <div className="flex items-center gap-3 text-xs text-neutral-500 font-bold uppercase tracking-widest mt-4 pt-4 border-t border-white/3">
                                                         <span className="text-[#00e676] italic">{commitData.commit.author.name}</span>
                                                         <div className="w-1 h-1 rounded-full bg-neutral-800" />
                                                         <span className="text-neutral-600 font-mono tracking-tighter">{formatDate(commitData.commit.author.date)}</span>
@@ -375,7 +375,7 @@ export default function RepositoryCommitsPage() {
                                 </div>
 
                                 {/* Right Sidebar: Authorship Stats */}
-                                <div className="w-80 hidden lg:flex flex-col bg-white/[0.02] p-6 space-y-6 shrink-0">
+                                <div className="w-80 hidden lg:flex flex-col bg-white/2 p-6 space-y-6 shrink-0">
                                     <div className="space-y-1">
                                         <div className="flex items-center gap-2 text-[#00e676]">
                                             <IconUsers size={18} />
@@ -391,7 +391,7 @@ export default function RepositoryCommitsPage() {
                                                 onClick={() => setFilterAuthor(filterAuthor === name ? null : name)}
                                                 className={cn(
                                                     "w-full flex items-center justify-between group p-3 rounded-2xl transition-all border",
-                                                    filterAuthor === name ? "bg-[#00e676]/10 border-[#00e676]/20" : "bg-white/[0.02] border-transparent hover:border-white/10 hover:bg-white/[0.04]"
+                                                    filterAuthor === name ? "bg-[#00e676]/10 border-[#00e676]/20" : "bg-white/2 border-transparent hover:border-white/10 hover:bg-white/4"
                                                 )}
                                             >
                                                 <div className="flex items-center gap-3">
@@ -441,7 +441,7 @@ export default function RepositoryCommitsPage() {
 
                     {/* Footer area */}
                     {commits.length > 0 && !loading && !error && (
-                        <div className="px-8 py-6 border-t border-white/10 bg-white/[0.02] flex items-center justify-between">
+                        <div className="px-8 py-6 border-t border-white/10 bg-white/2 flex items-center justify-between">
                             <div className="flex items-center gap-3">
                                 <div className="w-2 h-2 rounded-full bg-[#00e676] animate-pulse" />
                                 <span className="text-xs font-black uppercase tracking-[0.2em] text-neutral-500">
