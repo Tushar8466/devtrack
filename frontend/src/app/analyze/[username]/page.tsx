@@ -27,16 +27,19 @@ const MOCK_PROFILE = (user: string) => {
         created_at: new Date(2018, h % 12, h % 28).toISOString()
     };
 
-    const repoNames = ["neural-scan", "distributed-consensus", "vortex-ui", "nexus-kernel", "author-pulse", "sentinel-api"];
-    const mappedNodes = repoNames.map((name, i) => ({
-        name,
-        description: `High-fidelity ${name} module with embedded neural patterns and architectural optimization.`,
-        stargazerCount: (h % 500) + (800 - i * 150),
-        forkCount: (h % 100) + (120 - i * 20),
-        primaryLanguage: { name: ["TypeScript", "Rust", "Go", "C++", "Python"][i % 5], color: "#8a2be2" },
-        updatedAt: new Date().toISOString(),
-        url: `https://github.com/${user}/${name}`,
-    }));
+    const baseRepoNames = ["neural-scan", "distributed-consensus", "vortex-ui", "nexus-kernel", "author-pulse", "sentinel-api", "grid-logic", "alpha-protocol"];
+    const mappedNodes = baseRepoNames.map((base, i) => {
+        const name = `${base}-${h % 100}`;
+        return {
+            name,
+            description: `High-fidelity ${name} module for ${user}'s neural workspace. Architectural optimization enabled.`,
+            stargazerCount: (h % 500) + (800 - i * 150),
+            forkCount: (h % 100) + (120 - i * 20),
+            primaryLanguage: { name: ["TypeScript", "Rust", "Go", "C++", "Python", "Swift"][i % 6], color: "#8b5cf6" },
+            updatedAt: new Date().toISOString(),
+            url: `https://github.com/${user}/${name}`,
+        };
+    });
 
     const graphqlData = {
         name: restData.name,
@@ -84,7 +87,8 @@ export default function AnalyzeUserPage() {
             try {
                 // Fetch REST API Data for User with better timeout/error handling
                 const userRes = await fetch(`https://api.github.com/users/${username}`, {
-                    headers: { "Accept": "application/vnd.github.v3+json" }
+                    headers: { "Accept": "application/vnd.github.v3+json" },
+                    cache: 'no-store'
                 });
                 
                 if (userRes.status === 403) {
@@ -102,7 +106,7 @@ export default function AnalyzeUserPage() {
                 const restData = await userRes.json();
 
                 // Fetch Repositories
-                const reposRes = await fetch(`https://api.github.com/users/${username}/repos?sort=updated&per_page=100`);
+                const reposRes = await fetch(`https://api.github.com/users/${username}/repos?sort=updated&per_page=100`, { cache: 'no-store' });
                 if (reposRes.status === 403) {
                      const mock = MOCK_PROFILE(username);
                      setProfileData({ rest: restData, graphql: { ...mock.graphql, name: restData.name || username } });
@@ -183,7 +187,7 @@ export default function AnalyzeUserPage() {
                 >
                     <div className="relative inline-block mb-10">
                         <div className="absolute -inset-10 bg-red-600/10 blur-[60px] rounded-full animate-pulse" />
-                        <div className="w-24 h-24 rounded-[2rem] bg-black border border-red-500/20 flex items-center justify-center relative z-10 mx-auto">
+                        <div className="w-24 h-24 rounded-4xl bg-black border border-red-500/20 flex items-center justify-center relative z-10 mx-auto">
                             <AlertCircle className="text-red-500 w-10 h-10 group-hover:scale-110 transition-transform" />
                         </div>
                     </div>

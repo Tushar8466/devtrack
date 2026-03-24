@@ -19,6 +19,7 @@ import {
 } from 'recharts';
 
 import { Cover } from "@/components/ui/cover";
+import { GlowingEffect } from "@/components/ui/glowing-effect";
 
 interface Contribution {
     id: number;
@@ -34,11 +35,14 @@ interface Contribution {
 
 // MOCK DATA for Fallback (Neural Simulation)
 const MOCK_CONTRIBUTIONS = (user: string, type: 'pr' | 'issue' | 'merged') => {
-    const hash = (s: string) => s.split('').reduce((a, b) => (((a << 5) - a) + b.charCodeAt(0)) | 0, 0);
+    const hash = (s: string) => [...s].reduce((a, b) => (((a << 5) - a) + b.charCodeAt(0)) | 0, 0);
     const h = Math.abs(hash(user + type));
     
     const count = (h % 5) + 3;
-    const repos = ["facebook/react", "vercel/next.js", "tailwindlabs/tailwindcss", "microsoft/vscode", "oven-sh/bun"];
+    // Generate user-branded repo names for the simulation
+    const baseRepos = ["engine", "core", "nexus", "vortex", "pulse", "grid", "alpha", "omega"];
+    const repos = baseRepos.map(name => `${user}/${name}-${h % 100}`);
+    
     const titles = {
         pr: ["feat: implement neural optimization", "fix: architectural drift correction", "refactor: nexus-kernel core", "update: sentinel-api protocols"],
         issue: ["bug: dependency resolution failure", "feat request: global telemetry proxy", "docs: structural integrity guide", "security: node-uplink disclosure"],
@@ -82,9 +86,9 @@ export default function TrackerResultsPage() {
         setIsSimulated(false);
         try {
             const [prsRes, issuesRes, mergedRes] = await Promise.all([
-                fetch(`https://api.github.com/search/issues?q=author:${user}+type:pr+state:open`),
-                fetch(`https://api.github.com/search/issues?q=author:${user}+type:issue`),
-                fetch(`https://api.github.com/search/issues?q=author:${user}+type:pr+is:merged`),
+                fetch(`https://api.github.com/search/issues?q=author:${user}+type:pr+state:open`, { cache: 'no-store' }),
+                fetch(`https://api.github.com/search/issues?q=author:${user}+type:issue`, { cache: 'no-store' }),
+                fetch(`https://api.github.com/search/issues?q=author:${user}+type:pr+is:merged`, { cache: 'no-store' }),
             ]);
 
             if (prsRes.status === 403 || issuesRes.status === 403 || mergedRes.status === 403) {
@@ -249,52 +253,135 @@ export default function TrackerResultsPage() {
                     {!error && (prs.length > 0 || issues.length > 0 || merged.length > 0) && (
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                             {/* Achievement Card */}
-                            <div className="bg-black/40 border border-white/10 rounded-[3rem] p-10 backdrop-blur-3xl relative overflow-hidden group shadow-2xl">
-                                <div className="absolute top-0 right-0 p-10 opacity-5 group-hover:rotate-12 transition-transform">
-                                    <Zap size={100} />
+                            <div className="bg-black/40 border border-white/10 rounded-4xl p-10 backdrop-blur-3xl relative overflow-hidden group shadow-2xl">
+                                <GlowingEffect
+                                    blur={30}
+                                    borderWidth={2}
+                                    spread={100}
+                                    glow={true}
+                                    disabled={false}
+                                    proximity={100}
+                                    inactiveZone={0.01}
+                                />
+                                <div className="absolute top-0 right-0 p-12 opacity-5 scale-150 rotate-12 blur-sm">
+                                    <Zap size={140} className="text-violet-500" />
                                 </div>
-                                <div className="relative z-10 space-y-6">
-                                    <div className="flex items-center gap-5">
-                                        <div className="text-5xl group-hover:scale-110 transition-transform duration-500">{achievement?.icon}</div>
-                                        <div>
-                                            <p className="text-[9px] font-black text-violet-400 uppercase tracking-[0.3em] leading-none mb-2 font-mono">NEURAL_CLASS_L4</p>
-                                            <h3 className="text-2xl font-black text-white italic tracking-tighter uppercase leading-none">{achievement?.label}</h3>
+                                <div className="absolute inset-x-0 h-px top-1/4 bg-linear-to-r from-transparent via-violet-500/20 to-transparent animate-pulse" />
+                                
+                                <div className="relative z-10 space-y-8">
+                                    <div className="flex items-start gap-6">
+                                        <motion.div 
+                                            whileHover={{ scale: 1.1, rotate: [0, 5, -5, 0] }}
+                                            className="text-6xl group-hover:drop-shadow-[0_0_20px_rgba(255,255,255,0.4)] transition-all duration-500"
+                                        >
+                                            {achievement?.icon}
+                                        </motion.div>
+                                        <div className="space-y-2">
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-1.5 h-1.5 bg-violet-600 rounded-full animate-ping" />
+                                                <p className="text-[10px] font-black text-violet-400 uppercase tracking-[0.4em] font-mono">NEURAL_CLASS_L4</p>
+                                            </div>
+                                            <h3 className="text-3xl md:text-4xl font-black text-white italic tracking-tighter uppercase leading-none">{achievement?.label}</h3>
                                         </div>
                                     </div>
-                                    <p className="text-neutral-500 text-xs italic leading-relaxed font-medium">
-                                        {achievement?.desc}. Profile analysis indicates stable contribution trajectory in the {repoStats[0]?.name.split('/')[1] || "target"} sector.
+                                    
+                                    <p className="text-neutral-400 text-sm italic leading-relaxed font-medium bg-black/20 p-4 rounded-2xl border border-white/5">
+                                        "{achievement?.desc}. Profile analysis indicates stable contribution trajectory in the {repoStats[0]?.name.split('/')[1] || "target"} sector."
                                     </p>
-                                    <div className="flex gap-2">
+                                    
+                                    <div className="flex flex-wrap gap-2 pt-2">
                                         {["Verified", "Strategic", "Locked"].map(tag => (
-                                            <span key={tag} className="px-3 py-1 bg-white/5 border border-white/10 rounded-full text-[8px] font-black uppercase text-neutral-600 tracking-widest">{tag}</span>
+                                            <span key={tag} className="px-4 py-1.5 bg-violet-500/10 border border-violet-500/20 rounded-xl text-[9px] font-black uppercase text-violet-400 tracking-widest shadow-lg shadow-black/20 backdrop-blur-md">
+                                                {tag}
+                                            </span>
                                         ))}
                                     </div>
                                 </div>
                             </div>
-
-                            {/* Repo Distribution */}
-                            <div className="bg-black/40 border border-white/10 rounded-[3rem] p-10 backdrop-blur-3xl space-y-6 lg:col-span-2 overflow-hidden shadow-2xl">
-                                <div className="flex items-center justify-between mb-2">
-                                    <div className="space-y-1">
-                                        <h4 className="text-sm font-black text-white uppercase tracking-[0.3em] italic">Node Integrity Distribution</h4>
-                                        <p className="text-[9px] font-mono text-neutral-700 uppercase tracking-widest">Global_Grid_Impact_Radius</p>
+                             {/* Repo Distribution */}
+                            <div className="bg-black/40 border border-white/10 rounded-4xl p-10 backdrop-blur-3xl space-y-8 lg:col-span-2 overflow-hidden shadow-2xl relative">
+                                <GlowingEffect
+                                    blur={40}
+                                    borderWidth={1}
+                                    spread={80}
+                                    glow={true}
+                                    disabled={false}
+                                    proximity={120}
+                                    inactiveZone={0.01}
+                                />
+                                <div className="flex items-start justify-between relative z-10">
+                                    <div className="space-y-2">
+                                        <h4 className="text-xl md:text-2xl font-black text-white uppercase tracking-tighter italic">Node Integrity Distribution</h4>
+                                        <div className="flex items-center gap-3">
+                                            <div className="h-px w-8 bg-violet-500/50" />
+                                            <p className="text-[9px] font-mono text-neutral-500 uppercase tracking-[0.4em] font-black">Global_Grid_Impact_Radius</p>
+                                        </div>
                                     </div>
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-2 h-2 rounded-full bg-violet-500 animate-pulse" />
-                                        <span className="text-[8px] font-black text-neutral-600 uppercase tracking-widest">Uplink_Active</span>
+                                    <div className="flex items-center gap-3 px-4 py-2 bg-emerald-500/5 border border-emerald-500/10 rounded-full backdrop-blur-md">
+                                        <motion.div 
+                                            animate={{ scale: [1, 1.5, 1] }}
+                                            transition={{ duration: 2, repeat: Infinity }}
+                                            className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.8)]" 
+                                        />
+                                        <span className="text-[9px] font-black text-emerald-500/80 uppercase tracking-widest">Uplink_Active</span>
                                     </div>
                                 </div>
-                                <div className="h-[140px] w-full">
-                                    <ResponsiveContainer width="100%" height="100%">
-                                        <BarChart data={repoStats} layout="vertical" margin={{ left: -20 }}>
+
+                                <div className="h-[200px] w-full relative z-10 -ml-4">
+                                    <ResponsiveContainer width="110%" height="100%">
+                                        <BarChart data={repoStats} layout="vertical" margin={{ left: -30 }}>
                                             <XAxis type="number" hide />
-                                            <YAxis dataKey="name" type="category" width={140} tick={{ fontSize: 9, fill: '#444', fontWeight: 900 }} axisLine={false} tickLine={false} />
-                                            <Tooltip
-                                                cursor={{ fill: 'rgba(255,255,255,0.05)' }}
-                                                contentStyle={{ backgroundColor: '#000', border: '1px solid #ffffff10', fontSize: '10px', borderRadius: '12px' }}
-                                                itemStyle={{ color: '#8b5cf6' }}
+                                            <YAxis 
+                                                dataKey="name" 
+                                                type="category" 
+                                                width={180} 
+                                                tick={({ x, y, payload }) => (
+                                                    <g transform={`translate(${x},${y})`}>
+                                                        <text 
+                                                            x={0} 
+                                                            y={0} 
+                                                            dy={4} 
+                                                            textAnchor="end" 
+                                                            fill="#666" 
+                                                            fontSize="10" 
+                                                            fontWeight="900" 
+                                                            className="font-mono uppercase tracking-tighter italic"
+                                                        >
+                                                            {payload.value.length > 25 ? payload.value.substring(0, 22) + "..." : payload.value}
+                                                        </text>
+                                                    </g>
+                                                )}
+                                                axisLine={false} 
+                                                tickLine={false} 
                                             />
-                                            <Bar dataKey="count" fill="#8b5cf6" radius={[0, 4, 4, 0]} barSize={14} />
+                                            <Tooltip
+                                                cursor={{ fill: 'rgba(255,255,255,0.03)' }}
+                                                contentStyle={{ 
+                                                    backgroundColor: 'rgba(0,0,0,0.9)', 
+                                                    border: '1px solid rgba(139, 92, 246, 0.3)', 
+                                                    fontSize: '11px', 
+                                                    borderRadius: '16px',
+                                                    backdropFilter: 'blur(20px)',
+                                                    boxShadow: '0 20px 50px rgba(0,0,0,0.5)',
+                                                    fontWeight: '800'
+                                                }}
+                                                itemStyle={{ color: '#a78bfa' }}
+                                            />
+                                            <Bar 
+                                                dataKey="count" 
+                                                fill="url(#barGradient)" 
+                                                radius={[0, 8, 8, 0]} 
+                                                barSize={20}
+                                                animationDuration={2000}
+                                                animationEasing="ease-out"
+                                            />
+                                            <defs>
+                                                <linearGradient id="barGradient" x1="0" y1="0" x2="1" y2="0">
+                                                    <stop offset="0%" stopColor="#6366f1" />
+                                                    <stop offset="50%" stopColor="#8b5cf6" />
+                                                    <stop offset="100%" stopColor="#d946ef" />
+                                                </linearGradient>
+                                            </defs>
                                         </BarChart>
                                     </ResponsiveContainer>
                                 </div>
@@ -303,7 +390,7 @@ export default function TrackerResultsPage() {
                     )}
 
                     {error && (
-                        <div className="bg-red-500/5 border border-red-500/10 text-red-500 p-12 rounded-[3rem] text-center backdrop-blur-3xl max-w-2xl mx-auto shadow-2xl relative overflow-hidden group">
+                        <div className="bg-red-500/5 border border-red-500/10 text-red-500 p-12 rounded-4xl text-center backdrop-blur-3xl max-w-2xl mx-auto shadow-2xl relative overflow-hidden group">
                            <div className="absolute inset-0 bg-red-500/5 animate-pulse" />
                             <AlertCircle className="w-16 h-16 mx-auto mb-6 text-red-500/50 group-hover:scale-110 transition-transform" />
                             <h3 className="text-2xl font-black mb-3 uppercase italic tracking-tighter">Analysis Failure</h3>
@@ -383,7 +470,7 @@ function Header({ title, count, icon }: { title: string, count: number, icon: Re
 
 function GhostCard({ type }: { type: string }) {
     return (
-        <div className="w-full h-full border border-white/5 rounded-[3rem] bg-black/40 backdrop-blur-md flex items-center justify-center group/ghost relative overflow-hidden transition-all duration-700 hover:bg-white/5">
+        <div className="w-full h-full border border-white/5 rounded-4xl bg-black/40 backdrop-blur-md flex items-center justify-center group/ghost relative overflow-hidden transition-all duration-700 hover:bg-white/5">
             <div className="absolute inset-0 bg-linear-to-br from-white/2 via-transparent to-transparent" />
             <div className="flex flex-col items-center gap-3 opacity-10 group-hover/ghost:opacity-30 transition-all duration-500 scale-90 group-hover/ghost:scale-100">
                 <Plus className="w-10 h-10 text-neutral-500" strokeWidth={1} />
@@ -424,7 +511,7 @@ function ContributionCard({ contribution, type }: { contribution: Contribution; 
                             layoutId={`card-${contribution.id}`}
                             ref={cardRef}
                             onClick={(e) => e.stopPropagation()}
-                            className="bg-black border border-white/10 rounded-[3rem] p-10 max-w-3xl w-full shadow-2xl relative overflow-hidden cursor-default"
+                            className="bg-black border border-white/10 rounded-4xl p-10 max-w-3xl w-full shadow-2xl relative overflow-hidden cursor-default"
                         >
                             <div className="absolute inset-0 z-0 pointer-events-none opacity-20">
                                 <SparklesCore
@@ -514,8 +601,8 @@ function ContributionCard({ contribution, type }: { contribution: Contribution; 
                 className="cursor-pointer group h-full w-full"
             >
                 <GlareCard
-                    containerClassName="!w-full !h-full ![aspect-ratio:3/2] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.5)] rounded-[3rem]!"
-                    className="flex flex-col items-start justify-between p-7 h-full rounded-[3rem]!"
+                    containerClassName="!w-full !h-full ![aspect-ratio:3/2] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.5)] rounded-4xl!"
+                    className="flex flex-col items-start justify-between p-7 h-full rounded-4xl!"
                 >
                     <div className="w-full flex justify-between items-start mb-6">
                         <div className="p-3 bg-white/5 rounded-xl border border-white/10 group-hover:bg-white/10 transition-all group-hover:scale-110 shadow-2xl">

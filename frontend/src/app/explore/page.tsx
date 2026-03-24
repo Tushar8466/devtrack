@@ -40,16 +40,21 @@ export default function ExplorePage() {
         e.preventDefault();
         setError("");
 
-        const query = inputValue.trim();
+        let query = inputValue.trim();
         if (!query || loading) return;
 
-        if (searchType === 'profile') {
+        // Auto-detect owner/repo if they pasted a link or used slash format in profile mode
+        const isRepoFormat = query.includes("/") || query.includes("\\");
+        const actualType = (searchType === 'profile' && isRepoFormat) ? 'repo' : searchType;
+
+        if (actualType === 'profile') {
             setLoading(true);
-            await new Promise((resolve) => setTimeout(resolve, PROFILE_LOADING_STATES.length * 500 + 300));
-            router.push(`/analyze/${query}`);
-        } else if (searchType === 'repo') {
+            // Quick tactical delay for immersion scan
+            await new Promise((resolve) => setTimeout(resolve, 2000));
+            router.push(`/analyze/${query.replace("@", "")}`);
+        } else if (actualType === 'repo') {
             setLoading(true);
-            await new Promise((resolve) => setTimeout(resolve, REPO_LOADING_STATES.length * 500 + 300));
+            await new Promise((resolve) => setTimeout(resolve, 2000));
             router.push(`/opensource/explorer?q=${encodeURIComponent(query)}`);
         } else {
             let username = "";
@@ -70,16 +75,14 @@ export default function ExplorePage() {
                         repo = parts[1];
                     }
                 }
-            } catch (err) {
-                // ignore
-            }
+            } catch (err) { /* ignore */ }
 
             if (username && repo) {
                 setLoading(true);
-                await new Promise((resolve) => setTimeout(resolve, COMMITS_LOADING_STATES.length * 500 + 300));
+                await new Promise((resolve) => setTimeout(resolve, 2000));
                 router.push(`/explore/commits/${username}/${repo}`);
             } else {
-                setError("Please enter a valid username/repo format (e.g., torvalds/linux)");
+                setError("INTEGRITY_CHECK_FAILED: Enter 'username/repo' or a GitHub URL.");
             }
         }
     };
@@ -93,16 +96,22 @@ export default function ExplorePage() {
         >
                 {/* Satellite Uplink Status */}
                 <motion.div 
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="flex items-center gap-2 mb-8 bg-white/5 border border-white/10 rounded-full px-4 py-1.5 backdrop-blur-md self-center mx-auto w-fit"
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="flex items-center gap-3 mb-10 bg-black border border-white/10 rounded-full px-6 py-2 backdrop-blur-3xl shadow-2xl relative z-10"
                 >
-                    <div className="flex gap-1">
-                        {[1, 2, 3].map(i => (
-                            <div key={i} className="w-1 h-3 bg-violet-500 rounded-full animate-pulse" style={{ animationDelay: `${i * 0.2}s` }} />
-                        ))}
+                    <div className="flex gap-1.5 items-center">
+                        <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
+                        <span className="text-[10px] font-black uppercase tracking-[0.4em] text-neutral-400 font-mono">Satellite_Uplink: <span className="text-emerald-400">Stable</span></span>
                     </div>
-                    <span className="text-[9px] font-black uppercase tracking-[0.3em] text-neutral-500 font-mono">Satellite_Uplink: <span className="text-emerald-500">Stable</span></span>
+                    <div className="w-px h-4 bg-white/10" />
+                    <motion.div 
+                        animate={{ opacity: [0.4, 1, 0.4] }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                        className="text-[9px] font-bold text-violet-500 uppercase tracking-widest font-mono"
+                    >
+                        Sync_TX_Active
+                    </motion.div>
                 </motion.div>
 
                 <motion.div
@@ -185,11 +194,11 @@ export default function ExplorePage() {
                         </div>
                         <button
                             type="submit"
-                            disabled={!inputValue.trim()}
-                            className="px-5 py-3.5 bg-violet-600 hover:bg-violet-500 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-xl font-semibold transition-all flex items-center justify-center gap-2 whitespace-nowrap shadow-lg shadow-violet-500/20"
+                            disabled={!inputValue.trim() || loading}
+                            className="px-8 py-3.5 bg-violet-600 hover:bg-violet-500 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-xl font-black uppercase tracking-widest transition-all flex items-center justify-center gap-3 whitespace-nowrap shadow-2xl shadow-violet-500/30 active:scale-95 group/btn"
                         >
-                            {searchType === 'profile' ? 'Analyze' : 'Search'}
-                            <IconArrowRight className="w-4 h-4" />
+                            <span className="text-[11px] leading-none">{searchType === 'profile' ? 'Analyze' : 'Intercept'}</span>
+                            <IconArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
                         </button>
                     </div>
                     {error && (

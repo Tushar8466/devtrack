@@ -10,6 +10,7 @@ export async function GET(req: NextRequest) {
         // Fetch the public GitHub contributions page
         const res = await fetch(`https://github.com/users/${username}/contributions`, {
             headers: { "Accept": "text/html" },
+            cache: 'no-store'
         });
 
         if (!res.ok) {
