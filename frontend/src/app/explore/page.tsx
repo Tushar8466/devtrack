@@ -91,19 +91,34 @@ export default function ExplorePage() {
             waveWidth={30}
             containerClassName="min-h-screen flex flex-col items-center justify-center px-4"
         >
-            <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, ease: "easeOut" }}
-                className="w-full max-w-lg text-center bg-black/40 backdrop-blur-xl border border-white/10 p-10 rounded-3xl"
-            >
-                {/* Logo */}
-                <div className="flex items-center justify-center gap-3 mb-8 group cursor-pointer" onClick={() => router.push("/")}>
-                    <div className="relative w-12 h-12">
-                        <img src="/logo/devtrack-logo.png" alt="DevTrack Logo" className="w-full h-full object-contain group-hover:scale-110 transition-transform" />
+                {/* Satellite Uplink Status */}
+                <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="flex items-center gap-2 mb-8 bg-white/5 border border-white/10 rounded-full px-4 py-1.5 backdrop-blur-md self-center mx-auto w-fit"
+                >
+                    <div className="flex gap-1">
+                        {[1, 2, 3].map(i => (
+                            <div key={i} className="w-1 h-3 bg-violet-500 rounded-full animate-pulse" style={{ animationDelay: `${i * 0.2}s` }} />
+                        ))}
                     </div>
-                    <span className="text-white font-black text-3xl tracking-tighter uppercase italic">Devtrack</span>
-                </div>
+                    <span className="text-[9px] font-black uppercase tracking-[0.3em] text-neutral-500 font-mono">Satellite_Uplink: <span className="text-emerald-500">Stable</span></span>
+                </motion.div>
+
+                <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, ease: "easeOut" }}
+                    className="w-full max-w-lg text-center bg-black/40 backdrop-blur-xl border border-white/10 p-10 rounded-3xl relative overflow-hidden group/card"
+                >
+                    <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-violet-500 to-fuchsia-500 opacity-20 group-hover/card:opacity-60 transition-opacity" />
+                    {/* Logo */}
+                    <div className="flex items-center justify-center gap-3 mb-8 group cursor-pointer" onClick={() => router.push("/")}>
+                        <div className="relative w-12 h-12">
+                            <img src="/logo/devtrack-logo.png" alt="DevTrack Logo" className="w-full h-full object-contain group-hover:scale-110 transition-transform" />
+                        </div>
+                        <span className="text-white font-black text-3xl tracking-tighter uppercase italic">Devtrack</span>
+                    </div>
 
                 {/* Search Type Toggle */}
                 <div className="flex bg-white/5 border border-white/10 rounded-xl p-1 mb-8 w-fit mx-auto overflow-x-auto">

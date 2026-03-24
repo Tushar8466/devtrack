@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
-import { motion } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
 import { IconBrandGithub, IconArrowLeft, IconGitCommit, IconUsers, IconBrain } from "@tabler/icons-react";
 import { Sparkles } from "lucide-react";
 import { MultiStepLoader } from "@/components/ui/multi-step-loader";
@@ -39,12 +39,60 @@ export default function RepositoryCommitsPage() {
     const [hasMore, setHasMore] = useState(true);
     const [filterAuthor, setFilterAuthor] = useState<string | null>(null);
 
+    const [isSimulated, setIsSimulated] = useState(false);
+
+    const MOCK_COMMITS = (user: string, repo: string) => {
+        const hash = (s: string) => s.split('').reduce((a, b) => (((a << 5) - a) + b.charCodeAt(0)) | 0, 0);
+        const h = Math.abs(hash(user + repo));
+        
+        const messages = [
+            "feat: implement neural optimization vector",
+            "fix: resolved architectural drift in nexus-kernel",
+            "chore: database-uplink transition to v2.4",
+            "update: sentinel-api protocol buffers",
+            "feat: distributed-consensus logic refactor",
+            "docs: structural documentation for asset-mapping",
+            "feat: vortex-ui rendering pipeline upgrade",
+            "fix: global-dependency resolution patch"
+        ];
+
+        return Array.from({ length: 20 }).map((_, i) => ({
+            sha: Math.random().toString(16).substring(2, 42),
+            html_url: `https://github.com/${user}/${repo}`,
+            commit: {
+                message: messages[i % messages.length],
+                author: {
+                    name: user,
+                    date: new Date(Date.now() - (i * 3600000 * 2)).toISOString()
+                }
+            },
+            author: {
+                avatar_url: `https://avatars.githubusercontent.com/u/${(h + i) % 50000}?v=4`,
+                login: user
+            }
+        }));
+    };
+
     const fetchCommits = async (p: number, append = false) => {
         if (p === 1) setLoading(true);
         else setLoadingMore(true);
         setError(null);
+        setIsSimulated(false);
+
         try {
             const res = await fetch(`https://api.github.com/repos/${username}/${repoName}/commits?per_page=30&page=${p}`);
+            
+            if (res.status === 403) {
+                console.warn("API Rate Limit Reached. Activating Neural Simulation.");
+                const data = MOCK_COMMITS(username, repoName);
+                setCommits(prev => append ? [...prev, ...data] : data);
+                setIsSimulated(true);
+                setHasMore(false);
+                setLoading(false);
+                setLoadingMore(false);
+                return;
+            }
+
             if (!res.ok) {
                 if (res.status === 404) throw new Error("Repository or commits not found.");
                 if (res.status === 409) throw new Error("Repository is empty.");
@@ -128,6 +176,21 @@ export default function RepositoryCommitsPage() {
 
     return (
         <div className="min-h-screen bg-black text-white p-4 md:p-8 pt-24 relative overflow-hidden">
+            <AnimatePresence>
+                {isSimulated && (
+                    <motion.div 
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="bg-violet-600/90 text-white py-2 px-6 fixed top-0 left-0 w-full z-50 backdrop-blur-md flex items-center justify-between border-b border-white/10"
+                    >
+                        <div className="flex items-center gap-3">
+                            <div className="w-1.5 h-1.5 bg-white rounded-full animate-ping" />
+                            <span className="text-[10px] font-black uppercase tracking-[0.2em]">Neural_Simulation_Mode :: API_Uplink_Limited</span>
+                        </div>
+                        <button onClick={() => window.location.reload()} className="text-[9px] font-black underline hover:text-white/80">Sync_Matrix</button>
+                    </motion.div>
+                )}
+            </AnimatePresence>
             {/* BACKGROUND INFRASTRUCTURE */}
             <div className="absolute inset-0 z-0">
                 <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />

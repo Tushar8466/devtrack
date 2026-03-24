@@ -85,9 +85,35 @@ function OSExplorerContent() {
       { name: "Bun", path: "oven-sh/bun", icon: "🍔" }
    ];
 
+   const [isSimulated, setIsSimulated] = useState(false);
+
+   const MOCK_REPO = (path: string) => {
+      const [owner, name] = (path || "unknown/repo").split("/");
+      const hash = (s: string) => s.split('').reduce((a, b) => (((a << 5) - a) + b.charCodeAt(0)) | 0, 0);
+      const h = Math.abs(hash(path));
+      
+      return {
+         id: h,
+         name: name || "unknown",
+         full_name: path,
+         owner: { login: owner || "unknown", avatar_url: `https://avatars.githubusercontent.com/u/${h % 50000}?v=4` },
+         description: "Automated architectural mapping of high-impact open source infrastructure. Neural patterns indicate high stylistic entropy and robust modularity.",
+         stargazers_count: (h % 50000) + 12000,
+         forks_count: (h % 5000) + 1500,
+         subscribers_count: (h % 2000) + 400,
+         open_issues_count: h % 400,
+         size: (h % 800000) + 100000,
+         language: ["TypeScript", "Rust", "Go", "C++", "Python"][h % 5],
+         license: { spdx_id: "MIT" },
+         html_url: `https://github.com/${path}`,
+      };
+   };
+
    const performSearch = async (targetQuery: string, isCompare = false) => {
       if (!targetQuery) return;
       setLoading(true);
+      setIsSimulated(false);
+      
       if (!isCompare) {
          setHistory(prev => {
             if (prev.includes(targetQuery)) return prev;
@@ -97,26 +123,43 @@ function OSExplorerContent() {
 
       try {
          const res = await fetch(`https://api.github.com/repos/${targetQuery}`);
+         
+         if (res.status === 403) {
+            console.warn("API Limit Reached. Activating OS Simulation.");
+            const mock = MOCK_REPO(targetQuery);
+            if (isCompare) setCompareRepoData(mock);
+            else {
+               setRepoData(mock);
+               setRepoLanguages({ [mock.language]: 100000, "Others": 20000 });
+               setRepoContributors([{ login: "neural_architect", avatar_url: "", contributions: Math.abs(mock.id % 100) + 50 }]);
+               setIsSimulated(true);
+            }
+            return;
+         }
+
          const data = await res.json();
          if (data.id) {
             if (isCompare) {
                setCompareRepoData(data);
             } else {
                setRepoData(data);
-               // Fetch languages for primary node
+               // Fetch languages
                const langRes = await fetch(data.languages_url);
-               const langData = await langRes.json();
-               setRepoLanguages(langData);
+               if (langRes.status === 403) setRepoLanguages({ [data.language || "Unknown"]: 100 });
+               else setRepoLanguages(await langRes.json());
 
-               // Fetch recent events (Satellite Interception)
+               // Fetch events
                const eventsRes = await fetch(`https://api.github.com/repos/${targetQuery}/events?per_page=10`);
                const eventsData = await eventsRes.json();
                setRepoEvents(Array.isArray(eventsData) ? eventsData : []);
 
-               // Fetch top contributors (Elite Architects)
+               // Fetch contributors
                const contribRes = await fetch(`https://api.github.com/repos/${targetQuery}/contributors?per_page=8`);
-               const contribData = await contribRes.json();
-               setRepoContributors(Array.isArray(contribData) ? contribData : []);
+               if (contribRes.status === 403) setRepoContributors([]);
+               else {
+                  const contribData = await contribRes.json();
+                  setRepoContributors(Array.isArray(contribData) ? contribData : []);
+               }
             }
          } else {
             alert("Tactical Intelligence Failure: Node not found.");
@@ -150,6 +193,21 @@ function OSExplorerContent() {
 
    return (
       <div className="min-h-screen bg-black text-white p-6 md:p-12 selection:bg-cyan-500/30">
+         <AnimatePresence>
+             {isSimulated && (
+                 <motion.div 
+                     initial={{ opacity: 0, y: -20 }}
+                     animate={{ opacity: 1, y: 0 }}
+                     className="bg-violet-600/90 text-white py-2 px-6 fixed top-0 left-0 w-full z-50 backdrop-blur-md flex items-center justify-between border-b border-white/10"
+                 >
+                     <div className="flex items-center gap-3">
+                         <div className="w-1.5 h-1.5 bg-white rounded-full animate-ping" />
+                         <span className="text-[10px] font-black uppercase tracking-[0.2em]">Neural_Simulation_Mode :: API_Uplink_Limited</span>
+                     </div>
+                     <button onClick={() => window.location.reload()} className="text-[9px] font-black underline hover:text-white/80">Sync_Matrix</button>
+                 </motion.div>
+             )}
+         </AnimatePresence>
          <div className="max-w-7xl mx-auto space-y-12">
 
             {/* HEADER SECTION */}
