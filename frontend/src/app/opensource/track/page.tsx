@@ -9,6 +9,7 @@ import { GlareCard } from "@/components/ui/glare-card";
 import { Layers, Sparkles, Zap } from "lucide-react";
 import { Button } from "@/components/ui/stateful-button";
 import { MultiStepLoader } from "@/components/ui/multi-step-loader";
+import Wavy from "@/components/wavy-background";
 
 const LOADING_STATES = [
     { text: "Initializing analysis engine" },
@@ -39,7 +40,7 @@ export default function TrackerSearchPage() {
 
     return (
         <div className="relative min-h-screen bg-black overflow-hidden">
-            <Vortex
+            <Wavy
                 backgroundColor="black"
                 rangeY={800}
                 particleCount={500}
@@ -120,7 +121,7 @@ export default function TrackerSearchPage() {
                         </div>
                     </motion.div>
                 </div>
-            </Vortex>
+            </Wavy>
             <MultiStepLoader
                 loadingStates={LOADING_STATES}
                 loading={loading}
