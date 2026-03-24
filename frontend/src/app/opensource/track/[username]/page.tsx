@@ -1,4 +1,4 @@
-"use client";
+ "use client";
 
 import React, { useState, useRef, useEffect, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
@@ -16,6 +16,11 @@ import {
     XAxis,
     YAxis,
     Tooltip,
+    Radar,
+    RadarChart,
+    PolarGrid,
+    PolarAngleAxis,
+    PolarRadiusAxis,
 } from 'recharts';
 
 import { Cover } from "@/components/ui/cover";
@@ -31,6 +36,10 @@ interface Contribution {
     closed_at: string | null;
     number: number;
     repo_name?: string;
+    comments: number;
+    labels: any[];
+    author_association?: string;
+    body?: string;
 }
 
 // MOCK DATA for Fallback (Neural Simulation)
@@ -58,7 +67,10 @@ const MOCK_CONTRIBUTIONS = (user: string, type: 'pr' | 'issue' | 'merged') => {
         created_at: new Date(Date.now() - (i * 86400000 * 2)).toISOString(),
         closed_at: type === 'merged' ? new Date().toISOString() : null,
         number: (h % 1000) + i,
-        repo_name: repos[(h + i) % repos.length]
+        repo_name: repos[(h + i) % repos.length],
+        comments: (h + i) % 12,
+        labels: [{ name: "bug" }, { name: "neural-enhancement" }],
+        author_association: "CONTRIBUTOR"
     }));
 };
 
@@ -148,6 +160,38 @@ export default function TrackerResultsPage() {
         if (prs.length > 3) return { label: "Active Deployer", desc: "High frequency of engineering proposals", icon: "🚀" };
         if (issues.length > prs.length) return { label: "Systems Guardian", desc: "Focused on architectural integrity and bug tracking", icon: "🛡️" };
         return { label: "OS Voyager", desc: "Beginning the journey into the global ecosystem", icon: "🛰️" };
+    }, [prs, issues, merged]);
+
+    const qualityMetrics = useMemo(() => {
+        const all = [...prs, ...issues, ...merged];
+        if (all.length === 0) return [];
+
+        const avgComments = all.reduce((acc, curr) => acc + (curr.comments || 0), 0) / all.length;
+        const mergeRate = merged.length / (prs.length + merged.length || 1);
+        const labelDepth = all.reduce((acc, curr) => acc + (curr.labels?.length || 0), 0) / all.length;
+        const associationScore = all.filter(c => c.author_association !== 'NONE').length / all.length;
+
+        return [
+            { subject: 'Impact', A: Math.min(mergeRate * 100, 100), fullMark: 100 },
+            { subject: 'Feedback', A: Math.min(avgComments * 15, 100), fullMark: 100 },
+            { subject: 'Depth', A: Math.min(labelDepth * 40, 100), fullMark: 100 },
+            { subject: 'Influence', A: Math.min(associationScore * 100, 100), fullMark: 100 },
+            { subject: 'Stability', A: 85, fullMark: 100 }, // Simulated based on history
+            { subject: 'Momentum', A: Math.min(all.length * 5, 100), fullMark: 100 },
+        ];
+    }, [prs, issues, merged]);
+
+    const qualitySummary = useMemo(() => {
+        const all = [...prs, ...issues, ...merged];
+        if (all.length === 0) return { score: "N/A", signalRatio: "0.00" };
+        
+        const mergeRate = merged.length / (prs.length + merged.length || 1);
+        const score = mergeRate > 0.8 ? "S" : mergeRate > 0.5 ? "A++" : mergeRate > 0.3 ? "A" : "B";
+        
+        const feedbackSum = all.reduce((acc, curr) => acc + (curr.comments || 0), 0);
+        const signalRatio = Math.min((feedbackSum / (all.length || 1)) / 10, 1).toFixed(2);
+        
+        return { score, signalRatio };
     }, [prs, issues, merged]);
 
     const maxItems = Math.max(prs.length, issues.length, merged.length, 1);
@@ -386,6 +430,56 @@ export default function TrackerResultsPage() {
                                     </ResponsiveContainer>
                                 </div>
                             </div>
+
+                            {/* Quality Metrics Radar */}
+                            <div className="bg-black/40 border border-white/10 rounded-4xl p-10 backdrop-blur-3xl space-y-8 lg:col-span-1 overflow-hidden shadow-2xl relative group/quality">
+                                <GlowingEffect
+                                    blur={40}
+                                    borderWidth={1}
+                                    spread={80}
+                                    glow={true}
+                                    disabled={false}
+                                    proximity={120}
+                                    inactiveZone={0.01}
+                                />
+                                <div className="space-y-1 relative z-10">
+                                    <h4 className="text-xl font-black text-white uppercase tracking-tighter italic">Quality Signal Scan</h4>
+                                    <p className="text-[9px] font-mono text-neutral-600 uppercase tracking-widest">Heuristic_Integrity_Index</p>
+                                </div>
+
+                                <div className="h-[220px] w-full flex items-center justify-center relative z-10">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <RadarChart cx="50%" cy="50%" outerRadius="80%" data={qualityMetrics}>
+                                            <PolarGrid stroke="#333" />
+                                            <PolarAngleAxis dataKey="subject" tick={{ fill: '#666', fontSize: 10, fontWeight: 900 }} />
+                                            <Radar
+                                                name="Quality"
+                                                dataKey="A"
+                                                stroke="#8b5cf6"
+                                                fill="#8b5cf6"
+                                                fillOpacity={0.6}
+                                            />
+                                        </RadarChart>
+                                    </ResponsiveContainer>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4 relative z-10">
+                                    <div className="bg-white/5 border border-white/10 rounded-2xl p-4">
+                                        <p className="text-[8px] font-black text-neutral-600 uppercase mb-1">Impact_Score</p>
+                                        <div className="flex items-end gap-2 text-violet-400">
+                                            <span className="text-2xl font-black italic">{qualitySummary.score}</span>
+                                            <span className="text-[10px] mb-1">Rank</span>
+                                        </div>
+                                    </div>
+                                    <div className="bg-white/5 border border-white/10 rounded-2xl p-4">
+                                        <p className="text-[8px] font-black text-neutral-600 uppercase mb-1">Signal_Noise</p>
+                                        <div className="flex items-end gap-2 text-emerald-400">
+                                            <span className="text-2xl font-black italic">{qualitySummary.signalRatio}</span>
+                                            <span className="text-[10px] mb-1">Ratio</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     )}
 
@@ -546,11 +640,17 @@ function ContributionCard({ contribution, type }: { contribution: Contribution; 
                                             <GitMerge className="w-8 h-8 text-purple-400" />
                                         )}
                                     </div>
-                                    <div className="flex flex-col gap-1">
+                                    <div className="flex flex-col gap-1 flex-1">
                                         <h4 className="text-[10px] text-neutral-500 font-black uppercase tracking-[0.3em] font-mono leading-none">
                                             {contribution.repo_name || "Repository"}
                                         </h4>
                                         <span className="text-xs text-neutral-700 font-mono font-bold tracking-widest">TRACE_NODE_#{contribution.number}</span>
+                                    </div>
+                                    <div className="bg-violet-600/10 border border-violet-500/20 px-6 py-3 rounded-2xl flex flex-col items-center justify-center shadow-2xl">
+                                        <p className="text-[8px] font-black text-violet-400 uppercase tracking-widest leading-none mb-1">Impact_Rank</p>
+                                        <span className="text-xl font-black italic text-white leading-none">
+                                            {contribution.state === 'merged' ? 'S' : contribution.comments > 5 ? 'A++' : 'A'}
+                                        </span>
                                     </div>
                                 </div>
 
@@ -561,16 +661,22 @@ function ContributionCard({ contribution, type }: { contribution: Contribution; 
                                     {contribution.title}
                                 </motion.p>
 
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                     <div className="bg-white/5 p-6 rounded-3xl border border-white/10 shadow-3xl">
                                         <p className="text-[9px] text-neutral-600 uppercase tracking-[0.3em] font-black mb-2 font-mono">Status_Code</p>
                                         <p className="text-lg font-black text-white uppercase italic tracking-tighter">{contribution.state}</p>
                                     </div>
                                     <div className="bg-white/5 p-6 rounded-3xl border border-white/10 shadow-3xl">
+                                        <p className="text-[9px] text-neutral-600 uppercase tracking-[0.3em] font-black mb-2 font-mono">Signal_Depth</p>
+                                        <p className="text-lg font-black text-white uppercase italic tracking-tighter">
+                                            {contribution.comments.toString().padStart(2, '0')}_COMMENTS
+                                        </p>
+                                    </div>
+                                    <div className="bg-white/5 p-6 rounded-3xl border border-white/10 shadow-3xl">
                                         <p className="text-[9px] text-neutral-600 uppercase tracking-[0.3em] font-black mb-2 font-mono">Inbound_Epoch</p>
                                         <p className="text-lg font-black text-white italic tracking-tighter">
                                             {new Date(contribution.created_at).toLocaleDateString(undefined, {
-                                                month: 'long',
+                                                month: 'short',
                                                 day: 'numeric',
                                                 year: 'numeric'
                                             }).toUpperCase()}
@@ -624,9 +730,14 @@ function ContributionCard({ contribution, type }: { contribution: Contribution; 
                                     <GitMerge className="w-5 h-5 text-purple-400" />
                                 )}
                             </div>
-                            <span className="text-[9px] text-neutral-600 uppercase tracking-tighter font-black font-mono bg-white/5 px-2 py-0.5 rounded border border-white/5 group-hover:border-white/10 transition-colors">
-                                #{contribution.number}
-                            </span>
+                            <div className="flex items-center gap-2 shrink-0">
+                                <div className="bg-[#8b5cf6]/20 border border-[#8b5cf6]/30 px-2 py-0.5 rounded text-[8px] font-black text-[#8b5cf6] font-mono leading-none">
+                                    {contribution.state === 'merged' ? 'S_RANK' : contribution.comments > 5 ? 'A++_SIG' : 'A_SIG'}
+                                </div>
+                                <span className="text-[9px] text-neutral-600 uppercase tracking-tighter font-black font-mono bg-white/5 px-2 py-0.5 rounded border border-white/5 group-hover:border-white/10 transition-colors">
+                                    #{contribution.number}
+                                </span>
+                            </div>
                         </div>
 
                         <div className="flex-1 w-full space-y-4">
