@@ -1,4 +1,4 @@
- "use client";
+"use client";
 
 import React, { useState, useRef, useEffect, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
@@ -46,12 +46,12 @@ interface Contribution {
 const MOCK_CONTRIBUTIONS = (user: string, type: 'pr' | 'issue' | 'merged') => {
     const hash = (s: string) => [...s].reduce((a, b) => (((a << 5) - a) + b.charCodeAt(0)) | 0, 0);
     const h = Math.abs(hash(user + type));
-    
+
     const count = (h % 5) + 3;
     // Generate user-branded repo names for the simulation
     const baseRepos = ["engine", "core", "nexus", "vortex", "pulse", "grid", "alpha", "omega"];
     const repos = baseRepos.map(name => `${user}/${name}-${h % 100}`);
-    
+
     const titles = {
         pr: ["feat: implement neural optimization", "fix: architectural drift correction", "refactor: nexus-kernel core", "update: sentinel-api protocols"],
         issue: ["bug: dependency resolution failure", "feat request: global telemetry proxy", "docs: structural integrity guide", "security: node-uplink disclosure"],
@@ -184,13 +184,13 @@ export default function TrackerResultsPage() {
     const qualitySummary = useMemo(() => {
         const all = [...prs, ...issues, ...merged];
         if (all.length === 0) return { score: "N/A", signalRatio: "0.00" };
-        
+
         const mergeRate = merged.length / (prs.length + merged.length || 1);
         const score = mergeRate > 0.8 ? "S" : mergeRate > 0.5 ? "A++" : mergeRate > 0.3 ? "A" : "B";
-        
+
         const feedbackSum = all.reduce((acc, curr) => acc + (curr.comments || 0), 0);
         const signalRatio = Math.min((feedbackSum / (all.length || 1)) / 10, 1).toFixed(2);
-        
+
         return { score, signalRatio };
     }, [prs, issues, merged]);
 
@@ -223,7 +223,7 @@ export default function TrackerResultsPage() {
         <div className="relative min-h-screen bg-black overflow-y-auto">
             <AnimatePresence>
                 {isSimulated && (
-                    <motion.div 
+                    <motion.div
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
                         className="bg-violet-600/90 text-white py-2 px-6 fixed top-0 left-0 w-full z-50 backdrop-blur-md flex items-center justify-between border-b border-white/10"
@@ -233,7 +233,7 @@ export default function TrackerResultsPage() {
                             <span className="text-[10px] font-black uppercase tracking-[0.2em]">Neural_Simulation_Mode :: API_Uplink_Limited</span>
                         </div>
                         <button onClick={() => window.location.reload()} className="text-[9px] font-black underline hover:text-white/80 flex items-center gap-2">
-                             <RefreshCcw className="w-3 h-3" /> Sync_Matrix
+                            <RefreshCcw className="w-3 h-3" /> Sync_Matrix
                         </button>
                     </motion.div>
                 )}
@@ -311,10 +311,10 @@ export default function TrackerResultsPage() {
                                     <Zap size={140} className="text-violet-500" />
                                 </div>
                                 <div className="absolute inset-x-0 h-px top-1/4 bg-linear-to-r from-transparent via-violet-500/20 to-transparent animate-pulse" />
-                                
+
                                 <div className="relative z-10 space-y-8">
                                     <div className="flex items-start gap-6">
-                                        <motion.div 
+                                        <motion.div
                                             whileHover={{ scale: 1.1, rotate: [0, 5, -5, 0] }}
                                             className="text-6xl group-hover:drop-shadow-[0_0_20px_rgba(255,255,255,0.4)] transition-all duration-500"
                                         >
@@ -328,11 +328,11 @@ export default function TrackerResultsPage() {
                                             <h3 className="text-3xl md:text-4xl font-black text-white italic tracking-tighter uppercase leading-none">{achievement?.label}</h3>
                                         </div>
                                     </div>
-                                    
+
                                     <p className="text-neutral-400 text-sm italic leading-relaxed font-medium bg-black/20 p-4 rounded-2xl border border-white/5">
                                         "{achievement?.desc}. Profile analysis indicates stable contribution trajectory in the {repoStats[0]?.name.split('/')[1] || "target"} sector."
                                     </p>
-                                    
+
                                     <div className="flex flex-wrap gap-2 pt-2">
                                         {["Verified", "Strategic", "Locked"].map(tag => (
                                             <span key={tag} className="px-4 py-1.5 bg-violet-500/10 border border-violet-500/20 rounded-xl text-[9px] font-black uppercase text-violet-400 tracking-widest shadow-lg shadow-black/20 backdrop-blur-md">
@@ -342,7 +342,7 @@ export default function TrackerResultsPage() {
                                     </div>
                                 </div>
                             </div>
-                             {/* Repo Distribution */}
+                            {/* Repo Distribution */}
                             <div className="bg-black/40 border border-white/10 rounded-4xl p-10 backdrop-blur-3xl space-y-8 lg:col-span-2 overflow-hidden shadow-2xl relative">
                                 <GlowingEffect
                                     blur={40}
@@ -362,10 +362,10 @@ export default function TrackerResultsPage() {
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-3 px-4 py-2 bg-emerald-500/5 border border-emerald-500/10 rounded-full backdrop-blur-md">
-                                        <motion.div 
+                                        <motion.div
                                             animate={{ scale: [1, 1.5, 1] }}
                                             transition={{ duration: 2, repeat: Infinity }}
-                                            className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.8)]" 
+                                            className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.8)]"
                                         />
                                         <span className="text-[9px] font-black text-emerald-500/80 uppercase tracking-widest">Uplink_Active</span>
                                     </div>
@@ -375,35 +375,35 @@ export default function TrackerResultsPage() {
                                     <ResponsiveContainer width="110%" height="100%">
                                         <BarChart data={repoStats} layout="vertical" margin={{ left: -30 }}>
                                             <XAxis type="number" hide />
-                                            <YAxis 
-                                                dataKey="name" 
-                                                type="category" 
-                                                width={180} 
+                                            <YAxis
+                                                dataKey="name"
+                                                type="category"
+                                                width={180}
                                                 tick={({ x, y, payload }) => (
                                                     <g transform={`translate(${x},${y})`}>
-                                                        <text 
-                                                            x={0} 
-                                                            y={0} 
-                                                            dy={4} 
-                                                            textAnchor="end" 
-                                                            fill="#666" 
-                                                            fontSize="10" 
-                                                            fontWeight="900" 
+                                                        <text
+                                                            x={0}
+                                                            y={0}
+                                                            dy={4}
+                                                            textAnchor="end"
+                                                            fill="#666"
+                                                            fontSize="10"
+                                                            fontWeight="900"
                                                             className="font-mono uppercase tracking-tighter italic"
                                                         >
                                                             {payload.value.length > 25 ? payload.value.substring(0, 22) + "..." : payload.value}
                                                         </text>
                                                     </g>
                                                 )}
-                                                axisLine={false} 
-                                                tickLine={false} 
+                                                axisLine={false}
+                                                tickLine={false}
                                             />
                                             <Tooltip
                                                 cursor={{ fill: 'rgba(255,255,255,0.03)' }}
-                                                contentStyle={{ 
-                                                    backgroundColor: 'rgba(0,0,0,0.9)', 
-                                                    border: '1px solid rgba(139, 92, 246, 0.3)', 
-                                                    fontSize: '11px', 
+                                                contentStyle={{
+                                                    backgroundColor: 'rgba(0,0,0,0.9)',
+                                                    border: '1px solid rgba(139, 92, 246, 0.3)',
+                                                    fontSize: '11px',
                                                     borderRadius: '16px',
                                                     backdropFilter: 'blur(20px)',
                                                     boxShadow: '0 20px 50px rgba(0,0,0,0.5)',
@@ -411,10 +411,10 @@ export default function TrackerResultsPage() {
                                                 }}
                                                 itemStyle={{ color: '#a78bfa' }}
                                             />
-                                            <Bar 
-                                                dataKey="count" 
-                                                fill="url(#barGradient)" 
-                                                radius={[0, 8, 8, 0]} 
+                                            <Bar
+                                                dataKey="count"
+                                                fill="url(#barGradient)"
+                                                radius={[0, 8, 8, 0]}
                                                 barSize={20}
                                                 animationDuration={2000}
                                                 animationEasing="ease-out"
@@ -485,7 +485,7 @@ export default function TrackerResultsPage() {
 
                     {error && (
                         <div className="bg-red-500/5 border border-red-500/10 text-red-500 p-12 rounded-4xl text-center backdrop-blur-3xl max-w-2xl mx-auto shadow-2xl relative overflow-hidden group">
-                           <div className="absolute inset-0 bg-red-500/5 animate-pulse" />
+                            <div className="absolute inset-0 bg-red-500/5 animate-pulse" />
                             <AlertCircle className="w-16 h-16 mx-auto mb-6 text-red-500/50 group-hover:scale-110 transition-transform" />
                             <h3 className="text-2xl font-black mb-3 uppercase italic tracking-tighter">Analysis Failure</h3>
                             <p className="opacity-60 text-sm font-mono uppercase tracking-widest leading-relaxed">{error}</p>
@@ -520,7 +520,7 @@ export default function TrackerResultsPage() {
                             <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
                                 {rowIndices.map((rowIndex) => (
                                     <React.Fragment key={`row-${rowIndex}`}>
-                                    <div className="flex flex-col aspect-3/2 w-full">
+                                        <div className="flex flex-col aspect-3/2 w-full">
                                             {prs[rowIndex] ? <ContributionCard contribution={prs[rowIndex]} type="pr" /> : <GhostCard type="Inbound" />}
                                         </div>
                                         <div className="flex flex-col aspect-3/2 w-full">
