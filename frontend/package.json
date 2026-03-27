@@ -19,6 +19,7 @@
     "@tsparticles/react": "^3.0.0",
     "@tsparticles/slim": "^3.9.1",
     "@types/d3": "^7.4.3",
+    "@vercel/analytics": "^2.0.1",
     "canvas-confetti": "^1.9.4",
     "clsx": "^2.1.1",
     "countup.js": "^2.10.0",

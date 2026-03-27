@@ -3,6 +3,7 @@ import "./globals.css";
 import { SessionProvider } from "@/components/providers/SessionProvider";
 import { AtlasAssistant } from "@/components/AtlasAssistant";
 import { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/react";
 
 export const metadata: Metadata = {
   title: "DevTrack | Neural Intelligence Core",
@@ -25,6 +26,7 @@ export default function RootLayout({
     { name: "OS Tracker", link: "/opensource" },
     { name: "Compare", link: "/compare" },
     { name: "DevTrack AI", link: "/ai" },
+    { name: "Dashboard", link: "/dashboard" },
     { name: "Code DNA", link: "/dna" },
   ];
 
@@ -35,6 +37,7 @@ export default function RootLayout({
           <FloatingNav navItems={navItems} />
           {children}
           <AtlasAssistant />
+          <Analytics />
         </SessionProvider>
       </body>
     </html>
