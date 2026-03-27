@@ -592,7 +592,7 @@ export default function ProfileResults({ data, onBack }: ProfileResultsProps) {
                 {/* Influence Rating */}
                 <div className={`w-full p-4 rounded-2xl border ${overallRisk.badgeColor.split(' ')[2]} ${overallRisk.badgeColor.split(' ')[0]} flex flex-col items-center gap-1 group/rating relative overflow-hidden`}>
                     <div className="absolute top-0 right-0 p-2 opacity-10 group-hover/rating:rotate-12 transition-transform" />
-                    <span className="text-[9px] font-black uppercase tracking-[0.3em] opacity-60">Sequence_Analysis</span>
+                    <span className="text-[9px] font-black uppercase tracking-[0.3em] pl-[0.3em] opacity-60">Sequence_Analysis</span>
                     <span className="text-sm font-black uppercase italic tracking-tight">{overallRisk.label}</span>
                 </div>
 
