@@ -72,21 +72,21 @@ function OpenSourceLandingPage() {
           <div className="flex flex-col sm:flex-row gap-4 items-center">
             <button
               onClick={() => router.push("/opensource/track")}
-              className="group relative px-10 py-5 bg-white text-black font-bold rounded-2xl overflow-hidden transition-all hover:scale-105 active:scale-95 flex items-center gap-3 text-lg"
+              className="group relative px-10 py-5 bg-white text-black font-bold rounded-2xl overflow-hidden cursor-pointer transition-all hover:scale-105 active:scale-95 flex items-center gap-3 text-lg"
             >
               <span className="relative z-10">Contribution Tracker</span>
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </button>
             <button
               onClick={() => router.push("/opensource/explorer")}
-              className="group relative px-10 py-5 bg-cyan-500 text-black font-bold rounded-2xl overflow-hidden transition-all hover:scale-105 active:scale-95 flex items-center gap-3 text-lg shadow-[0_0_20px_rgba(6,182,212,0.3)] hover:shadow-[0_0_30px_rgba(6,182,212,0.5)]"
+              className="group relative px-10 py-5 bg-cyan-500 text-black font-bold rounded-2xl overflow-hidden cursor-pointer transition-all hover:scale-105 active:scale-95 flex items-center gap-3 text-lg shadow-[0_0_20px_rgba(6,182,212,0.3)] hover:shadow-[0_0_30px_rgba(6,182,212,0.5)]"
             >
               <Zap className="w-5 h-5 fill-black" />
               <span className="relative z-10">Node Intelligence</span>
             </button>
             <button
               onClick={() => router.push("/opensource/docs")}
-              className="group relative px-10 py-5 bg-white/5 border border-white/10 text-white font-bold rounded-2xl overflow-hidden transition-all hover:scale-105 hover:bg-white/10 active:scale-95 flex items-center gap-3 text-lg backdrop-blur-sm"
+              className="group relative px-10 py-5 bg-white/5 border border-white/10 text-white font-bold rounded-2xl overflow-hidden cursor-pointer transition-all hover:scale-105 hover:bg-white/10 active:scale-95 flex items-center gap-3 text-lg backdrop-blur-sm"
             >
               <BookOpen className="w-5 h-5 text-violet-400" />
               <span className="relative z-10">Guide</span>
@@ -143,7 +143,7 @@ function OpenSourceLandingPage() {
               {/* CTA link */}
               <button
                 onClick={() => router.push("/opensource/track")}
-                className="flex items-center gap-2 text-cyan-400 text-xs font-bold uppercase tracking-widest hover:text-white transition-colors group/cta mt-2"
+                className="flex items-center gap-2 text-cyan-400 text-xs font-bold uppercase tracking-widest cursor-pointer hover:text-white transition-colors group/cta mt-2"
               >
                 <ExternalLink className="w-3.5 h-3.5" />
                 Start Contributing
@@ -367,7 +367,7 @@ function OpenSourceLandingPage() {
                         </div>
                         <button 
                             onClick={() => router.push(`/opensource/explorer?q=${asset.path}`)}
-                            className="w-full py-3 bg-white/2 border border-white/5 rounded-2xl text-[9px] font-black text-white uppercase tracking-widest hover:bg-white/5 transition-all active:scale-95"
+                            className="w-full py-3 bg-white/2 border border-white/5 rounded-2xl text-[9px] font-black text-white uppercase tracking-widest cursor-pointer hover:bg-white/5 transition-all active:scale-95"
                         >
                             Intercept Node Telemetry
                         </button>
@@ -389,14 +389,14 @@ function OpenSourceLandingPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <button
               onClick={() => router.push("/opensource/track")}
-              className="group px-12 py-6 bg-white text-black font-black rounded-4xl hover:scale-105 active:scale-95 transition-all flex items-center gap-3 text-xl"
+              className="group px-12 py-6 bg-white text-black font-black rounded-4xl cursor-pointer hover:scale-105 active:scale-95 transition-all flex items-center gap-3 text-xl"
             >
               Get Started
               <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
             </button>
             <button
               onClick={() => router.push("/opensource/docs")}
-              className="px-12 py-6 bg-white/5 border border-white/10 text-white font-black rounded-4xl hover:bg-white/10 transition-all text-xl backdrop-blur-xl"
+              className="px-12 py-6 bg-white/5 border border-white/10 text-white font-black rounded-4xl cursor-pointer hover:bg-white/10 transition-all text-xl backdrop-blur-xl"
             >
               Read Documentation
             </button>
