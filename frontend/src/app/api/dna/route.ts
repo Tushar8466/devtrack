@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
     const userRes = await fetch(`https://api.github.com/users/${username}`, {
       headers: { "Accept": "application/vnd.github.v3+json" }
     });
-    
+
     if (!userRes.ok) throw new Error("User not found");
     const user = await userRes.json();
 
@@ -31,8 +31,8 @@ export async function GET(req: NextRequest) {
       }
     });
 
-    const topLang = Object.entries(languages).sort((a,b) => b[1] - a[1])[0]?.[0] || "Unknown";
-    
+    const topLang = Object.entries(languages).sort((a, b) => b[1] - a[1])[0]?.[0] || "Unknown";
+
     // Genetic traits (mocked logic based on real stats)
     const dna = {
       traits: [

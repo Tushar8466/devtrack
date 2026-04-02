@@ -12,7 +12,7 @@ const MOCK_PROFILE = (user: string) => {
     // Generate a deterministic hash for consistent mock results per username
     const hash = (s: string) => s.split('').reduce((a, b) => (((a << 5) - a) + b.charCodeAt(0)) | 0, 0);
     const h = Math.abs(hash(user));
-    
+
     const restData = {
         login: user,
         name: user.charAt(0).toUpperCase() + user.slice(1),
@@ -90,7 +90,7 @@ export default function AnalyzeUserPage() {
                     headers: { "Accept": "application/vnd.github.v3+json" },
                     cache: 'no-store'
                 });
-                
+
                 if (userRes.status === 403) {
                     console.warn("GitHub API rate limit exceeded. Activating Neural Simulation.");
                     setProfileData(MOCK_PROFILE(username));
@@ -108,11 +108,11 @@ export default function AnalyzeUserPage() {
                 // Fetch Repositories
                 const reposRes = await fetch(`https://api.github.com/users/${username}/repos?sort=updated&per_page=100`, { cache: 'no-store' });
                 if (reposRes.status === 403) {
-                     const mock = MOCK_PROFILE(username);
-                     setProfileData({ rest: restData, graphql: { ...mock.graphql, name: restData.name || username } });
-                     setIsSimulated(true);
-                     setLoading(false);
-                     return;
+                    const mock = MOCK_PROFILE(username);
+                    setProfileData({ rest: restData, graphql: { ...mock.graphql, name: restData.name || username } });
+                    setIsSimulated(true);
+                    setLoading(false);
+                    return;
                 }
                 const reposData = reposRes.ok ? await reposRes.json() : [];
 
@@ -180,7 +180,7 @@ export default function AnalyzeUserPage() {
         return (
             <div className="min-h-screen bg-black flex items-center justify-center p-8 relative overflow-hidden">
                 <div className="fixed inset-0 bg-[radial-gradient(circle_at_50%_40%,rgba(139,92,246,0.05),transparent)] pointer-events-none" />
-                <motion.div 
+                <motion.div
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
                     className="text-center max-w-xl z-10"
@@ -191,11 +191,11 @@ export default function AnalyzeUserPage() {
                             <AlertCircle className="text-red-500 w-10 h-10 group-hover:scale-110 transition-transform" />
                         </div>
                     </div>
-                    
+
                     <h2 className="text-5xl font-black text-white mb-4 uppercase italic tracking-tighter">
                         Analysis <span className="text-red-500">Failed</span>
                     </h2>
-                    
+
                     <div className="bg-red-500/5 border border-red-500/10 rounded-3xl p-8 mb-10 backdrop-blur-xl">
                         <p className="text-neutral-400 font-mono text-xs uppercase tracking-[0.2em] leading-relaxed mb-6">
                             SYSTEM_ALERT // UPLINK_LOST: {error}
@@ -205,7 +205,7 @@ export default function AnalyzeUserPage() {
                             <span>Neural stability at 0.0%</span>
                         </div>
                     </div>
-                    
+
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                         <button
                             onClick={handleBack}
@@ -236,7 +236,7 @@ export default function AnalyzeUserPage() {
             <div className="relative min-h-screen bg-black">
                 <AnimatePresence>
                     {isSimulated && (
-                        <motion.div 
+                        <motion.div
                             initial={{ y: -60, opacity: 0 }}
                             animate={{ y: 0, opacity: 1 }}
                             className="fixed top-0 left-0 w-full z-50 bg-violet-600/90 text-white backdrop-blur-md border-b border-white/10"
@@ -248,7 +248,7 @@ export default function AnalyzeUserPage() {
                                         Tactical_Simulation_Active // Uplink Failure Met // G_API_LIMIT_TRIPPED
                                     </span>
                                 </div>
-                                <button 
+                                <button
                                     onClick={() => window.location.reload()}
                                     className="text-[9px] font-black uppercase border-b border-white/50 hover:border-white transition-all flex items-center gap-2"
                                 >
