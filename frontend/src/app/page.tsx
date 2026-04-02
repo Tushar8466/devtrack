@@ -375,7 +375,7 @@ export default function Home() {
           </div>
           <div className="flex flex-wrap justify-center gap-x-8 gap-y-4 sm:gap-x-12">
             {["Pulse", "DNA", "Nodes", "Privacy", "Terms"].map((item) => (
-              <a key={item} href="#" className="text-[10px] sm:text-[11px] font-black uppercase tracking-[0.2em] text-neutral-500 hover:text-white transition-all hover:scale-110 active:scale-95">{item}</a>
+              <Link key={item} href={`/${item.toLowerCase()}`} className="text-[10px] sm:text-[11px] font-black uppercase tracking-[0.2em] text-neutral-500 hover:text-white transition-all hover:scale-110 active:scale-95">{item}</Link>
             ))}
           </div>
         </div>

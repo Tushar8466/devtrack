@@ -248,9 +248,7 @@ export default function ContributePage() {
             <footer className="border-t border-white/5 py-12 px-6 bg-black mt-40">
                 <div className="max-w-7xl mx-auto flex flex-col items-center gap-8">
                     <div className="flex gap-8 items-center opacity-40 hover:opacity-100 transition-opacity duration-700">
-                        <Github size={20} />
-                        <Globe size={20} />
-                        <Terminal size={20} />
+                        <a href="https://github.com/Tushar8466/devtrack" target="_blank" rel="noreferrer" className="hover:text-white hover:scale-110 transition-all cursor-pointer"><Github size={20} /></a>
                     </div>
                     <p className="text-neutral-600 text-[10px] font-mono uppercase tracking-[0.5em] text-center">
             // Neural authorship established // Human primary contributor //
