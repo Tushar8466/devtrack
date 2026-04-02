@@ -1,221 +1,163 @@
 <div align="center">
-  <img src="/hero.png" alt="DevTrack Banner" width="100%">
+  <img src="hero.png" alt="DevTrack — Neural Intelligence Core" width="100%">
 
+  # 🧬 DevTrack — Neural Intelligence Core
+  
+  **The ultimate AI-powered developer authorship detection & code integrity platform.**
 
-# 🧬 DevTrack — Neural Intelligence Core
-
-<div align="center">
-
-![DevTrack Logo](https://devtrack-seven.vercel.app/_next/image?url=%2Flogo%2Fdevtrack-logo.png&w=64&q=75)
-
-**AI-powered developer authorship detection & code integrity platform**
-
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-devtrack--seven.vercel.app-blue?style=for-the-badge)](https://devtrack-seven.vercel.app/)
-[![GitHub Repo](https://img.shields.io/badge/GitHub-Source%20Code-black?style=for-the-badge&logo=github)](https://github.com/Tushar8466/devtrack)
-[![VS Code Extension](https://img.shields.io/badge/VS%20Code-Extension-007ACC?style=for-the-badge&logo=visualstudiocode)](https://github.com/Tushar8466/devtrack/tree/main/frontend/devtrack-vscode)
-[![Open Source](https://img.shields.io/badge/Open%20Source-Yes-brightgreen?style=for-the-badge)]()
-[![Author](https://img.shields.io/badge/Author-Tushar%20Singla-orange?style=for-the-badge)](https://github.com/Tushar8466)
+  [![Live Demo](https://img.shields.io/badge/Live%20Demo-devtrack--seven.vercel.app-7c3aed?style=for-the-badge&logo=vercel)](https://devtrack-seven.vercel.app/)
+  [![GitHub Repo](https://img.shields.io/badge/GitHub-Source%20Code-white?style=for-the-badge&logo=github)](https://github.com/Tushar8466/devtrack)
+  [![VS Code Extension](https://img.shields.io/badge/VS%20Code-Extension-007ACC?style=for-the-badge&logo=visualstudiocode)](https://github.com/Tushar8466/devtrack/tree/main/frontend/devtrack-vscode)
+  [![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](https://github.com/Tushar8466/devtrack/blob/main/LICENSE)
 
 </div>
 
 ---
 
-## 🚀 Overview
+## 🛰️ Vision & Mission
 
-**DevTrack** is an open-source, AI-powered platform that analyzes GitHub repositories to detect AI-generated code and verify developer authorship. In an era where synthetic code is increasingly prevalent, DevTrack equips teams with the intelligence to ensure code integrity, authenticate engineering talent, and maintain trust in their codebases.
+In an era where synthetic code is becoming the norm, **DevTrack** establishes a new standard for engineering trust. It maps the unique "Authorship DNA" of developers across global repository clusters, providing a high-dimensional visualization of code provenance and integrity.
 
-> *"Our mission is to help human ingenuity thrive in the age of synthetic code authorship."*
-
----
-
-## ✨ Features
-
-| Feature | Description |
-|---|---|
-| 🔍 **AI Detection Pulse** | Real-time analysis to identify synthetic code patterns with ultra-high accuracy |
-| 🧠 **Neural Authorship** | Map unique developer signatures using deep learning across billions of tokens |
-| 📈 **Evolutionary Metrics** | Track the growth and impact of high-dimensional codebases over time |
-| ✅ **Identity Verification** | Authenticate the true source of engineering talent across global repositories |
-| 🔗 **Node Integration** | Seamlessly connect and analyze any GitHub node or private repository |
-| 🔒 **Secure Processing** | Privacy-first architecture — code remains ephemeral and is never stored |
-| 🧩 **VS Code Extension** | Analyze repos and scan authorship without leaving your editor |
+> [!IMPORTANT]
+> **Privacy-First Intelligence**: DevTrack never stores your code. All neural scans are ephemeral and processed in isolated memory buffers.
 
 ---
 
-## 🧠 How It Works
+## 🚀 Feature Registry
 
+| Sector | Capability | Technical Intelligence |
+| :--- | :--- | :--- |
+| **🔍 Forensic Scanning** | **AI Detection Pulse** | Heuristic analysis to identify synthetic code with ultra-high accuracy. |
+| **🧬 Authorship DNA** | **Neural Mapping** | Unique developer signature extraction using deep vector analysis across repositories. |
+| **🛡️ PR Sentinel** | **Code Guard** | Automated GitHub Action to audit AI-risk in pull requests before they are merged. |
+| **📊 Real-time Metrics** | **Linguistic Matrix** | High-fidelity visualization of language distribution and repository-level DNA. |
+| **🌍 Global Pulse** | **OS Tracker** | Live feed of development nodes synchronized across 40+ repository clusters. |
+| **📈 Integrity Rankings** | **Leaderboard Hub** | Public validation of human-verified engineering talent on the DevTrack network. |
+| **🖼️ Badge Genesis** | **Authorship Artifacts** | Generate cryptographic badges and exportable DNA cards for developer profiles. |
+| **🧩 Extension Node** | **VS Code Integration** | Real-time workspace scanning and DNA exploration directly within the editor. |
+
+---
+
+## 🏗️ Community Evolution (How to Contribute)
+
+DevTrack is a decentralized, open-source project. We invite developers to help expand the neural core and improve global software integrity.
+
+### 🧬 Contribution Lifecycle
+1. **Node Synchronization**: [Fork the repository](https://github.com/Tushar8466/devtrack/fork) clusters to your local workspace.
+2. **Feature Branching**: Initialize a new tactical branch: `git checkout -b feature/tactical-improvement`.
+3. **Neural Commit**: Implement your human-verified changes with clear, atomic commit messages.
+4. **Validation Scan**: Ensure all nodes are operational by running `npm run lint` and `npm run build`.
+5. **PR Uplink**: [Submit a Pull Request](https://github.com/Tushar8466/devtrack/compare) with a detailed report of the changes.
+
+### 🎯 High-Priority Nodes
+- **Neural Engine**: Improving AI-detection heuristics and authorship scoring.
+- **UI/UX Node**: Enhancing the high-dimensional dashboard with better visual fidelity.
+- **Extension Node**: Adding more interactive features to the VS Code integration.
+- **Documentation**: Correcting technical typos and expanding the "Mission Archive".
+- **Sentinel API**: Optimizing the GitHub Action for faster real-time auditing.
+
+---
+
+---
+
+## 🛠️ Integrated Systems
+
+### 🧩 VS Code Extension
+Bring the power of the Neural Core directly into your engineering workflow.
+- **Analyze Workspace**: Run full-repo scans with one click.
+- **DNA Explorer**: View authorship metrics for any file in real-time.
+- **Status Indicator**: Adaptive "DevTrack: Active" pulse in your status bar.
+
+### 📂 Dynamic Dashboard
+- **Linguistic DNA**: Visualize your language distribution and expertise.
+- **Temporal Map**: High-dimensional contribution calendar with pulse analysis.
+- **Achievement Node**: Earn cryptographic badges for human-verified engineering milestones.
+
+---
+
+## 🏗️ System Architecture
+
+```mermaid
+graph TD
+    A[GitHub Node] -->|OAuth| B(Neural Sync Layer)
+    B -->|Ephemeral Trace| C{Intelligence Core}
+    C -->|Forensics| D[Authorship DNA]
+    C -->|Heuristics| E[AI Score Pulse]
+    C -->|Entropy| F[Integrity Metrics]
+    D & E & F --> G((DevTrack Dashboard))
+    G -->|Node Sync| H[Badge Registry]
 ```
-1. Initialize Sync   →   Connect your GitHub account or search any public repo
-2. Neural Scan       →   The engine deconstructs authorship patterns in seconds
-3. Extract DNA       →   Receive a comprehensive report on code provenance
-```
 
 ---
 
-## 🧩 VS Code Extension
+## 🚀 Deployment & Installation
 
-DevTrack now has a **VS Code Extension** that brings the full power of the Neural Intelligence Core directly into your editor.
-
-<div align="center">
-
-![DevTrack Extension](https://devtrack-seven.vercel.app/_next/image?url=%2Flogo%2Fdevtrack-logo.png&w=64&q=75)
-
-</div>
-
-### Features
-
-| Command | Description |
-|---|---|
-| 🧬 **DevTrack: Analyze Workspace** | Runs a neural authorship scan on your current workspace with real-time progress |
-| 🔍 **DevTrack: Open Explorer** | Jump to the DevTrack explorer dashboard for any GitHub repository |
-
-### Install the Extension
-
-**Option 1 — Install from VSIX (Local)**
-
+### Web Node Setup
 ```bash
-# Clone the repo
+# Clone the neural network
 git clone https://github.com/Tushar8466/devtrack.git
 
-# Navigate to the extension folder
-cd devtrack/frontend/devtrack-vscode
-
-# Install dependencies
-npm install
-
-# Package the extension
-npx @vscode/vsce package
-
-# Install the .vsix in VS Code:
-# Extensions → ... → Install from VSIX → select devtrack-vscode-0.1.0.vsix
-```
-
-**Option 2 — From VS Code directly**
-
-1. Open VS Code
-2. Go to **Extensions** (`Cmd+Shift+X`)
-3. Click the **`...`** menu → **Install from VSIX...**
-4. Select `devtrack-vscode-0.1.0.vsix`
-
-### How to Use
-
-1. Press `Cmd+Shift+P` to open the Command Palette
-2. Type `DevTrack` to see available commands
-3. Select **`DevTrack: Analyze Workspace`** or **`DevTrack: Open Explorer`**
-
-The **`⚡ DevTrack: Active`** indicator will always be visible in your VS Code status bar.
-
----
-
-## 🏗️ Tech Stack
-
-- **Framework**: Next.js (React)
-- **Deployment**: Vercel
-- **Extension**: VS Code Extension API (TypeScript)
-- **AI/ML**: Neural vector analysis for code authorship detection
-- **Architecture**: Privacy-centric, ephemeral code scanning
-
----
-
-## 📦 Getting Started
-
-### Prerequisites
-
-- Node.js 18+
-- npm or yarn
-- A GitHub account (for repository analysis)
-
-### Installation
-
-```bash
-# Clone the repository
-git clone https://github.com/Tushar8466/devtrack.git
-
-# Navigate into the project
+# Enter the frontend sector
 cd devtrack/frontend
 
 # Install dependencies
 npm install
 
-# Start the development server
+# Initialize development hub
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+### extension Node Setup
+1. Open **VS Code**
+2. Command Palette (`Cmd+Shift+P`) → **Install from VSIX**
+3. Select `devtrack-vscode-0.1.0.vsix` from the `frontend/devtrack-vscode` directory.
 
 ---
 
-## 🗺️ Pages & Navigation
+## 🌍 Tech Stack Matrix
 
-| Route | Description |
-|---|---|
-| `/` | Home — Overview and feature highlights |
-| `/explore` | Explore public repositories |
-| `/projects` | Your tracked projects |
-| `/pulse` | AI Detection Pulse dashboard |
-| `/compare` | Compare repositories side by side |
-| `/ai` | DevTrack AI Intelligence Core |
-| `/dna` | Code DNA authorship analysis |
-| `/contribute` | How to contribute to the project |
-| `/terminal` | Live feed of intercepted GitHub pushes |
-| `/leaderboard` | Developer integrity leaderboard |
+<div align="left">
+  <img src="https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white" />
+  <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" />
+  <img src="https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white" />
+  <img src="https://img.shields.io/badge/Framer_Motion-0055FF?style=for-the-badge&logo=framer&logoColor=white" />
+  <img src="https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white" />
+  <img src="https://img.shields.io/badge/Lucide_Icons-FF0000?style=for-the-badge&logo=lucide&logoColor=white" />
+</div>
 
 ---
 
-## 🌍 Open Source
+## 🗺️ Node Registry (Sitemap)
 
-DevTrack is an open-source project aimed at creating a **transparent, verifiable ecosystem for software authorship**. Every line of code is open for review and contribution.
-
-### Contributing
-
-Contributions are welcome! To get started:
-
-1. Fork the repository
-2. Create a new branch: `git checkout -b feature/your-feature-name`
-3. Commit your changes: `git commit -m "Add your feature"`
-4. Push to the branch: `git push origin feature/your-feature-name`
-5. Open a Pull Request
-
-See the [Contribute page](https://devtrack-seven.vercel.app/contribute) for more details.
+| Route | Tactical Purpose |
+| :--- | :--- |
+| `/` | **Home Sector** — Mission overview and neural network highlights. |
+| `/pulse` | **AI Audit Hub** — Real-time detection and synthetic risk forensics. |
+| `/dna` | **Authorship Mapping** — Deep metadata exploration and DNA extraction. |
+| `/ai` | **Intelligence Core** — Direct query node for any GitHub repository. |
+| `/terminal` | **Satellite Feed** — Live interception of global commit pulses. |
+| `/profile` | **Identity Vault** — High-fidelity developer integrity portfolios. |
+| `/contribute` | **Mission Protocols** — Detailed guide for joining the open-source evolution. |
+| `/compare` | **Vector Analysis** — Dual-node comparison of engineering signatures. |
 
 ---
 
-## 🔐 Privacy
+## 🤝 Community & Evolution
 
-DevTrack is built with a **privacy-first** architecture:
+DevTrack is a decentralized, open-source initiative. We invite developers to help evolve the mission of human-first engineering.
 
-- Code is **never stored** on our servers
-- All analysis is **ephemeral** and happens within secured neural buffers
-- Zero-trust verification for every pull request scan
-
----
-
-## 📊 Scale
-
-- Synchronized across **40+ global repository clusters**
-- Real-time interception of development pulses
-- **99.4% accuracy** in distinguishing human vs. AI-generated code
+1. **Fork** the repository clusters.
+2. **Commit** human-verified features.
+3. **Synchronize** via Pull Requests.
 
 ---
-
-## 📄 License
-
-This project is open source. See the [LICENSE](https://github.com/Tushar8466/devtrack/blob/main/LICENSE) file for details.
-
----
-
-## 🙌 Acknowledgements
-
-Built and maintained by [Tushar Singla](https://github.com/Tushar8466) and the DevTrack open-source community.
-
----
-
-
 
 <div align="center">
-
-**Integrated Intelligence Systems © 2026**
-
-[Live App](https://devtrack-seven.vercel.app/) · [GitHub](https://github.com/Tushar8466/devtrack) · [Contribute](https://devtrack-seven.vercel.app/contribute)
-
+  <img src="frontend/public/logo/devtrack-logo.png" width="80" alt="Logo">
+  <p><b>Integrated Intelligence Systems © 2026</b></p>
+  <p>
+    <a href="https://devtrack-seven.vercel.app/">Live Network</a> • 
+    <a href="https://github.com/Tushar8466/devtrack">GitHub Cluster</a> • 
+    <a href="https://devtrack-seven.vercel.app/contribute">Join the Mission</a>
+  </p>
 </div>
