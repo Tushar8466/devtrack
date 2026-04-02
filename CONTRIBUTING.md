@@ -64,6 +64,9 @@ Before proposing an uplink (PR):
 
 ## 🛰️ Uplink Protocol (Submitting a PR)
 
+> [!IMPORTANT]
+> **OBLIGATORY ASSIGNMENT**: To avoid redundant effort and maintain a high-fidelity development cycle, **you must be formally assigned to an issue by a maintainer before opening a Pull Request.** PRs submitted without prior assignment will be closed automatically.
+
 1. **Synchronize**: Ensure your branch is rebased on the latest `main`.
 2. **Uplink**: Push your branch to GitHub.
 3. **Report**: Open a Pull Request with:

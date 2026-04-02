@@ -14,6 +14,7 @@ We are committed to providing a harassment-free experience for everyone, regardl
 
 Examples of behavior that contributes to creating a positive environment include:
 
+- **Formal Node Assignment**: To ensure a synchronized development flow, **please do not open a Pull Request without being formally assigned to an issue first.** Unauthorized PRs may be rejected to maintain neural order.
 - **Neural Positivity**: Using welcoming and inclusive language.
 - **Collaborative Flow**: Being respectful of differing viewpoints and experiences.
 - **Node Integrity**: Gracefully accepting constructive criticism.
