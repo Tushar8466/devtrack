@@ -42,19 +42,19 @@ In an era where synthetic code is becoming the norm, **DevTrack** establishes a 
 
 DevTrack is a decentralized, open-source project. We invite developers to help expand the neural core and improve global software integrity.
 
-### 🧬 Contribution Lifecycle
-1. **Node Synchronization**: [Fork the repository](https://github.com/Tushar8466/devtrack/fork) clusters to your local workspace.
-2. **Feature Branching**: Initialize a new tactical branch: `git checkout -b feature/tactical-improvement`.
-3. **Neural Commit**: Implement your human-verified changes with clear, atomic commit messages.
-4. **Validation Scan**: Ensure all nodes are operational by running `npm run lint` and `npm run build`.
-5. **PR Uplink**: [Submit a Pull Request](https://github.com/Tushar8466/devtrack/compare) with a detailed report of the changes.
+- **[CONTRIBUTING.md](CONTRIBUTING.md)**: Detailed technical protocols for synchronizing code.
+- **[CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)**: Our high-fidelity standards for human-centric engineering.
+
+### 🧬 Quick Lifecycle
+1. **Sync**: [Fork the repository](https://github.com/Tushar8466/devtrack/fork) clusters.
+2. **Branch**: Create a tactical branch: `git checkout -b feature/your-feature`.
+3. **Commit**: Neural-standard, atomic commits.
+4. **Uplink**: Submit a [Pull Request](https://github.com/Tushar8466/devtrack/compare).
 
 ### 🎯 High-Priority Nodes
-- **Neural Engine**: Improving AI-detection heuristics and authorship scoring.
-- **UI/UX Node**: Enhancing the high-dimensional dashboard with better visual fidelity.
-- **Extension Node**: Adding more interactive features to the VS Code integration.
-- **Documentation**: Correcting technical typos and expanding the "Mission Archive".
-- **Sentinel API**: Optimizing the GitHub Action for faster real-time auditing.
+- **Neural Engine**: Improving AI-detection heuristics.
+- **UI/UX Node**: Enhancing high-dimensional dashboard visuals.
+- **Extension Node**: Interactive features for the VS Code integration.
 
 ---
 
