@@ -54,6 +54,7 @@ const DiagnosticBar = ({ value, label, color }: { value: number, label: string, 
 );
 
 export default function AIPage() {
+  const [messages, setMessages] = useState<{ role: string, content: string }[]>([]);
   const [logs, setLogs] = useState<string[]>([]);
   const [isScanning, setIsScanning] = useState(false);
   const [pulseData, setPulseData] = useState<number[]>(Array(12).fill(20));
@@ -78,80 +79,70 @@ export default function AIPage() {
     };
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const trimmedInput = input.trim();
-    if (!trimmedInput || isScanning) return;
+    if (!trimmedInput || isScanning || isTyping) return;
 
     const lowerInput = trimmedInput.toLowerCase();
     
-    // INTENT ANALYSIS
-    const questionKeywords = ["what", "how", "who", "why", "tell", "explain", "info", "help", "guide"];
-    const isQuestion = questionKeywords.some(k => lowerInput.includes(k));
-    const isExplicitScan = lowerInput.startsWith("analyze") || lowerInput.startsWith("scan") || lowerInput.startsWith("search");
+    // INTENT ANALYSIS: Check for "analyze" command first
+    const isExplicitScan = lowerInput.startsWith("analyze ") || lowerInput.startsWith("scan ") || lowerInput.startsWith("search ");
     const isRepoLink = lowerInput.includes("github.com/");
     
-    // REDIRECTION PROTOCOL
-    if ((isExplicitScan || isRepoLink || !isQuestion) && trimmedInput.length > 2) {
+    if ((isExplicitScan || isRepoLink) && trimmedInput.length > 5) {
         let extractedId = trimmedInput;
         const words = trimmedInput.split(/\s+/);
-
         if (words.length > 1) {
-          const fromIndex = words.findIndex((w: string) => w.toLowerCase() === 'from');
-          const analyzeIndex = words.findIndex((w: string) => w.toLowerCase() === 'analyze');
-          const atIndex = words.findIndex((w: string) => w.startsWith('@'));
-
-          if (fromIndex !== -1 && words[fromIndex + 1]) extractedId = words[fromIndex + 1];
-          else if (analyzeIndex !== -1 && words[analyzeIndex + 1]) extractedId = words[analyzeIndex + 1];
-          else if (atIndex !== -1) extractedId = words[atIndex].substring(1);
-          else extractedId = words[words.length - 1];
+            extractedId = words[1].replace(/[?.!,]$/, "");
         }
-
-        extractedId = extractedId.replace(/[?.!,]$/, "");
+        
         if (extractedId.includes("github.com/")) {
-          const parts = extractedId.split("/");
-          extractedId = parts[parts.length - 1];
-        }
-
-        // Check if extractedId is a reserved keyword (not a user)
-        const reserved = ["repo", "repository", "commits", "dna", "devtrack"];
-        if (reserved.includes(extractedId.toLowerCase())) {
-            // Fallback to question mode if it's a keyword
-            handleQuestion(lowerInput);
-            return;
+            const parts = extractedId.split("/");
+            extractedId = parts[parts.length - 1];
         }
 
         setTargetId(extractedId);
         setIsScanning(true);
         setAiResponse(`INITIATING_TOPOLOGICAL_RECONNAISSANCE: ${extractedId}`);
-
         setTimeout(() => {
           window.location.href = `/analyze/${extractedId}`;
         }, 2200);
-    } else {
-        handleQuestion(lowerInput);
+        return;
     }
-  };
 
-  const handleQuestion = (lowerInput: string) => {
+    // CHAT PROTOCOL
     setIsTyping(true);
     setAiResponse(null);
     setInput("");
 
-    setTimeout(() => {
-        let response = DEV_TRACK_ANSWERS["default"];
-        let bestMatch = "";
-        for (const key in DEV_TRACK_ANSWERS) {
-            if (lowerInput.includes(key) && key !== "default") {
-                if (key.length > bestMatch.length) {
-                    bestMatch = key;
-                }
-            }
+    const newMessages = [...messages, { role: "user", content: trimmedInput }];
+    setMessages(newMessages);
+
+    try {
+        const response = await fetch("/api/ai", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ messages: newMessages }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            setAiResponse(data.message || "An error occurred during neural intercept.");
+            return;
         }
-        if (bestMatch) response = DEV_TRACK_ANSWERS[bestMatch];
-        setAiResponse(response);
+
+        const botReply = data.choices[0].message.content;
+        setMessages(prev => [...prev, { role: "assistant", content: botReply }]);
+        setAiResponse(botReply);
+
+    } catch (err) {
+        console.error("Neural gateway error:", err);
+        setAiResponse("SYNC_ERROR: The AI core is unreachable. Check your nexus core configuration.");
+    } finally {
         setIsTyping(false);
-    }, 1000);
+    }
   };
 
   return (
