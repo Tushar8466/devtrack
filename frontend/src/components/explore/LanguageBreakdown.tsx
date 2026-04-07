@@ -4,6 +4,8 @@ interface LanguageBreakdownProps {
     data: any;
 }
 
+import { getLanguageColor } from "@/lib/language-colors";
+
 export default function LanguageBreakdown({ data }: LanguageBreakdownProps) {
     const { graphql } = data;
     const repos = graphql?.repositories?.nodes || [];
@@ -15,7 +17,8 @@ export default function LanguageBreakdown({ data }: LanguageBreakdownProps) {
 
     repos.forEach((repo: any) => {
         const langName = repo.primaryLanguage?.name;
-        const langColor = repo.primaryLanguage?.color || "#cccccc";
+        // Robust color: use the color from API if available, else use our utility, else default gray
+        const langColor = repo.primaryLanguage?.color || getLanguageColor(langName || null);
 
         if (langName) {
             if (!langStats[langName]) {

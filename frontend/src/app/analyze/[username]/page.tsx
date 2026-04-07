@@ -7,6 +7,8 @@ import { MultiStepLoader } from "@/components/ui/multi-step-loader";
 import { Info, AlertCircle, RefreshCw, Activity, Terminal } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 
+import { getLanguageColor } from "@/lib/language-colors";
+
 // MOCK DATA for Fallback (Neural Simulation Mode)
 const MOCK_PROFILE = (user: string) => {
     // Generate a deterministic hash for consistent mock results per username
@@ -30,12 +32,13 @@ const MOCK_PROFILE = (user: string) => {
     const baseRepoNames = ["neural-scan", "distributed-consensus", "vortex-ui", "nexus-kernel", "author-pulse", "sentinel-api", "grid-logic", "alpha-protocol"];
     const mappedNodes = baseRepoNames.map((base, i) => {
         const name = `${base}-${h % 100}`;
+        const lang = ["TypeScript", "Rust", "Go", "C++", "Python", "Swift"][i % 6];
         return {
             name,
             description: `High-fidelity ${name} module for ${user}'s neural workspace. Architectural optimization enabled.`,
             stargazerCount: (h % 500) + (800 - i * 150),
             forkCount: (h % 100) + (120 - i * 20),
-            primaryLanguage: { name: ["TypeScript", "Rust", "Go", "C++", "Python", "Swift"][i % 6], color: "#8b5cf6" },
+            primaryLanguage: { name: lang, color: getLanguageColor(lang) },
             updatedAt: new Date().toISOString(),
             url: `https://github.com/${user}/${name}`,
         };
@@ -121,7 +124,7 @@ export default function AnalyzeUserPage() {
                     description: repo.description,
                     stargazerCount: repo.stargazers_count,
                     forkCount: repo.forks_count,
-                    primaryLanguage: repo.language ? { name: repo.language, color: "#8a2be2" } : null,
+                    primaryLanguage: repo.language ? { name: repo.language, color: getLanguageColor(repo.language) } : null,
                     updatedAt: repo.updated_at,
                     url: repo.html_url,
                 }));
@@ -157,6 +160,7 @@ export default function AnalyzeUserPage() {
 
         fetchData();
     }, [username]);
+
 
     if (loading) {
         return (

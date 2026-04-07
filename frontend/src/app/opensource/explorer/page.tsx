@@ -59,6 +59,8 @@ const generatePulseData = () => {
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 
+import { getLanguageColor } from "@/lib/language-colors";
+
 function OSExplorerContent() {
    const searchParams = useSearchParams();
    const initialQuery = searchParams.get("q") || "";
@@ -92,6 +94,7 @@ function OSExplorerContent() {
       const hash = (s: string) => s.split('').reduce((a, b) => (((a << 5) - a) + b.charCodeAt(0)) | 0, 0);
       const h = Math.abs(hash(path));
       
+      const lang = ["TypeScript", "Rust", "Go", "C++", "Python"][h % 5];
       return {
          id: h,
          name: name || "unknown",
@@ -103,7 +106,7 @@ function OSExplorerContent() {
          subscribers_count: (h % 2000) + 400,
          open_issues_count: h % 400,
          size: (h % 800000) + 100000,
-         language: ["TypeScript", "Rust", "Go", "C++", "Python"][h % 5],
+         language: lang,
          license: { spdx_id: "MIT" },
          html_url: `https://github.com/${path}`,
       };
@@ -667,12 +670,12 @@ function OSExplorerContent() {
                               {Object.entries(repoLanguages).map(([lang, bytes]: [string, any], i) => {
                                  const total = Object.values(repoLanguages).reduce((a: any, b: any) => a + b, 0) as number;
                                  const percentage = (bytes / total) * 100;
-                                 const color = i % 3 === 0 ? "bg-cyan-500" : i % 3 === 1 ? "bg-violet-500" : "bg-emerald-500";
+                                 const langColor = getLanguageColor(lang);
 
                                  return (
                                     <div key={lang} className="flex-1 min-w-[140px] p-6 bg-white/2 border border-white/5 rounded-3xl hover:bg-white/5 transition-all group/lang">
                                        <div className="flex items-center justify-between mb-4">
-                                          <div className={cn("w-2 h-2 rounded-full", color)} />
+                                          <div className="w-2 h-2 rounded-full" style={{ backgroundColor: langColor }} />
                                           <span className="text-[8px] font-mono text-neutral-600">DNA_{i.toString().padStart(2, '0')}</span>
                                        </div>
                                        <h4 className="text-sm font-black text-white uppercase tracking-tight">{lang}</h4>
@@ -684,7 +687,8 @@ function OSExplorerContent() {
                                           <motion.div
                                              initial={{ width: 0 }}
                                              animate={{ width: `${percentage}%` }}
-                                             className={cn("h-full", color)}
+                                             style={{ backgroundColor: langColor }}
+                                             className="h-full"
                                              transition={{ duration: 1, delay: i * 0.1 }}
                                           />
                                        </div>

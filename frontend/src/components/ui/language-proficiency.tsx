@@ -12,25 +12,7 @@ interface LanguageProficiencyProps {
   repos: Repo[];
 }
 
-const LANG_COLORS: Record<string, string> = {
-  JavaScript: "#f7df1e",
-  TypeScript: "#3178c6",
-  Python: "#3572a5",
-  Go: "#00add8",
-  Rust: "#dea584",
-  Java: "#b07219",
-  "C++": "#f34b7d",
-  "C#": "#178600",
-  Ruby: "#701516",
-  PHP: "#4f5d95",
-  Swift: "#f05138",
-  Kotlin: "#a97bff",
-  HTML: "#e34c26",
-  CSS: "#563d7c",
-  Shell: "#89e051",
-  Dart: "#00b4ab",
-  Vue: "#41b883",
-};
+import { getLanguageColor } from "@/lib/language-colors";
 
 export function LanguageProficiency({ repos }: LanguageProficiencyProps) {
   const languages: Record<string, number> = {};
@@ -61,7 +43,7 @@ export function LanguageProficiency({ repos }: LanguageProficiencyProps) {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {sortedLangs.map((lang, i) => {
           const pct = Math.round((lang.count / totalReposWithLang) * 100);
-          const color = LANG_COLORS[lang.name] || "#6b7280";
+          const color = getLanguageColor(lang.name);
 
           return (
             <motion.div
