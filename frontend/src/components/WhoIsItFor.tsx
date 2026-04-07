@@ -25,7 +25,7 @@ export function WhoIsItFor() {
             <CanvasRevealEffect
               animationSpeed={3}
               containerClassName="bg-black"
-              colors={[[124, 58, 237]]} // Violet
+              colors={[[0, 255, 204]]} // Cyber Teal/Emerald
               dotSize={2}
             />
           </Card>
@@ -51,7 +51,7 @@ export function WhoIsItFor() {
             <CanvasRevealEffect
               animationSpeed={3}
               containerClassName="bg-black"
-              colors={[[124, 58, 237]]}
+              colors={[[14, 165, 233]]} // Sky Blue
               dotSize={2}
             />
           </Card>
