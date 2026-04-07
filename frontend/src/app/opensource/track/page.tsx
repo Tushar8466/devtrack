@@ -10,6 +10,7 @@ import { Layers, Sparkles, Zap } from "lucide-react";
 import { Button } from "@/components/ui/stateful-button";
 import { MultiStepLoader } from "@/components/ui/multi-step-loader";
 import Wavy from "@/components/wavy-background";
+import { CornerBorders } from "@/components/ui/corner-borders";
 
 const LOADING_STATES = [
     { text: "Initializing analysis engine" },
@@ -62,9 +63,9 @@ export default function TrackerSearchPage() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.6 }}
-                        className="bg-black/40 backdrop-blur-2xl border border-white/10 p-12 rounded-3xl mb-16 relative overflow-hidden shadow-2xl"
+                        className="bg-black/40 backdrop-blur-2xl border border-white/10 p-12 mb-16 relative shadow-2xl group"
                     >
-
+                        <CornerBorders />
                         <div className="relative z-10 flex flex-col items-center py-20">
                             <h1 className="text-5xl md:text-7xl lg:text-8xl font-black text-center text-white tracking-tighter uppercase italic mb-6">
                                 CONTRIBUTION <br /> <span className="text-glow-violet">ANALYZER</span>

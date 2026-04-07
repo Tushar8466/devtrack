@@ -14,6 +14,7 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { Star, ChevronRight } from "lucide-react";
 import { SparklesCore } from "@/components/ui/sparkles";
+import { WhoIsItFor } from "@/components/WhoIsItFor";
 
 const Globe = dynamic(() => import("@/components/globe"), {
   ssr: false,
@@ -183,6 +184,7 @@ export default function Home() {
         </div>
       </section>
 
+      <WhoIsItFor />
 
       {/* Architecture Visual */}
       <section className="bg-black py-20 sm:py-32 px-6 relative overflow-hidden border-t border-white/5">

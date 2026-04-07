@@ -7,6 +7,7 @@ import { Shield, Cpu, ArrowLeft, Terminal, Send, Sparkles, Bot, User, Zap } from
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { CornerBorders } from "@/components/ui/corner-borders";
 
 const INTERCEPT_MESSAGES = [
   "DECRYPTING_NEURAL_DNA",
@@ -180,8 +181,9 @@ export default function AIPage() {
 
         {/* TOP RIGHT: SYSTEM STATUS */}
         <div className="absolute top-0 right-8 space-y-6 pointer-events-auto flex flex-col items-end">
-          <div className="bg-black/60 backdrop-blur-3xl border border-white/10 rounded-4xl p-8 space-y-6 min-w-[280px]">
-            <div className="flex items-center justify-between border-b border-white/5 pb-4">
+          <div className="bg-black/60 backdrop-blur-3xl border border-white/10 p-8 space-y-6 min-w-[280px] relative group">
+            <CornerBorders />
+            <div className="flex items-center justify-between border-b border-white/5 pb-4 relative z-10">
               <div className="flex items-center gap-3">
                 <Shield size={16} className="text-emerald-500" />
                 <span className="text-[10px] font-black text-white uppercase tracking-widest pt-0.5">Integrity_Grid</span>
@@ -210,8 +212,9 @@ export default function AIPage() {
                         initial={{ opacity: 0, y: 20, scale: 0.9 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.95, filter: "blur(10px)" }}
-                        className="bg-black/60 backdrop-blur-3xl border border-violet-500/20 p-6 rounded-3xl shadow-[0_0_50px_rgba(139,92,246,0.1)] relative overflow-hidden group"
+                        className="bg-black/60 backdrop-blur-3xl border border-violet-500/20 p-6 shadow-[0_0_50px_rgba(139,92,246,0.1)] relative group"
                     >
+                        <CornerBorders />
                         <div className="absolute top-0 left-0 w-1 h-full bg-linear-to-b from-violet-600 to-transparent" />
                         <div className="flex gap-4 items-start">
                            <div className="p-2 bg-violet-600/20 rounded-xl border border-violet-500/30">
@@ -244,8 +247,9 @@ export default function AIPage() {
         <div className="absolute bottom-12 left-1/2 -translate-x-1/2 w-full max-w-3xl px-8 pointer-events-auto">
           <form onSubmit={handleSubmit} className="relative group/form">
             <div className="absolute -inset-2 bg-linear-to-r from-violet-600/20 to-fuchsia-600/20 rounded-[40px] blur-xl opacity-0 group-focus-within/form:opacity-100 transition duration-1000"></div>
-            <div className="relative flex items-center bg-black/40 backdrop-blur-3xl border border-white/10 rounded-[32px] p-3 pl-6 hover:border-violet-500/30 transition-all duration-500 shadow-2xl">
-              <div className="flex items-center gap-4 shrink-0">
+            <div className="relative flex items-center bg-black/40 backdrop-blur-3xl border border-white/10 p-3 pl-6 hover:border-violet-500/30 transition-all duration-500 shadow-2xl">
+              <CornerBorders />
+              <div className="flex items-center gap-4 shrink-0 relative z-10">
                 <div className="relative w-8 h-8 group-hover:scale-110 transition-transform">
                    <img src="/logo/devtrack-logo.png" alt="Logo" className="w-full h-full object-contain" />
                    <motion.div animate={{ scale: [1, 1.5, 1], opacity: [0.5, 0, 0.5] }} transition={{ duration: 2, repeat: Infinity }} className="absolute inset-0 bg-violet-500 rounded-full blur-md -z-10" />
@@ -294,8 +298,9 @@ export default function AIPage() {
             <Terminal size={14} className="text-violet-500" />
             <h3 className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.3em]">Intelligence_Feed</h3>
           </div>
-          <div className="bg-black/40 backdrop-blur-xl border border-white/5 rounded-3xl p-6 h-48 flex flex-col">
-            <div className="flex-1 overflow-hidden space-y-2 font-mono text-[8px] leading-relaxed">
+          <div className="bg-black/40 backdrop-blur-xl border border-white/5 p-6 h-48 flex flex-col relative group">
+            <CornerBorders />
+            <div className="flex-1 overflow-hidden space-y-2 font-mono text-[8px] leading-relaxed relative z-10">
               <AnimatePresence mode="popLayout">
                 {logs.map((log, i) => (
                   <motion.div

@@ -60,6 +60,7 @@ import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 
 import { getLanguageColor } from "@/lib/language-colors";
+import { CornerBorders } from "@/components/ui/corner-borders";
 
 function OSExplorerContent() {
    const searchParams = useSearchParams();
@@ -328,7 +329,8 @@ function OSExplorerContent() {
                         const diff = stat.v1 - stat.v2;
                         const perc = ((Math.abs(diff) / Math.max(stat.v1, stat.v2)) * 100).toFixed(1);
                         return (
-                           <div key={i} className="bg-white/5 border border-white/10 rounded-4xl p-8 backdrop-blur-3xl relative overflow-hidden group">
+                           <div key={i} className="bg-white/5 border border-white/10 p-8 backdrop-blur-3xl relative group">
+                              <CornerBorders />
                               <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity">{stat.icon}</div>
                               <p className="text-[10px] font-black text-neutral-500 uppercase tracking-widest mb-6">{stat.label}</p>
                               <div className="flex items-end justify-between gap-4">
@@ -352,8 +354,9 @@ function OSExplorerContent() {
                      })}
                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                         {/* Asset Identity Comparison */}
-                        <div className="bg-black border border-white/10 rounded-4xl p-10 flex flex-col md:flex-row gap-12 items-center">
-                           <div className="flex-1 text-center md:text-left space-y-4">
+                        <div className="bg-black border border-white/10 p-10 flex flex-col md:flex-row gap-12 items-center relative">
+                           <CornerBorders />
+                           <div className="flex-1 text-center md:text-left space-y-4 relative z-10">
                               <div className="w-16 h-16 rounded-3xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 mx-auto md:mx-0">
                                  <Globe size={32} />
                               </div>
@@ -375,7 +378,8 @@ function OSExplorerContent() {
                         </div>
 
                         {/* Comparative Radar Matrix */}
-                        <div className="bg-white/2 border border-white/5 rounded-4xl p-10 backdrop-blur-3xl relative overflow-hidden group">
+                        <div className="bg-white/2 border border-white/5 p-10 backdrop-blur-3xl relative group">
+                           <CornerBorders />
                            <div className="flex items-center justify-between mb-8">
                               <div className="space-y-1">
                                  <h4 className="text-sm font-black text-white uppercase tracking-[0.3em]">Spectral Comparison Matrix</h4>
@@ -469,7 +473,8 @@ function OSExplorerContent() {
                         { icon: <Users />, label: "Neural Nodes", value: repoData.subscribers_count || 0, color: "text-emerald-400" },
                         { icon: <ShieldCheck />, label: "Health Score", value: `${healthScore.toFixed(1)}%`, color: "text-cyan-400" },
                      ].map((stat, i) => (
-                        <div key={i} className="bg-black border border-white/5 rounded-4xl p-8 backdrop-blur-3xl group hover:border-cyan-500/20 transition-all">
+                        <div key={i} className="bg-black border border-white/5 p-8 backdrop-blur-3xl group hover:border-cyan-500/20 transition-all relative">
+                           <CornerBorders />
                            <div className="flex items-center justify-between mb-8">
                               <div className={cn("w-12 h-12 rounded-2xl bg-white/5 border border-white/5 flex items-center justify-center", stat.color)}>
                                  {stat.icon}
@@ -488,7 +493,8 @@ function OSExplorerContent() {
 
                   {/* LEFT COLUMN: IDENTIFIER & DETAILS */}
                   <div className="space-y-8">
-                     <div className="bg-black border border-white/5 rounded-4xl p-10 backdrop-blur-3xl space-y-8 relative overflow-hidden group">
+                     <div className="bg-black border border-white/5 p-10 backdrop-blur-3xl space-y-8 relative group">
+                        <CornerBorders />
                         <div className="absolute top-0 right-0 p-10 opacity-5 group-hover:opacity-10 transition-opacity">
                            <Box size={140} />
                         </div>
@@ -535,8 +541,9 @@ function OSExplorerContent() {
                      </div>
 
                      {/* TACTICAL STATUS FEED */}
-                     <div className="bg-black border border-white/5 rounded-4xl p-8 space-y-6">
-                        <div className="flex items-center justify-between">
+                     <div className="bg-black border border-white/5 p-8 space-y-6 relative">
+                        <CornerBorders />
+                        <div className="flex items-center justify-between relative z-10">
                            <div className="flex items-center gap-2">
                               <Activity size={14} className="text-cyan-500 animate-pulse" />
                               <h4 className="text-[10px] font-black text-white uppercase tracking-[0.3em]">Status_Logs</h4>
@@ -559,7 +566,8 @@ function OSExplorerContent() {
                      </div>
 
                      {/* NEURAL HEALTH SCOUTER */}
-                     <div className="bg-[#050505] border border-white/5 rounded-4xl p-10 backdrop-blur-3xl relative overflow-hidden group">
+                     <div className="bg-[#050505] border border-white/5 p-10 backdrop-blur-3xl relative group">
+                        <CornerBorders />
                         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(6,182,212,0.15),transparent)] opacity-50" />
                         <div className="relative z-10 flex flex-col items-center text-center space-y-6">
                            <div className="relative w-40 h-40 flex items-center justify-center">
@@ -602,8 +610,9 @@ function OSExplorerContent() {
                   <div className="lg:col-span-2 space-y-8">
 
                      {/* ACTIVITY PULSE CHART */}
-                     <div className="bg-black border border-white/5 rounded-4xl p-10 backdrop-blur-3xl space-y-8">
-                        <div className="flex items-center justify-between">
+                     <div className="bg-black border border-white/5 p-10 backdrop-blur-3xl space-y-8 relative">
+                        <CornerBorders />
+                        <div className="flex items-center justify-between relative z-10">
                            <div className="space-y-1">
                               <h3 className="text-xl font-black text-white uppercase tracking-tighter italic">Tactical Activity Pulse</h3>
                               <p className="text-[9px] font-mono text-neutral-500 uppercase tracking-widest">Global_Frequency_Index</p>
@@ -657,7 +666,8 @@ function OSExplorerContent() {
 
                      {/* NEURAL DNA COMPONENT */}
                      {repoLanguages && (
-                        <div className="bg-black border border-white/5 rounded-4xl p-10 backdrop-blur-3xl overflow-hidden relative group">
+                        <div className="bg-black border border-white/5 p-10 backdrop-blur-3xl relative group">
+                           <CornerBorders />
                            <div className="flex items-center justify-between mb-10">
                               <div className="space-y-1">
                                  <h3 className="text-xl font-black text-white uppercase tracking-tighter italic">Neural Language DNA</h3>
@@ -703,7 +713,8 @@ function OSExplorerContent() {
 
                      {/* BIG FEATURE: NEURAL CONTRIBUTOR MATRIX */}
                      {repoContributors.length > 0 && (
-                        <div className="bg-[#050505] border border-white/5 rounded-4xl p-10 backdrop-blur-3xl space-y-8 relative overflow-hidden group">
+                        <div className="bg-[#050505] border border-white/5 p-10 backdrop-blur-3xl space-y-8 relative group">
+                           <CornerBorders />
                            <div className="flex items-center justify-between mb-8">
                               <div className="space-y-1">
                                  <h3 className="text-xl font-black text-white uppercase tracking-tighter italic">Architectural Elite</h3>
@@ -735,8 +746,9 @@ function OSExplorerContent() {
                      )}
 
                      {/* BIG FEATURE: ARCHITECTURAL IMPULSE MAP (HEATMAP) */}
-                     <div className="bg-[#050505] border border-white/5 rounded-4xl p-10 backdrop-blur-3xl space-y-8 relative overflow-hidden group">
-                        <div className="flex items-center justify-between mb-8">
+                     <div className="bg-[#050505] border border-white/5 p-10 backdrop-blur-3xl space-y-8 relative group">
+                        <CornerBorders />
+                        <div className="flex items-center justify-between mb-8 relative z-10">
                            <div className="space-y-1">
                               <h3 className="text-xl font-black text-white uppercase tracking-tighter italic">Architectural Impulse Map</h3>
                               <p className="text-[9px] font-mono text-neutral-500 uppercase tracking-widest">30_Day_Neural_Activity_Density</p>
@@ -781,7 +793,8 @@ function OSExplorerContent() {
                      </div>
 
                      {/* BIG FEATURE: GLOBAL GEO-TELEMETRY */}
-                     <div className="bg-[#050505] border border-white/10 rounded-4xl p-10 backdrop-blur-3xl overflow-hidden relative group h-[400px]">
+                     <div className="bg-[#050505] border border-white/10 p-10 backdrop-blur-3xl relative group h-[400px]">
+                        <CornerBorders />
                         <div className="absolute top-0 right-0 p-10 opacity-5 group-hover:scale-110 transition-transform duration-1000 group-hover:opacity-10">
                            <Globe size={300} />
                         </div>
