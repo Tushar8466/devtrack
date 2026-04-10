@@ -1,10 +1,6 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // @ts-ignore
-  turbopack: {
-    root: "/Users/tusharsingla22222gmail.com/Documents/devtrack/frontend",
-  },
   images: {
     remotePatterns: [
       {
